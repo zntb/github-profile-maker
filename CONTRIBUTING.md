@@ -72,12 +72,13 @@ GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
 
 ### Running the Project
 
-| Command         | Description              |
-| --------------- | ------------------------ |
-| `npm run dev`   | Start development server |
-| `npm run build` | Create production build  |
-| `npm run start` | Start production server  |
-| `npm run lint`  | Run ESLint               |
+| Command          | Description               |
+| ---------------- | ------------------------- |
+| `npm run dev`    | Start development server  |
+| `npm run build`  | Create production build   |
+| `npm run start`  | Start production server   |
+| `npm run lint`   | Run ESLint                |
+| `npm run format` | Format code with Prettier |
 
 ---
 
@@ -359,6 +360,31 @@ Follow this order in component files:
 3. Component function
 4. Return JSX
 5. Export
+
+### Code Formatting
+
+We use **Prettier** for code formatting and **ESLint** for code quality. The project is configured with:
+
+- Prettier handles formatting (indentation, quotes, line width)
+- ESLint handles code quality (unused variables, import order)
+- lint-staged runs formatting on staged files before commit
+- A pre-commit hook ensures no commits with lint/format errors
+
+```bash
+# Format all files
+npm run format
+
+# Check formatting without fixing
+npm run format:check
+
+# Fix formatting and lint issues
+npm run format:fix
+
+# Run lint with auto-fix
+npm run lint:fix
+```
+
+**Important:** The pre-commit hook blocks commits if there are any ESLint errors or formatting issues. Make sure to run `npm run format:check` and `npm run lint` before pushing.
 
 ---
 
