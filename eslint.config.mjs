@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     },
     rules: {
       'react/no-unescaped-entities': 'off',
+      // Enforce unused vars as errors
+      '@typescript-eslint/no-unused-vars': 'error',
       // Import sorting rules
       'import/order': [
         'error',
