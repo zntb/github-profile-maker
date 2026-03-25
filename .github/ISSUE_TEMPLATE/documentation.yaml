@@ -1,0 +1,53 @@
+name: 📝 Documentation
+description: Suggest improvements or report issues with documentation
+title: '[Docs]: '
+labels: ['documentation']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation!
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Brief summary of the documentation issue or suggestion.
+      placeholder: Brief summary of the issue
+    validations:
+      required: true
+
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Documentation
+      description: |
+        What does the current documentation say?
+        Include links if possible.
+      placeholder: What does the current documentation say?
+
+  - type: textarea
+    id: suggested
+    attributes:
+      label: Suggested Change
+      description: |
+        Describe what you'd like the documentation to say or how it should be improved.
+      placeholder: Describe your suggested change
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason
+      description: |
+        Why is this change needed?
+        What problem does it solve or how does it improve the docs?
+      placeholder: Why is this change needed?
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other relevant information here.
+      placeholder: Add any other relevant information
