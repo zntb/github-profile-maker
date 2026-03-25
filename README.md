@@ -345,6 +345,17 @@ git push origin feat/my-new-block
 - Follow existing Tailwind class conventions (CSS variables, `cn()` helper)
 - Run `npm run lint` before submitting
 
+We use **Prettier** and **ESLint** with a pre-commit hook. The hook will block commits if there are any lint errors or formatting issues:
+
+```bash
+# Format all files
+npm run format
+
+# Check for issues
+npm run format:check
+npm run lint
+```
+
 ---
 
 ## 📄 License
