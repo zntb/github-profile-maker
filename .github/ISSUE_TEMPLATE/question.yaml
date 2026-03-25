@@ -1,0 +1,59 @@
+name: ❓ Question / Support
+description: Ask a question or get help with something
+title: '[Question]: '
+labels: ['question']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reaching out with your question!
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: Clear and specific question you're asking.
+      placeholder: What would you like to know?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: |
+        Provide context about your question.
+        What are you trying to do? What's the background?
+      placeholder: Describe the context
+    validations:
+      required: true
+
+  - type: textarea
+    id: attempts
+    attributes:
+      label: What You've Tried
+      description: |
+        Describe what you've already attempted or researched.
+        This helps us provide better answers.
+      placeholder: Describe what you've tried
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Please provide details about your environment:
+        - OS: [e.g., Windows 11, macOS]
+        - Browser: [e.g., Chrome, Firefox, Safari]
+        - Version: [e.g., 1.0.0]
+      placeholder: |
+        - OS:
+        - Browser:
+        - Version:
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other relevant information here.
+      placeholder: Add any other relevant information
