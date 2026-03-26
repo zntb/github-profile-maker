@@ -831,7 +831,10 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
         <>
           <FieldGroup>
             <Label>Theme</Label>
-            <Select value={props.theme as string} onValueChange={(v) => update('theme', v)}>
+            <Select
+              value={(props.theme as string) || 'default'}
+              onValueChange={(v) => update('theme', v)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -846,7 +849,10 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
           </FieldGroup>
           <FieldGroup>
             <Label>Layout</Label>
-            <Select value={props.layout as string} onValueChange={(v) => update('layout', v)}>
+            <Select
+              value={(props.layout as string) || 'compact'}
+              onValueChange={(v) => update('layout', v)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -860,30 +866,35 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
             </Select>
           </FieldGroup>
           <FieldGroup>
-            <Label>Languages Count ({String(props.langs_count)})</Label>
-            <Slider
-              value={[props.langs_count as number]}
-              onValueChange={([v]) => update('langs_count', v)}
+            <Label>Languages Count ({String(props.langs_count ?? 8)})</Label>
+            <input
+              type="number"
+              value={Number(props.langs_count) || 8}
+              onChange={(e) => update('langs_count', parseInt(e.target.value) || 8)}
               min={1}
               max={20}
-              step={1}
+              className="w-full px-2 py-1 border rounded"
             />
           </FieldGroup>
           <FieldGroup>
             <div className="flex items-center justify-between">
               <Label>Hide Border</Label>
-              <Switch
+              <input
+                type="checkbox"
                 checked={Boolean(props.hideBorder)}
-                onCheckedChange={(v) => update('hideBorder', v)}
+                onChange={(e) => update('hideBorder', e.target.checked)}
+                className="h-4 w-4"
               />
             </div>
           </FieldGroup>
           <FieldGroup>
             <div className="flex items-center justify-between">
               <Label>Hide Progress</Label>
-              <Switch
+              <input
+                type="checkbox"
                 checked={Boolean(props.hideProgress)}
-                onCheckedChange={(v) => update('hideProgress', v)}
+                onChange={(e) => update('hideProgress', e.target.checked)}
+                className="h-4 w-4"
               />
             </div>
           </FieldGroup>
@@ -895,7 +906,10 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
         <>
           <FieldGroup>
             <Label>Theme</Label>
-            <Select value={props.theme as string} onValueChange={(v) => update('theme', v)}>
+            <Select
+              value={(props.theme as string) || 'default'}
+              onValueChange={(v) => update('theme', v)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -911,20 +925,23 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
           <FieldGroup>
             <div className="flex items-center justify-between">
               <Label>Hide Border</Label>
-              <Switch
+              <input
+                type="checkbox"
                 checked={Boolean(props.hideBorder)}
-                onCheckedChange={(v) => update('hideBorder', v)}
+                onChange={(e) => update('hideBorder', e.target.checked)}
+                className="h-4 w-4"
               />
             </div>
           </FieldGroup>
           <FieldGroup>
             <Label>Border Radius ({String(props.borderRadius ?? 10)}px)</Label>
-            <Slider
-              value={[props.borderRadius as number]}
-              onValueChange={([v]) => update('borderRadius', v)}
+            <input
+              type="number"
+              value={Number(props.borderRadius) || 10}
+              onChange={(e) => update('borderRadius', parseInt(e.target.value) || 10)}
               min={0}
               max={20}
-              step={1}
+              className="w-full px-2 py-1 border rounded"
             />
           </FieldGroup>
         </>
@@ -936,43 +953,9 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
           <FieldGroup>
             <Label>Theme</Label>
             <Select
-              value={(props.theme as string) || 'tokyo-night'}
+              value={(props.theme as string) || 'default'}
               onValueChange={(v) => update('theme', v)}
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tokyo-night">Tokyo Night</SelectItem>
-                <SelectItem value="dracula">Dracula</SelectItem>
-                <SelectItem value="github">GitHub</SelectItem>
-                <SelectItem value="github-dark">GitHub Dark</SelectItem>
-                <SelectItem value="rogue">Rogue</SelectItem>
-                <SelectItem value="merko">Merko</SelectItem>
-                <SelectItem value="vue">Vue</SelectItem>
-                <SelectItem value="react-dark">React Dark</SelectItem>
-                <SelectItem value="high-contrast">High Contrast</SelectItem>
-              </SelectContent>
-            </Select>
-          </FieldGroup>
-          <FieldGroup>
-            <div className="flex items-center justify-between">
-              <Label>Hide Border</Label>
-              <Switch
-                checked={Boolean(props.hideBorder)}
-                onCheckedChange={(v) => update('hideBorder', v)}
-              />
-            </div>
-          </FieldGroup>
-        </>
-      );
-
-    case 'trophies':
-      return (
-        <>
-          <FieldGroup>
-            <Label>Theme</Label>
-            <Select value={props.theme as string} onValueChange={(v) => update('theme', v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -986,38 +969,82 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
             </Select>
           </FieldGroup>
           <FieldGroup>
-            <Label>Columns ({String(props.column)})</Label>
-            <Slider
-              value={[props.column as number]}
-              onValueChange={([v]) => update('column', v)}
+            <div className="flex items-center justify-between">
+              <Label>Hide Border</Label>
+              <input
+                type="checkbox"
+                checked={Boolean(props.hideBorder)}
+                onChange={(e) => update('hideBorder', e.target.checked)}
+                className="h-4 w-4"
+              />
+            </div>
+          </FieldGroup>
+        </>
+      );
+
+    case 'trophies':
+      return (
+        <>
+          <FieldGroup>
+            <Label>Theme</Label>
+            <Select
+              value={(props.theme as string) || 'default'}
+              onValueChange={(v) => update('theme', v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {STATS_THEMES.map((theme) => (
+                  <SelectItem key={theme} value={theme}>
+                    {theme}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FieldGroup>
+          <FieldGroup>
+            <Label>Columns ({String(props.column ?? 4)})</Label>
+            <input
+              type="number"
+              value={Number(props.column) || 4}
+              onChange={(e) => update('column', parseInt(e.target.value) || 4)}
               min={1}
               max={10}
-              step={1}
+              className="w-full px-2 py-1 border rounded"
             />
           </FieldGroup>
           <FieldGroup>
-            <Label>Rows ({String(props.row)})</Label>
-            <Slider
-              value={[props.row as number]}
-              onValueChange={([v]) => update('row', v)}
+            <Label>Rows ({String(props.row ?? 2)})</Label>
+            <input
+              type="number"
+              value={Number(props.row) || 2}
+              onChange={(e) => update('row', parseInt(e.target.value) || 2)}
               min={1}
               max={4}
-              step={1}
+              className="w-full px-2 py-1 border rounded"
             />
           </FieldGroup>
           <FieldGroup>
             <div className="flex items-center justify-between">
               <Label>No Frame</Label>
-              <Switch
+              <input
+                type="checkbox"
                 checked={Boolean(props.noFrame)}
-                onCheckedChange={(v) => update('noFrame', v)}
+                onChange={(e) => update('noFrame', e.target.checked)}
+                className="h-4 w-4"
               />
             </div>
           </FieldGroup>
           <FieldGroup>
             <div className="flex items-center justify-between">
               <Label>No Background</Label>
-              <Switch checked={Boolean(props.noBg)} onCheckedChange={(v) => update('noBg', v)} />
+              <input
+                type="checkbox"
+                checked={Boolean(props.noBg)}
+                onChange={(e) => update('noBg', e.target.checked)}
+                className="h-4 w-4"
+              />
             </div>
           </FieldGroup>
         </>
