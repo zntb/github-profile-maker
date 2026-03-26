@@ -133,13 +133,7 @@ export function Canvas() {
                         ? 'animate-slide-up'
                         : 'animate-slide-up lg:col-span-2'
                     }
-                    style={{
-                      animationDelay: `${index * 50}ms`,
-                      width: block.props.blockWidth ? `${String(block.props.blockWidth)}%` : undefined,
-                      height: block.props.blockHeight
-                        ? `${String(block.props.blockHeight)}px`
-                        : undefined,
-                    }}
+                    style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <CanvasBlock
                       block={block}
