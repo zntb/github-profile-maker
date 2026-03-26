@@ -101,11 +101,6 @@ function PreviewBlock({ block, wrapperClassName = 'mb-4' }: { block: Block; wrap
   const { type, props, children } = block;
   const globalUsername = useBuilderStore((state) => state.username);
   const imageSizeStyle = resolvePreviewImageSize(block);
-  const wrapperStyle: CSSProperties = {
-    width: props.blockWidth ? `${String(props.blockWidth)}%` : undefined,
-    height: props.blockHeight ? `${String(props.blockHeight)}px` : undefined,
-    maxWidth: '100%',
-  };
 
   const renderBlock = useMemo(() => {
     // Helper function to get username with global fallback
@@ -522,9 +517,5 @@ function PreviewBlock({ block, wrapperClassName = 'mb-4' }: { block: Block; wrap
     }
   }, [type, props, children, globalUsername, imageSizeStyle]);
 
-  return (
-    <div className={wrapperClassName} style={wrapperStyle}>
-      {renderBlock}
-    </div>
-  );
+  return <div className={wrapperClassName}>{renderBlock}</div>;
 }
