@@ -433,4 +433,44 @@ describe('renderMarkdown', () => {
     expect((result.match(/<div align="center">/g) || []).length).toBe(2);
     expect(result).toContain('Break');
   });
+
+  it('should render mixed half-width cards in one centered row', () => {
+    const blocks: Block[] = [
+      {
+        id: '1',
+        type: 'stats-card',
+        props: { username: 'user-one', theme: 'dark', layoutWidth: 'half' },
+      },
+      {
+        id: '2',
+        type: 'top-languages',
+        props: { username: 'user-one', theme: 'dark', layoutWidth: 'half' },
+      },
+    ];
+
+    const result = renderMarkdown(blocks);
+    expect((result.match(/<div align="center">/g) || []).length).toBe(1);
+    expect(result).toContain('alt="GitHub Stats"');
+    expect(result).toContain('alt="Top Languages"');
+  });
+
+  it('should keep half-width card separate when following card is full width', () => {
+    const blocks: Block[] = [
+      {
+        id: '1',
+        type: 'stats-card',
+        props: { username: 'user-one', theme: 'dark', layoutWidth: 'half' },
+      },
+      {
+        id: '2',
+        type: 'streak-stats',
+        props: { username: 'user-one', theme: 'dark', layoutWidth: 'full' },
+      },
+    ];
+
+    const result = renderMarkdown(blocks);
+    expect((result.match(/<div align="center">/g) || []).length).toBe(2);
+    expect(result).toContain('alt="GitHub Stats"');
+    expect(result).toContain('alt="GitHub Streak"');
+  });
 });
