@@ -136,34 +136,34 @@ function generateStreakSvg(
 
   const { currentStreak, longestStreak, totalContributions } = streakStats;
 
-  // Column centres
+  // Column centers
   const leftCX = 82;
   const midCX = 247;
   const rightCX = 412;
 
-  // Ring dimensions
-  const ringCY = 98;
+  // Ring dimensions - slightly adjusted to be more centered
+  const ringCY = 105;
   const ringR = 40;
   const circumference = +(2 * Math.PI * ringR).toFixed(2);
   const progress = longestStreak > 0 ? currentStreak / longestStreak : 0;
   const dashOffset = +(circumference * (1 - progress)).toFixed(2);
-  const ringTop = ringCY - ringR; // y=58
-  const ringBottom = ringCY + ringR; // y=138
+  const ringTop = ringCY - ringR; // y=65
+  const ringBottom = ringCY + ringR; // y=145
 
-  // Flame icon: 20x20, positioned 4px above ring top
+  // Flame icon: 20x20, positioned above ring top
   const flameSize = 20;
-  const flameX = midCX - flameSize / 2; // 237
-  const flameY = ringTop - flameSize - 4; // 34
+  const flameX = midCX - flameSize / 2;
+  const flameY = ringTop - flameSize - 8; // Increased gap to 8px
 
-  // Centre column text — number inside ring, label+date strictly below ring
-  const currNumY = ringCY + 10; // 108
-  const centLabelY = ringBottom + 20; // 158
-  const centDateY = centLabelY + 16; // 174
+  // Centre column text - increased spacing to prevent overlap
+  const currNumY = ringCY + 11; // Centered visually inside ring
+  const centLabelY = ringBottom + 28; // Moved further down from ring bottom (was 20)
+  const centDateY = centLabelY + 18; // Increased vertical gap between label and date (was 16)
 
-  // Side columns — vertically centred in the 230px card
-  const sideNumY = 95;
-  const sideLabelY = 115;
-  const sideDateY = 133;
+  // Side columns - balanced with the centre column
+  const sideNumY = 100;
+  const sideLabelY = 125;
+  const sideDateY = 148; // Increased spacing for side elements too
 
   const currentYear = new Date().getFullYear();
 
@@ -182,8 +182,8 @@ function generateStreakSvg(
     stroke="${options.hideBorder ? 'none' : '#' + theme.border}"
     stroke-width="${options.hideBorder ? 0 : 1}"/>
 
-  <line x1="165" y1="12"  x2="165" y2="${height - 12}" stroke="#${theme.border}" stroke-width="1" stroke-opacity="0.5"/>
-  <line x1="330" y1="12"  x2="330" y2="${height - 12}" stroke="#${theme.border}" stroke-width="1" stroke-opacity="0.5"/>
+  <line x1="165" y1="15" x2="165" y2="${height - 15}" stroke="#${theme.border}" stroke-width="1" stroke-opacity="0.3"/>
+  <line x1="330" y1="15" x2="330" y2="${height - 15}" stroke="#${theme.border}" stroke-width="1" stroke-opacity="0.3"/>
 
   <!-- Left: Total Contributions -->
   <text x="${leftCX}" y="${sideNumY}"   text-anchor="middle" class="side-num"   fill="#${theme.sideNums}">${totalContributions.toLocaleString()}</text>
@@ -209,7 +209,7 @@ function generateStreakSvg(
   <!-- Centre: streak number (inside ring) -->
   <text x="${midCX}" y="${currNumY}" text-anchor="middle" class="curr-num">${currentStreak}</text>
 
-  <!-- Centre: label and date (below ring, no overlap) -->
+  <!-- Centre: label and date (below ring, fixed spacing) -->
   <text x="${midCX}" y="${centLabelY}" text-anchor="middle" class="stat-label">Current Streak</text>
   <text x="${midCX}" y="${centDateY}"  text-anchor="middle" class="date-label">${formatDate(streakStats.currentStreakStart)} - ${formatDate(streakStats.currentStreakEnd)}</text>
 
