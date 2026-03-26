@@ -1,100 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { fetchUserStats, calculateRank, type GitHubStats } from '@/lib/github';
-
-// Theme configurations
-const themes: Record<
-  string,
-  { bg: string; title: string; text: string; icon: string; border: string }
-> = {
-  default: {
-    bg: 'fffefe',
-    title: '2f80ed',
-    text: '434d58',
-    icon: '4c71f2',
-    border: 'e4e2e2',
-  },
-  dark: {
-    bg: '151515',
-    title: 'fff',
-    text: '9f9f9f',
-    icon: '79ff97',
-    border: 'e4e2e2',
-  },
-  radical: {
-    bg: '141321',
-    title: 'fe428e',
-    text: 'a9fef7',
-    icon: 'f8d847',
-    border: 'e4e2e2',
-  },
-  merko: {
-    bg: '0a0f0b',
-    title: 'abd200',
-    text: '68b587',
-    icon: 'b7d364',
-    border: 'e4e2e2',
-  },
-  gruvbox: {
-    bg: '282828',
-    title: 'fabd2f',
-    text: 'ebdbb2',
-    icon: 'fe8019',
-    border: 'e4e2e2',
-  },
-  tokyonight: {
-    bg: '1a1b27',
-    title: '70a5fd',
-    text: '38bdae',
-    icon: 'bf91f3',
-    border: 'e4e2e2',
-  },
-  onedark: {
-    bg: '282c34',
-    title: 'e4bf7a',
-    text: 'abb2bf',
-    icon: '8eb573',
-    border: 'e4e2e2',
-  },
-  dracula: {
-    bg: '282a36',
-    title: 'ff6e96',
-    text: 'f8f8f2',
-    icon: 'bd93f9',
-    border: 'e4e2e2',
-  },
-  nord: {
-    bg: '2e3440',
-    title: '81a1c1',
-    text: 'd8dee9',
-    icon: '88c0d0',
-    border: 'e4e2e2',
-  },
-  github_dark: {
-    bg: '0d1117',
-    title: '58a6ff',
-    text: 'c9d1d9',
-    icon: '1f6feb',
-    border: '30363d',
-  },
-  catppuccin_mocha: {
-    bg: '1e1e2e',
-    title: '89b4fa',
-    text: 'cdd6f4',
-    icon: '94e2d5',
-    border: '313244',
-  },
-};
-
-function getTheme(themeName: string): {
-  bg: string;
-  title: string;
-  text: string;
-  icon: string;
-  border: string;
-} {
-  return themes[themeName] || themes.default;
-}
+import { calculateRank, fetchUserStats, type GitHubStats } from '@/lib/github';
+import { getStatsTheme } from '@/lib/themes';
 
 function generateStatsSvg(
   username: string,
@@ -133,7 +40,7 @@ function generateStatsSvg(
   </style>
 
   <rect x="0.5" y="0.5" rx="${options.borderRadius}" ry="${options.borderRadius}" width="${width - 1}" height="${height - 1}" fill="#${theme.bg}" stroke="${options.hideBorder ? 'none' : '#' + theme.border}" stroke-width="${options.hideBorder ? 0 : 1}"/>
-  
+
   ${!options.hideTitle ? `<text x="25" y="35" class="header">${username}'s GitHub Stats</text>` : ''}
 
   <g transform="translate(25, ${options.hideTitle ? 30 : 55})">
@@ -192,7 +99,7 @@ export async function GET(request: NextRequest) {
   const hideRank = searchParams.get('hide_rank') === 'true';
   const borderRadius = parseInt(searchParams.get('border_radius') || '10');
 
-  const theme = getTheme(themeName);
+  const theme = getStatsTheme(themeName);
 
   // Override theme colors if provided
   if (searchParams.get('bg_color')) {
