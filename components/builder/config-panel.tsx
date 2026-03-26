@@ -39,6 +39,8 @@ export function ConfigPanel() {
 
   const selectedBlock = findBlock(blocks, selectedBlockId);
   if (!selectedBlock) return null;
+  const blockWidth = selectedBlock.props.blockWidth as number | undefined;
+  const blockHeight = selectedBlock.props.blockHeight as number | undefined;
 
   return (
     <div className="flex h-full w-full flex-col border-l border-border bg-sidebar">
@@ -53,6 +55,34 @@ export function ConfigPanel() {
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
+          <FieldGroup>
+            <Label>Block Width (%)</Label>
+            <Input
+              type="number"
+              min={1}
+              max={100}
+              value={blockWidth ?? 100}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                updateBlock(selectedBlock.id, { blockWidth: Math.min(100, Math.max(1, value || 100)) });
+              }}
+            />
+          </FieldGroup>
+          <FieldGroup>
+            <Label>Block Height (px)</Label>
+            <Input
+              type="number"
+              min={1}
+              value={blockHeight ?? ''}
+              onChange={(e) => {
+                const raw = e.target.value;
+                updateBlock(selectedBlock.id, {
+                  blockHeight: raw === '' ? undefined : Math.max(1, Number(raw) || 1),
+                });
+              }}
+              placeholder="auto"
+            />
+          </FieldGroup>
           <BlockConfigFields block={selectedBlock} updateBlock={updateBlock} />
         </div>
       </ScrollArea>
