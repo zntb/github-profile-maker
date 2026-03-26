@@ -140,7 +140,10 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
         <>
           <FieldGroup>
             <Label>Alignment</Label>
-            <Select value={props.alignment as string} onValueChange={(v) => update('alignment', v)}>
+            <Select
+              value={(props.alignment as string) ?? 'center'}
+              onValueChange={(v) => update('alignment', v)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -153,7 +156,10 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
           </FieldGroup>
           <FieldGroup>
             <Label>Direction</Label>
-            <Select value={props.direction as string} onValueChange={(v) => update('direction', v)}>
+            <Select
+              value={(props.direction as string) ?? 'column'}
+              onValueChange={(v) => update('direction', v)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -164,13 +170,19 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
             </Select>
           </FieldGroup>
           <FieldGroup>
-            <Label>Gap ({String(props.gap)}px)</Label>
-            <Slider
-              value={[props.gap as number]}
-              onValueChange={([v]) => update('gap', v)}
+            <Label>Gap ({(props.gap as number) ?? 16}px)</Label>
+            <Input
+              type="number"
               min={0}
               max={48}
               step={4}
+              value={(props.gap as number) ?? 16}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val)) {
+                  update('gap', Math.min(48, Math.max(0, val)));
+                }
+              }}
             />
           </FieldGroup>
         </>
@@ -181,7 +193,10 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
         <>
           <FieldGroup>
             <Label>Type</Label>
-            <Select value={props.type as string} onValueChange={(v) => update('type', v)}>
+            <Select
+              value={(props.type as string) ?? 'line'}
+              onValueChange={(v) => update('type', v)}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -195,7 +210,7 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
             <FieldGroup>
               <Label>GIF URL</Label>
               <Input
-                value={(props.gifUrl as string) || ''}
+                value={(props.gifUrl as string) ?? ''}
                 onChange={(e) => update('gifUrl', e.target.value)}
                 placeholder="https://..."
               />
@@ -207,13 +222,19 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
     case 'spacer':
       return (
         <FieldGroup>
-          <Label>Height ({String(props.height)}px)</Label>
-          <Slider
-            value={[props.height as number]}
-            onValueChange={([v]) => update('height', v)}
+          <Label>Height ({(props.height as number) ?? 20}px)</Label>
+          <Input
+            type="number"
             min={10}
             max={100}
             step={5}
+            value={(props.height as number) ?? 20}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              if (!isNaN(val)) {
+                update('height', Math.min(100, Math.max(10, val)));
+              }
+            }}
           />
         </FieldGroup>
       );
