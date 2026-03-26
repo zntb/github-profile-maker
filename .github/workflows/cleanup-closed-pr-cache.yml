@@ -2,10 +2,8 @@ name: Cleanup closed pull requests cache
 
 on:
   schedule:
-    # Run daily at 3:00 UTC
     - cron: '0 3 * * *'
   workflow_dispatch:
-  # Also run when a PR is closed
   pull_request:
     types: [closed]
 
@@ -24,7 +22,7 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
 
-            // Get all closed pull requests from the last 30 days
+            // Get all closed pull requests
             const closedPRs = await github.rest.pulls.list({
               owner,
               repo,
@@ -34,20 +32,35 @@ jobs:
 
             console.log(`Found ${closedPRs.data.length} closed pull requests`);
 
-            // Get all current caches
-            const caches = await github.rest.actions.listCaches({
-              owner,
-              repo
-            });
+            // Get all caches with pagination
+            let allCaches = [];
+            let page = 1;
+            let hasMore = true;
 
-            console.log(`Found ${caches.data.total_count} cache entries`);
+            while (hasMore) {
+              const caches = await github.rest.actions.getActionsCacheList({
+                owner,
+                repo,
+                per_page: 100,
+                page: page
+              });
+
+              allCaches = allCaches.concat(caches.data.actions_caches);
+
+              if (caches.data.actions_caches.length < 100) {
+                hasMore = false;
+              } else {
+                page++;
+              }
+            }
+
+            console.log(`Found ${allCaches.length} total cache entries`);
 
             // Find and delete caches related to closed PRs
             const prNumbers = closedPRs.data.map(pr => pr.number);
             let deletedCount = 0;
 
-            for (const cache of caches.data.caches) {
-              // Check if the cache key contains a PR number
+            for (const cache of allCaches) {
               const cacheKey = cache.key;
               const isPRCache = prNumbers.some(prNum =>
                 cacheKey.includes(`pr-${prNum}`) ||
@@ -57,7 +70,7 @@ jobs:
 
               if (isPRCache) {
                 console.log(`Deleting cache: ${cacheKey} (id: ${cache.id})`);
-                await github.rest.actions.deleteCache({
+                await github.rest.actions.deleteActionsCacheById({
                   owner,
                   repo,
                   cache_id: cache.id
