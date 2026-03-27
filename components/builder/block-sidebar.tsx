@@ -68,12 +68,23 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Columns2,
 };
 
+function findBlockById(items: Block[], id: string): Block | null {
+  for (const item of items) {
+    if (item.id === id) return item;
+    if (item.children?.length) {
+      const nested = findBlockById(item.children, id);
+      if (nested) return nested;
+    }
+  }
+  return null;
+}
+
 export function BlockSidebar() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState<string[]>(
     BLOCK_CATEGORIES.map((c) => c.name),
   );
-  const { addBlock, username } = useBuilderStore();
+  const { addBlock, addChildBlock, blocks, selectedBlockId, username } = useBuilderStore();
 
   const toggleCategory = (name: string) => {
     setExpandedCategories((prev) =>
@@ -90,6 +101,8 @@ export function BlockSidebar() {
     'trophies',
     'visitor-counter',
   ];
+  const STATS_ROW_CHILD_BLOCKS: BlockType[] = ['stats-card', 'top-languages', 'streak-stats'];
+  const selectedBlock = selectedBlockId ? findBlockById(blocks, selectedBlockId) : null;
 
   const handleAddBlock = (type: BlockType, defaultProps: Record<string, unknown>) => {
     // If username is set and this is a GitHub stats block, use the username
@@ -223,9 +236,15 @@ export function BlockSidebar() {
       </ScrollArea>
 
       <div className="border-t border-border p-4 bg-gradient-to-t from-card/50 to-transparent">
-        <p className="text-xs text-muted-foreground text-center">
-          Click a block to add it to your README
-        </p>
+        {selectedBlock?.type === 'stats-row' ? (
+          <p className="text-xs text-muted-foreground text-center">
+            Stats Row selected: click Stats Card, Top Languages, or Streak Stats to add as child
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground text-center">
+            Click a block to add it to your README
+          </p>
+        )}
       </div>
     </div>
   );
