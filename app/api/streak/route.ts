@@ -3,6 +3,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calculateStreakStats, fetchContributionCalendar } from '@/lib/github';
 import { getStreakTheme, type StreakTheme } from '@/lib/themes';
 
+function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function isValidHexColor(color: string): boolean {
+  return /^[0-9A-Fa-f]{6}$/.test(color);
+}
+
 function formatDate(date: Date | null): string {
   if (!date) return 'N/A';
   return date.toLocaleDateString('en-US', {
@@ -126,25 +139,46 @@ export async function GET(request: NextRequest) {
   let theme = getStreakTheme(themeName);
 
   if (searchParams.get('background')) {
-    theme = { ...theme, bg: searchParams.get('background')!.replace('#', '') };
+    const bgColor = searchParams.get('background')!.replace('#', '');
+    if (isValidHexColor(bgColor)) {
+      theme = { ...theme, bg: bgColor };
+    }
   }
   if (searchParams.get('fire')) {
-    theme = { ...theme, fire: searchParams.get('fire')!.replace('#', '') };
+    const fireColor = searchParams.get('fire')!.replace('#', '');
+    if (isValidHexColor(fireColor)) {
+      theme = { ...theme, fire: fireColor };
+    }
   }
   if (searchParams.get('ring')) {
-    theme = { ...theme, ring: searchParams.get('ring')!.replace('#', '') };
+    const ringColor = searchParams.get('ring')!.replace('#', '');
+    if (isValidHexColor(ringColor)) {
+      theme = { ...theme, ring: ringColor };
+    }
   }
   if (searchParams.get('currStreakNum')) {
-    theme = { ...theme, currStreak: searchParams.get('currStreakNum')!.replace('#', '') };
+    const currStreakColor = searchParams.get('currStreakNum')!.replace('#', '');
+    if (isValidHexColor(currStreakColor)) {
+      theme = { ...theme, currStreak: currStreakColor };
+    }
   }
   if (searchParams.get('sideNums')) {
-    theme = { ...theme, sideNums: searchParams.get('sideNums')!.replace('#', '') };
+    const sideNumsColor = searchParams.get('sideNums')!.replace('#', '');
+    if (isValidHexColor(sideNumsColor)) {
+      theme = { ...theme, sideNums: sideNumsColor };
+    }
   }
   if (searchParams.get('sideLabels')) {
-    theme = { ...theme, sideLabels: searchParams.get('sideLabels')!.replace('#', '') };
+    const sideLabelsColor = searchParams.get('sideLabels')!.replace('#', '');
+    if (isValidHexColor(sideLabelsColor)) {
+      theme = { ...theme, sideLabels: sideLabelsColor };
+    }
   }
   if (searchParams.get('dates')) {
-    theme = { ...theme, dates: searchParams.get('dates')!.replace('#', '') };
+    const datesColor = searchParams.get('dates')!.replace('#', '');
+    if (isValidHexColor(datesColor)) {
+      theme = { ...theme, dates: datesColor };
+    }
   }
 
   const token = process.env.GITHUB_TOKEN;
@@ -167,7 +201,7 @@ export async function GET(request: NextRequest) {
         `<svg width="850" height="120" xmlns="http://www.w3.org/2000/svg">
           <rect width="850" height="120" fill="#${theme.bg}" rx="10"/>
           <text x="425" y="50" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="14">
-            Error fetching streak for @${username}
+            Error fetching streak for @${escapeXml(username)}
           </text>
           <text x="425" y="75" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12" opacity="0.7">
             User may not exist or API rate limit exceeded
