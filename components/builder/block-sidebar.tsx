@@ -104,12 +104,37 @@ export function BlockSidebar() {
   const STATS_ROW_CHILD_BLOCKS: BlockType[] = ['stats-card', 'top-languages', 'streak-stats'];
   const selectedBlock = selectedBlockId ? findBlockById(blocks, selectedBlockId) : null;
 
-  const handleAddBlock = (type: BlockType, defaultProps: Record<string, unknown>) => {
-    // If username is set and this is a GitHub stats block, use the username
+  const createBlock = (type: BlockType, defaultProps: Record<string, unknown>): Block => {
     const props = { ...defaultProps };
     if (username && GITHUB_STATS_BLOCKS.includes(type)) {
       props.username = username;
     }
+
+    if (STATS_ROW_CHILD_BLOCKS.includes(type)) {
+      props.layoutWidth = 'half';
+    }
+
+    return {
+      id: generateId(),
+      type,
+      props,
+      children: type === 'container' || type === 'collapsible' ? [] : undefined,
+    };
+  };
+
+  const handleAddBlock = (type: BlockType, defaultProps: Record<string, unknown>) => {
+    if (
+      selectedBlock?.type === 'stats-row' &&
+      STATS_ROW_CHILD_BLOCKS.includes(type) &&
+      selectedBlock.children &&
+      selectedBlock.children.length < 2
+    ) {
+      addChildBlock(selectedBlock.id, createBlock(type, defaultProps));
+      return;
+    }
+
+    const block = createBlock(type, defaultProps);
+    const blockUsername = (block.props.username as string) || 'github';
     const defaultChildren: Block[] | undefined =
       type === 'stats-row'
         ? [
@@ -117,7 +142,7 @@ export function BlockSidebar() {
               id: generateId(),
               type: 'stats-card',
               props: {
-                username: props.username || 'github',
+                username: blockUsername,
                 theme: 'tokyonight',
                 showIcons: true,
                 hideBorder: false,
@@ -131,7 +156,7 @@ export function BlockSidebar() {
               id: generateId(),
               type: 'top-languages',
               props: {
-                username: props.username || 'github',
+                username: blockUsername,
                 theme: 'tokyonight',
                 layout: 'compact',
                 hideBorder: false,
@@ -145,15 +170,8 @@ export function BlockSidebar() {
         : undefined;
 
     addBlock({
-      id: generateId(),
-      type,
-      props,
-      children:
-        type === 'container' || type === 'collapsible'
-          ? []
-          : type === 'stats-row'
-            ? defaultChildren
-            : undefined,
+      ...block,
+      children: type === 'stats-row' ? defaultChildren : block.children,
     });
   };
 
