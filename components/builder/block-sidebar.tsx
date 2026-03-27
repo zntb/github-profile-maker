@@ -35,7 +35,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { findBlock, useBuilderStore, generateId } from '@/lib/store';
+import { useBuilderStore, generateId } from '@/lib/store';
 import { BLOCK_CATEGORIES, type Block, type BlockType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -132,7 +132,7 @@ export function BlockSidebar() {
           ]
         : undefined;
 
-    const newBlock: Block = {
+    addBlock({
       id: generateId(),
       type,
       props,
@@ -142,21 +142,7 @@ export function BlockSidebar() {
           : type === 'stats-row'
             ? defaultChildren
             : undefined,
-    };
-
-    if (selectedBlockId) {
-      const selectedBlock = findBlock(blocks, selectedBlockId);
-      const canNestInsideStatsRow =
-        selectedBlock?.type === 'stats-row' &&
-        STATS_ROW_CHILD_BLOCKS.includes(type) &&
-        type !== 'stats-row';
-      if (canNestInsideStatsRow) {
-        addChildBlock(selectedBlock.id, newBlock);
-        return;
-      }
-    }
-
-    addBlock(newBlock);
+    });
   };
 
   const filteredCategories = BLOCK_CATEGORIES.map((category) => ({
