@@ -128,7 +128,8 @@ export function BlockSidebar() {
     if (
       selectedBlock?.type === 'stats-row' &&
       STATS_ROW_CHILD_BLOCKS.includes(type) &&
-      selectedStatsRowChildCount < 2
+      selectedBlock.children &&
+      selectedBlock.children.length < 2
     ) {
       addChildBlock(selectedBlock.id, createBlock(type, defaultProps));
       return;
