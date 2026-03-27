@@ -103,13 +103,39 @@ export function BlockSidebar() {
   ];
   const STATS_ROW_CHILD_BLOCKS: BlockType[] = ['stats-card', 'top-languages', 'streak-stats'];
   const selectedBlock = selectedBlockId ? findBlockById(blocks, selectedBlockId) : null;
+  const selectedStatsRowChildCount =
+    selectedBlock?.type === 'stats-row' ? (selectedBlock.children?.length ?? 0) : 0;
 
-  const handleAddBlock = (type: BlockType, defaultProps: Record<string, unknown>) => {
-    // If username is set and this is a GitHub stats block, use the username
+  const createBlock = (type: BlockType, defaultProps: Record<string, unknown>): Block => {
     const props = { ...defaultProps };
     if (username && GITHUB_STATS_BLOCKS.includes(type)) {
       props.username = username;
     }
+
+    if (STATS_ROW_CHILD_BLOCKS.includes(type)) {
+      props.layoutWidth = 'half';
+    }
+
+    return {
+      id: generateId(),
+      type,
+      props,
+      children: type === 'container' || type === 'collapsible' ? [] : undefined,
+    };
+  };
+
+  const handleAddBlock = (type: BlockType, defaultProps: Record<string, unknown>) => {
+    if (
+      selectedBlock?.type === 'stats-row' &&
+      STATS_ROW_CHILD_BLOCKS.includes(type) &&
+      selectedStatsRowChildCount < 2
+    ) {
+      addChildBlock(selectedBlock.id, createBlock(type, defaultProps));
+      return;
+    }
+
+    const block = createBlock(type, defaultProps);
+    const blockUsername = (block.props.username as string) || 'github';
     const defaultChildren: Block[] | undefined =
       type === 'stats-row'
         ? [
@@ -117,7 +143,7 @@ export function BlockSidebar() {
               id: generateId(),
               type: 'stats-card',
               props: {
-                username: props.username || 'github',
+                username: blockUsername,
                 theme: 'tokyonight',
                 showIcons: true,
                 hideBorder: false,
@@ -131,7 +157,7 @@ export function BlockSidebar() {
               id: generateId(),
               type: 'top-languages',
               props: {
-                username: props.username || 'github',
+                username: blockUsername,
                 theme: 'tokyonight',
                 layout: 'compact',
                 hideBorder: false,
@@ -145,15 +171,8 @@ export function BlockSidebar() {
         : undefined;
 
     addBlock({
-      id: generateId(),
-      type,
-      props,
-      children:
-        type === 'container' || type === 'collapsible'
-          ? []
-          : type === 'stats-row'
-            ? defaultChildren
-            : undefined,
+      ...block,
+      children: type === 'stats-row' ? defaultChildren : block.children,
     });
   };
 
@@ -238,7 +257,8 @@ export function BlockSidebar() {
       <div className="border-t border-border p-4 bg-gradient-to-t from-card/50 to-transparent">
         {selectedBlock?.type === 'stats-row' ? (
           <p className="text-xs text-muted-foreground text-center">
-            Stats Row selected: click Stats Card, Top Languages, or Streak Stats to add as child
+            Stats Row selected: click Stats Card / Top Languages / Streak Stats to add as child (up
+            to 2 cards for side-by-side layout)
           </p>
         ) : (
           <p className="text-xs text-muted-foreground text-center">
