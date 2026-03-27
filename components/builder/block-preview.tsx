@@ -132,7 +132,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
 
       case 'collapsible':
         return (
-          <details open={props.defaultOpen as boolean}>
+          <details open={Boolean(props.defaultOpen)}>
             <summary className="cursor-pointer font-medium">{props.title as string}</summary>
             <div className="mt-2 pl-4 text-sm text-muted-foreground">
               {block.children && block.children.length > 0
