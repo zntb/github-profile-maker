@@ -103,6 +103,8 @@ export function BlockSidebar() {
   ];
   const STATS_ROW_CHILD_BLOCKS: BlockType[] = ['stats-card', 'top-languages', 'streak-stats'];
   const selectedBlock = selectedBlockId ? findBlockById(blocks, selectedBlockId) : null;
+  const selectedStatsRowChildCount =
+    selectedBlock?.type === 'stats-row' ? (selectedBlock.children?.length ?? 0) : 0;
 
   const createBlock = (type: BlockType, defaultProps: Record<string, unknown>): Block => {
     const props = { ...defaultProps };
@@ -256,7 +258,8 @@ export function BlockSidebar() {
       <div className="border-t border-border p-4 bg-gradient-to-t from-card/50 to-transparent">
         {selectedBlock?.type === 'stats-row' ? (
           <p className="text-xs text-muted-foreground text-center">
-            Stats Row selected: click Stats Card, Top Languages, or Streak Stats to add as child
+            Stats Row selected: click Stats Card / Top Languages / Streak Stats to add as child (up
+            to 2 cards for side-by-side layout)
           </p>
         ) : (
           <p className="text-xs text-muted-foreground text-center">
