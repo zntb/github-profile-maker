@@ -562,8 +562,8 @@ function BlockConfigFields({ block, updateBlock }: BlockConfigFieldsProps) {
             <div className="flex items-center justify-between">
               <Label>Default Open</Label>
               <Switch
-                checked={Boolean(props.defaultOpen)}
-                onCheckedChange={(v) => update('defaultOpen', v)}
+                checked={props.defaultOpen === true}
+                onCheckedChange={(checked) => update('defaultOpen', checked)}
               />
             </div>
           </FieldGroup>
