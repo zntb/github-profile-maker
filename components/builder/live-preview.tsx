@@ -218,7 +218,7 @@ function PreviewBlock({
 
       case 'collapsible':
         return (
-          <details open={props.defaultOpen as boolean}>
+          <details open={Boolean(props.defaultOpen)}>
             <summary>{props.title as string}</summary>
             <div className="pl-4 mt-2">
               {children?.map((child) => (
