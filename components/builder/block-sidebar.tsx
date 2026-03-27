@@ -144,7 +144,7 @@ export function BlockSidebar() {
           ]
         : undefined;
 
-    const newBlock: Block = {
+    addBlock({
       id: generateId(),
       type,
       props,
@@ -154,18 +154,7 @@ export function BlockSidebar() {
           : type === 'stats-row'
             ? defaultChildren
             : undefined,
-    };
-
-    const canNestInsideStatsRow =
-      selectedBlock?.type === 'stats-row' &&
-      STATS_ROW_CHILD_BLOCKS.includes(type) &&
-      type !== 'stats-row';
-    if (canNestInsideStatsRow) {
-      addChildBlock(selectedBlock.id, newBlock);
-      return;
-    }
-
-    addBlock(newBlock);
+    });
   };
 
   const filteredCategories = BLOCK_CATEGORIES.map((category) => ({
