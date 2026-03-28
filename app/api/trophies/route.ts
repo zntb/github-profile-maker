@@ -324,8 +324,7 @@ export async function GET(request: NextRequest) {
           'Cache-Control': 'public, max-age=3600',
         },
       });
-    } catch (error) {
-      console.error('Error fetching trophies:', error);
+    } catch {
       return new NextResponse(
         `<svg width="495" height="120" xmlns="http://www.w3.org/2000/svg">
           <rect width="495" height="120" fill="#${theme.bg}" rx="10"/>

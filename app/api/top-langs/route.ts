@@ -365,8 +365,7 @@ export async function GET(request: NextRequest) {
           percent: (size / totalSize) * 100,
         }))
         .sort((a, b) => b.size - a.size);
-    } catch (error) {
-      console.error('Error fetching language stats:', error);
+    } catch {
       return new NextResponse(
         `<svg width="495" height="120" xmlns="http://www.w3.org/2000/svg">
           <rect width="495" height="120" fill="#${theme.bg}" rx="10"/>
