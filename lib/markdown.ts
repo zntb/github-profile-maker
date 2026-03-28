@@ -556,8 +556,11 @@ export function renderMarkdown(blocks: Block[], origin: string = ''): string {
             ? secondWidthRaw.trim()
             : '50%';
 
+        // Get cardHeight from block props
+        const cardHeight = block.props.cardHeight || nextBlock.props.cardHeight;
+
         rendered.push(
-          `<div align="center">\n  <img src="${imageTag.match(/src="([^"]+)"/)?.[1]}" width="${firstWidth}" alt="${getAltText(block.type)}" />\n  <img src="${nextImageTag.match(/src="([^"]+)"/)?.[1]}" width="${secondWidth}" alt="${getAltText(nextBlock.type, true)}" />\n</div>`,
+          `<div align="center">\n  <img src="${imageTag.match(/src="([^"]+)"/)?.[1]}" width="${firstWidth}" alt="${getAltText(block.type)}"${cardHeight ? ` height="${cardHeight}"` : ''} />\n  <img src="${nextImageTag.match(/src="([^"]+)"/)?.[1]}" width="${secondWidth}" alt="${getAltText(nextBlock.type, true)}"${cardHeight ? ` height="${cardHeight}"` : ''} />\n</div>`,
         );
         i += 1;
         continue;

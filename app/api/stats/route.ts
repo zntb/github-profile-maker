@@ -17,7 +17,7 @@ function generateStatsSvg(
   },
 ): string {
   const width = 495;
-  const height = 195;
+  const height = 230;
 
   const iconSvg = (x: number, y: number, path: string) =>
     options.showIcons
