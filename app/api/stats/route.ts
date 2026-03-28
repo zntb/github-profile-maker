@@ -352,7 +352,7 @@ export async function GET(request: NextRequest) {
           Set GITHUB_TOKEN environment variable
         </text>
         <text x="${noTokW / 2}" y="${noTokH / 2 + 18}" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="9" opacity="0.7">
-          to fetch real stats for @${escapeHtml(username)}
+          to fetch real stats for @${escapeHtml(username).replace(/&quot;/g, '&amp;quot;')}
         </text>
       </svg>`,
       { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=60' } },
