@@ -11,6 +11,15 @@ function isValidHexColor(color: string): boolean {
   return /^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(color);
 }
 
+/**
+ * Sanitize a color value for use in SVG - strips any non-hex characters.
+ * This provides defense in depth against XSS by ensuring only valid hex
+ * characters can ever appear in color attributes.
+ */
+function sanitizeColor(color: string): string {
+  return color.replace(/[^0-9a-fA-F]/g, '');
+}
+
 function formatCompact(num: number): string {
   if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
   if (num >= 1_000) return `${(num / 1_000).toFixed(1)}k`;
@@ -314,22 +323,34 @@ export async function GET(request: NextRequest) {
 
   const theme = getStatsTheme(themeName);
 
-  // Per-request colour overrides (with validation)
+  // Per-request colour overrides (with validation and sanitization)
   const bgColor = searchParams.get('bg_color');
-  if (bgColor && isValidHexColor(bgColor.replace('#', ''))) {
-    theme.bg = bgColor.replace('#', '');
+  if (bgColor) {
+    const sanitized = sanitizeColor(bgColor.replace('#', ''));
+    if (isValidHexColor(sanitized)) {
+      theme.bg = sanitized;
+    }
   }
   const textColor = searchParams.get('text_color');
-  if (textColor && isValidHexColor(textColor.replace('#', ''))) {
-    theme.text = textColor.replace('#', '');
+  if (textColor) {
+    const sanitized = sanitizeColor(textColor.replace('#', ''));
+    if (isValidHexColor(sanitized)) {
+      theme.text = sanitized;
+    }
   }
   const titleColor = searchParams.get('title_color');
-  if (titleColor && isValidHexColor(titleColor.replace('#', ''))) {
-    theme.title = titleColor.replace('#', '');
+  if (titleColor) {
+    const sanitized = sanitizeColor(titleColor.replace('#', ''));
+    if (isValidHexColor(sanitized)) {
+      theme.title = sanitized;
+    }
   }
   const iconColor = searchParams.get('icon_color');
-  if (iconColor && isValidHexColor(iconColor.replace('#', ''))) {
-    theme.icon = iconColor.replace('#', '');
+  if (iconColor) {
+    const sanitized = sanitizeColor(iconColor.replace('#', ''));
+    if (isValidHexColor(sanitized)) {
+      theme.icon = sanitized;
+    }
   }
 
   const token = process.env.GITHUB_TOKEN;
