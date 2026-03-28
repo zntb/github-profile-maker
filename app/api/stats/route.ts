@@ -330,7 +330,7 @@ export async function GET(request: NextRequest) {
         `<svg width="${errW}" height="${errH}" xmlns="http://www.w3.org/2000/svg">
           <rect width="${errW}" height="${errH}" fill="#${theme.bg}" rx="10"/>
           <text x="${errW / 2}" y="${errH / 2 - 8}" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12">
-            Error fetching stats for @${escapeHtml(username)}
+            Error fetching stats for @${escapeHtml(username).replace(/&quot;/g, '&amp;quot;')}
           </text>
           <text x="${errW / 2}" y="${errH / 2 + 12}" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="10" opacity="0.7">
             User may not exist or API rate limit exceeded
