@@ -612,6 +612,7 @@ export const BLOCK_CATEGORIES: BlockCategory[] = [
           direction: 'row',
           gap: 12,
           cardWidth: '49%',
+          cardHeight: 230,
         },
       },
       {
