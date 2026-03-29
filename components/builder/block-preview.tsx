@@ -149,6 +149,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         );
 
       case 'image':
+        if (!props.url) return null;
         return (
           <div
             className={cn(
@@ -170,6 +171,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         );
 
       case 'gif':
+        if (!props.url) return null;
         return (
           <div
             className={cn(

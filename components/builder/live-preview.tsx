@@ -491,6 +491,7 @@ function PreviewBlock({
         );
 
       case 'image':
+        if (!props.url) return null;
         return (
           <div style={{ textAlign: props.alignment as 'left' | 'center' | 'right' }}>
             <img
@@ -508,6 +509,7 @@ function PreviewBlock({
         );
 
       case 'gif':
+        if (!props.url) return null;
         return (
           <div style={{ textAlign: props.alignment as 'left' | 'center' | 'right' }}>
             <img
