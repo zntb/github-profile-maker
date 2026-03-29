@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 
 import { FieldGroup } from '../field-group';
+import { FileUpload } from '../file-upload';
 
 interface ImageConfigProps {
   url: string;
@@ -44,8 +45,13 @@ export function ImageConfig({
   return (
     <>
       <FieldGroup>
-        <Label>Image URL</Label>
-        <Input value={url} onChange={(e) => onUrlChange(e.target.value)} />
+        <FileUpload
+          accept="image/png,image/jpeg,image/gif,image/webp"
+          value={url}
+          onChange={onUrlChange}
+          label="Image URL"
+          placeholder="Enter image URL or upload a file"
+        />
       </FieldGroup>
       <FieldGroup>
         <Label>Alt Text</Label>

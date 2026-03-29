@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 
 import { FieldGroup } from '../field-group';
+import { FileUpload } from '../file-upload';
 
 interface GifConfigProps {
   url: string;
@@ -36,8 +37,13 @@ export function GifConfig({
   return (
     <>
       <FieldGroup>
-        <Label>GIF URL</Label>
-        <Input value={url} onChange={(e) => onUrlChange(e.target.value)} />
+        <FileUpload
+          accept="image/gif"
+          value={url}
+          onChange={onUrlChange}
+          label="GIF URL"
+          placeholder="Enter GIF URL or upload a file"
+        />
       </FieldGroup>
       <FieldGroup>
         <Label>Alt Text</Label>
