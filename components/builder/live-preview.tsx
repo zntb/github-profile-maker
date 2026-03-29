@@ -117,6 +117,15 @@ function PreviewBlock({
   const globalUsername = useBuilderStore((state) => state.username);
   const imageSizeStyle = imageStyleOverride ?? resolvePreviewImageSize(block);
 
+  // Memoize stable keys for props and children to prevent unnecessary recalculations
+  // Using JSON.stringify for props creates a stable string that only changes when values change
+  // Using child IDs for children prevents recalculation when parent re-renders with same children
+
+  const propsKey = useMemo(() => JSON.stringify(props), [props]);
+
+  const childrenKey = useMemo(() => children?.map((child) => child.id).join(',') ?? '', [children]);
+
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const renderBlock = useMemo(() => {
     const getUsername = (blockUsername: string) => {
       return (!blockUsername || blockUsername === 'github') && globalUsername
@@ -618,7 +627,7 @@ function PreviewBlock({
       default:
         return null;
     }
-  }, [type, props, children, globalUsername, imageSizeStyle]);
+  }, [type, propsKey, childrenKey, globalUsername]);
 
   return <div className={wrapperClassName}>{renderBlock}</div>;
 }
