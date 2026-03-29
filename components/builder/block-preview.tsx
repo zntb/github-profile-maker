@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-'use client';
 
 import type { Block } from '@/lib/types';
 import { cn } from '@/lib/utils';
