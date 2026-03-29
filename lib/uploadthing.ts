@@ -2,10 +2,18 @@ export function isUploadThingUrl(value: string | undefined | null): value is str
   if (!value) return false;
 
   try {
-    const { hostname } = new URL(value);
-    return hostname.includes('uploadthing') || hostname.includes('utfs.io');
+    const { protocol, hostname } = new URL(value);
+    if (protocol !== 'https:' && protocol !== 'http:') return false;
+
+    const normalizedHost = hostname.toLowerCase().replace(/\.$/, '');
+    const allowedHosts = ['utfs.io', 'uploadthing.com'];
+
+    return (
+      allowedHosts.includes(normalizedHost) ||
+      allowedHosts.some((allowedHost) => normalizedHost.endsWith(`.${allowedHost}`))
+    );
   } catch {
-    return value.includes('uploadthing') || value.includes('utfs.io');
+    return false;
   }
 }
 
