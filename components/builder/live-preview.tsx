@@ -2,10 +2,188 @@
 'use client';
 
 import { Eye } from 'lucide-react';
-import { JSX, useMemo, type CSSProperties } from 'react';
+import { JSX, useEffect, useMemo, useState, type CSSProperties } from 'react';
 
 import { useBuilderStore } from '@/lib/store';
 import type { Block } from '@/lib/types';
+
+/**
+ * Hook to prefetch all API images in parallel for a list of blocks.
+ * Returns a map of URL -> { loading, data, error } for each image URL.
+ */
+function usePrefetchedImages(
+  blocks: Block[],
+  globalUsername: string,
+): Map<string, { loading: boolean; data: string | null; error: Error | null }> {
+  const [imageStates, setImageStates] = useState<
+    Map<string, { loading: boolean; data: string | null; error: Error | null }>
+  >(new Map());
+
+  // Collect all unique URLs that need fetching
+  const urls = useMemo(() => {
+    const urlSet = new Set<string>();
+
+    const getUsername = (blockUsername: string) => {
+      return (!blockUsername || blockUsername === 'github') && globalUsername
+        ? globalUsername
+        : blockUsername;
+    };
+
+    const collectUrls = (blockList: Block[]) => {
+      for (const block of blockList) {
+        switch (block.type) {
+          case 'stats-card': {
+            const username = getUsername(block.props.username as string);
+            if (username && username !== 'github') {
+              const params = new URLSearchParams({
+                username,
+                theme: block.props.theme as string,
+                layout: (block.props.layoutStyle as string | undefined) ?? 'standard',
+                show_icons: block.props.showIcons ? 'true' : 'false',
+                hide_border: block.props.hideBorder ? 'true' : 'false',
+                hide_title: block.props.hideTitle ? 'true' : 'false',
+                hide_rank: block.props.hideRank ? 'true' : 'false',
+                border_radius: String(block.props.borderRadius),
+              });
+              urlSet.add(`/api/stats?${params.toString()}`);
+            }
+            break;
+          }
+          case 'top-languages': {
+            const username = getUsername(block.props.username as string);
+            if (username) {
+              const params = new URLSearchParams({
+                username,
+                theme: block.props.theme as string,
+                layout: block.props.layout as string,
+                hide_border: block.props.hideBorder ? 'true' : 'false',
+                hide_progress: block.props.hideProgress ? 'true' : 'false',
+                langs_count: String(block.props.langs_count),
+                border_radius: String(block.props.borderRadius),
+              });
+              urlSet.add(`/api/top-langs?${params.toString()}`);
+            }
+            break;
+          }
+          case 'streak-stats': {
+            const username = getUsername(block.props.username as string);
+            if (username) {
+              const params = new URLSearchParams({
+                username,
+                theme: block.props.theme as string,
+                hide_border: block.props.hideBorder ? 'true' : 'false',
+                border_radius: String(block.props.borderRadius),
+              });
+              urlSet.add(`/api/streak?${params.toString()}`);
+            }
+            break;
+          }
+          case 'activity-graph': {
+            const username = getUsername(block.props.username as string);
+            if (username) {
+              const params = new URLSearchParams({
+                username,
+                theme: block.props.theme as string,
+                hide_border: block.props.hideBorder ? 'true' : 'false',
+              });
+              urlSet.add(`/api/activity?${params.toString()}`);
+            }
+            break;
+          }
+          case 'trophies': {
+            const username = getUsername(block.props.username as string);
+            if (username) {
+              const params = new URLSearchParams({
+                username,
+                theme: block.props.theme as string,
+                column: String(block.props.column),
+                row: String(block.props.row),
+                margin_w: String(block.props.margin_w),
+                margin_h: String(block.props.margin_h),
+                no_frame: block.props.noFrame ? 'true' : 'false',
+                no_bg: block.props.noBg ? 'true' : 'false',
+              });
+              urlSet.add(`/api/trophies?${params.toString()}`);
+            }
+            break;
+          }
+          case 'quote': {
+            if (!block.props.quote || !block.props.author) {
+              const params = new URLSearchParams({
+                type: block.props.type as string,
+                theme: block.props.theme as string,
+              });
+              urlSet.add(`/api/quotes?${params.toString()}`);
+            }
+            break;
+          }
+        }
+        if (block.children) {
+          collectUrls(block.children);
+        }
+      }
+    };
+
+    collectUrls(blocks);
+    return Array.from(urlSet);
+  }, [blocks, globalUsername]);
+
+  // Fetch all URLs in parallel on mount and when urls change
+  useEffect(() => {
+    if (urls.length === 0) return;
+
+    // Initialize state with all URLs as loading
+    const initialStates = new Map<
+      string,
+      { loading: boolean; data: string | null; error: Error | null }
+    >();
+    for (const url of urls) {
+      initialStates.set(url, { loading: true, data: null, error: null });
+    }
+    setImageStates(initialStates);
+
+    // Fetch all URLs in parallel using Promise.allSettled
+    Promise.all(
+      urls.map(async (url) => {
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const blob = await response.blob();
+          const dataUrl = await blobToDataUrl(blob);
+          return { url, dataUrl, success: true };
+        } catch (error) {
+          return { url, error: error as Error, success: false };
+        }
+      }),
+    ).then((results) => {
+      setImageStates((prev) => {
+        const newStates = new Map(prev);
+        for (const result of results) {
+          if (result.success && result.dataUrl) {
+            newStates.set(result.url, { loading: false, data: result.dataUrl, error: null });
+          } else {
+            newStates.set(result.url, { loading: false, data: null, error: result.error ?? null });
+          }
+        }
+        return newStates;
+      });
+    });
+  }, [urls]);
+
+  return imageStates;
+}
+
+/**
+ * Convert a Blob to a data URL for inline embedding.
+ */
+async function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
 
 interface LivePreviewProps {
   blocks: Block[];
@@ -20,6 +198,9 @@ function isHalfWidthGithubCard(block: Block): boolean {
 }
 
 export function LivePreview({ blocks }: LivePreviewProps) {
+  const globalUsername = useBuilderStore((state) => state.username);
+  const prefetchedImages = usePrefetchedImages(blocks, globalUsername);
+
   if (blocks.length === 0) {
     return (
       <div className="flex h-full items-center justify-center p-4 sm:p-8 relative">
@@ -55,10 +236,18 @@ export function LivePreview({ blocks }: LivePreviewProps) {
                     style={{ display: 'flex', gap: '8px', animationDelay: `${i * 30}ms` }}
                   >
                     <div style={{ flex: '1 1 0', minWidth: 0 }}>
-                      <PreviewBlock block={block} wrapperClassName="mb-0" />
+                      <PreviewBlock
+                        block={block}
+                        wrapperClassName="mb-0"
+                        prefetchedImages={prefetchedImages}
+                      />
                     </div>
                     <div style={{ flex: '1 1 0', minWidth: 0 }}>
-                      <PreviewBlock block={nextBlock} wrapperClassName="mb-0" />
+                      <PreviewBlock
+                        block={nextBlock}
+                        wrapperClassName="mb-0"
+                        prefetchedImages={prefetchedImages}
+                      />
                     </div>
                   </div>,
                 );
@@ -108,10 +297,12 @@ function PreviewBlock({
   block,
   wrapperClassName = 'mb-4',
   imageStyleOverride,
+  prefetchedImages,
 }: {
   block: Block;
   wrapperClassName?: string;
   imageStyleOverride?: CSSProperties;
+  prefetchedImages?: Map<string, { loading: boolean; data: string | null; error: Error | null }>;
 }) {
   const { type, props, children } = block;
   const globalUsername = useBuilderStore((state) => state.username);
@@ -125,13 +316,19 @@ function PreviewBlock({
 
   const childrenKey = useMemo(() => children?.map((child) => child.id).join(',') ?? '', [children]);
 
-  const renderBlock = useMemo(() => {
-    const getUsername = (blockUsername: string) => {
-      return (!blockUsername || blockUsername === 'github') && globalUsername
-        ? globalUsername
-        : blockUsername;
-    };
+  const getPrefetchedSrc = (url: string): string | undefined => {
+    const state = prefetchedImages?.get(url);
+    return state?.data ?? undefined;
+  };
 
+  const getUsername = (blockUsername: string) => {
+    return (!blockUsername || blockUsername === 'github') && globalUsername
+      ? globalUsername
+      : blockUsername;
+  };
+
+  /* eslint-disable react-hooks/preserve-manual-memoization, react-hooks/exhaustive-deps */
+  const renderBlock = useMemo(() => {
     switch (type) {
       case 'container':
         return (
@@ -497,13 +694,10 @@ function PreviewBlock({
           border_radius: String(props.borderRadius),
         });
 
-        return (
-          <img
-            src={`/api/stats?${statsParams.toString()}`}
-            alt="GitHub Stats"
-            style={imageSizeStyle}
-          />
-        );
+        const statsUrl = `/api/stats?${statsParams.toString()}`;
+        const prefetchedSrc = getPrefetchedSrc(statsUrl);
+
+        return <img src={prefetchedSrc ?? statsUrl} alt="GitHub Stats" style={imageSizeStyle} />;
       }
 
       case 'top-languages': {
@@ -516,12 +710,10 @@ function PreviewBlock({
           langs_count: String(props.langs_count),
           border_radius: String(props.borderRadius),
         });
+        const langsUrl = `/api/top-langs?${langsParams.toString()}`;
+        const prefetchedLangsSrc = getPrefetchedSrc(langsUrl);
         return (
-          <img
-            src={`/api/top-langs?${langsParams.toString()}`}
-            alt="Top Languages"
-            style={imageSizeStyle}
-          />
+          <img src={prefetchedLangsSrc ?? langsUrl} alt="Top Languages" style={imageSizeStyle} />
         );
       }
 
@@ -532,12 +724,10 @@ function PreviewBlock({
           hide_border: props.hideBorder ? 'true' : 'false',
           border_radius: String(props.borderRadius),
         });
+        const streakUrl = `/api/streak?${streakParams.toString()}`;
+        const prefetchedStreakSrc = getPrefetchedSrc(streakUrl);
         return (
-          <img
-            src={`/api/streak?${streakParams.toString()}`}
-            alt="GitHub Streak"
-            style={imageSizeStyle}
-          />
+          <img src={prefetchedStreakSrc ?? streakUrl} alt="GitHub Streak" style={imageSizeStyle} />
         );
       }
 
@@ -547,10 +737,12 @@ function PreviewBlock({
           theme: props.theme as string,
           hide_border: props.hideBorder ? 'true' : 'false',
         });
+        const activityUrl = `/api/activity?${activityParams.toString()}`;
+        const prefetchedActivitySrc = getPrefetchedSrc(activityUrl);
         return (
           // Activity graph SVG is 850 px wide — always fill the full container width
           <img
-            src={`/api/activity?${activityParams.toString()}`}
+            src={prefetchedActivitySrc ?? activityUrl}
             alt="Activity Graph"
             style={{ width: '100%', height: 'auto', display: 'block' }}
           />
@@ -568,10 +760,12 @@ function PreviewBlock({
           no_frame: props.noFrame ? 'true' : 'false',
           no_bg: props.noBg ? 'true' : 'false',
         });
+        const trophyUrl = `/api/trophies?${trophyParams.toString()}`;
+        const prefetchedTrophySrc = getPrefetchedSrc(trophyUrl);
         return (
           <div className="text-center">
             <img
-              src={`/api/trophies?${trophyParams.toString()}`}
+              src={prefetchedTrophySrc ?? trophyUrl}
               alt="GitHub Trophies"
               style={{ maxWidth: '100%', height: 'auto' }}
             />
@@ -601,10 +795,12 @@ function PreviewBlock({
           type: props.type as string,
           theme: props.theme as string,
         });
+        const quoteUrl = `/api/quotes?${quoteParams.toString()}`;
+        const prefetchedSrc = getPrefetchedSrc(quoteUrl);
         return (
           <div className="text-center">
             <img
-              src={`/api/quotes?${quoteParams.toString()}`}
+              src={prefetchedSrc ?? quoteUrl}
               alt="Quote"
               style={{ maxWidth: '100%', height: 'auto' }}
             />
@@ -626,8 +822,7 @@ function PreviewBlock({
       default:
         return null;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [type, propsKey, childrenKey, globalUsername]);
+  }, [type, propsKey, childrenKey, globalUsername, prefetchedImages]);
 
   return <div className={wrapperClassName}>{renderBlock}</div>;
 }
