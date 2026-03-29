@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Outfit, JetBrains_Mono } from 'next/font/google';
+import { JetBrains_Mono, Outfit } from 'next/font/google';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
@@ -7,13 +7,15 @@ import './globals.css';
 const outfit = Outfit({
   variable: '--font-outfit',
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
+  preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
   subsets: ['latin'],
-  display: 'swap',
+  display: 'optional',
+  preload: true,
 });
 
 export const metadata: Metadata = {
