@@ -12,7 +12,7 @@
 
 <br/>
 
-**[🚀 Live Demo](https://github-profile-maker.vercel.app/) · [📖 Documentation](#documentation) · [🐛 Report Bug](issues) · [✨ Request Feature](issues)**
+**[🚀 Live Demo](https://github-profile-maker.vercel.app/) · [📖 Documentation](README.md) · [🐛 Report Bug](https://github.com/zntb/github-profile-maker/issues) · [✨ Request Feature](https://github.com/zntb/github-profile-maker/issues)**
 
 </div>
 
