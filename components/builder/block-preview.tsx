@@ -1,7 +1,37 @@
 /* eslint-disable @next/next/no-img-element */
 
+import { getActivityTheme, getLangTheme, getStatsTheme, getStreakTheme } from '@/lib/themes';
 import type { Block } from '@/lib/types';
 import { cn } from '@/lib/utils';
+
+// Helper functions to get theme colors with null safety
+function getStatsThemeColors(
+  themeName: string | undefined,
+): ReturnType<typeof getStatsTheme> | undefined {
+  if (!themeName) return undefined;
+  return getStatsTheme(themeName);
+}
+
+function getActivityThemeColors(
+  themeName: string | undefined,
+): ReturnType<typeof getActivityTheme> | undefined {
+  if (!themeName) return undefined;
+  return getActivityTheme(themeName);
+}
+
+function getLangThemeColors(
+  themeName: string | undefined,
+): ReturnType<typeof getLangTheme> | undefined {
+  if (!themeName) return undefined;
+  return getLangTheme(themeName);
+}
+
+function getStreakThemeColors(
+  themeName: string | undefined,
+): ReturnType<typeof getStreakTheme> | undefined {
+  if (!themeName) return undefined;
+  return getStreakTheme(themeName);
+}
 
 interface BlockPreviewProps {
   block: Block;
@@ -247,12 +277,32 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         );
 
       case 'stats-card':
+        const statsTheme = getStatsThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <div className="text-sm font-medium">GitHub Stats</div>
-              <div className="text-xs text-muted-foreground mt-1">@{props.username as string}</div>
-              <div className="text-[10px] text-muted-foreground mt-1">
+            <div
+              className="rounded-lg border p-4 text-center"
+              style={{
+                borderColor: statsTheme ? `#${statsTheme.border}` : undefined,
+                backgroundColor: statsTheme ? `#${statsTheme.bg}` : undefined,
+              }}
+            >
+              <div
+                className="text-sm font-medium"
+                style={{ color: statsTheme ? `#${statsTheme.title}` : undefined }}
+              >
+                GitHub Stats
+              </div>
+              <div
+                className="text-xs mt-1"
+                style={{ color: statsTheme ? `#${statsTheme.text}` : undefined }}
+              >
+                @{props.username as string}
+              </div>
+              <div
+                className="text-[10px] mt-1"
+                style={{ color: statsTheme ? `#${statsTheme.text}` : undefined }}
+              >
                 Theme: {props.theme as string}
               </div>
             </div>
@@ -260,25 +310,63 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         );
 
       case 'stats-row':
+        const rowTheme = getStatsThemeColors(props.theme as string | undefined);
         return (
-          <div className="rounded-lg border border-border bg-muted/40 p-3 text-center">
-            <div className="text-sm font-medium">Stats Row</div>
-            <div className="text-xs text-muted-foreground mt-1">
+          <div
+            className="rounded-lg border p-3 text-center"
+            style={{
+              borderColor: rowTheme ? `#${rowTheme.border}` : undefined,
+              backgroundColor: rowTheme ? `#${rowTheme.bg}` : undefined,
+            }}
+          >
+            <div
+              className="text-sm font-medium"
+              style={{ color: rowTheme ? `#${rowTheme.title}` : undefined }}
+            >
+              Stats Row
+            </div>
+            <div
+              className="text-xs mt-1"
+              style={{ color: rowTheme ? `#${rowTheme.text}` : undefined }}
+            >
               {String(props.direction ?? 'row')} • {String(props.gap ?? 12)}px gap
             </div>
-            <div className="text-xs text-muted-foreground mt-1">
+            <div
+              className="text-xs mt-1"
+              style={{ color: rowTheme ? `#${rowTheme.text}` : undefined }}
+            >
               {block.children?.length ?? 0} child card(s)
             </div>
           </div>
         );
 
       case 'top-languages':
+        const langTheme = getLangThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <div className="text-sm font-medium">Top Languages</div>
-              <div className="text-xs text-muted-foreground mt-1">@{props.username as string}</div>
-              <div className="text-[10px] text-muted-foreground mt-1">
+            <div
+              className="rounded-lg border p-4 text-center"
+              style={{
+                borderColor: langTheme ? `#${langTheme.border}` : undefined,
+                backgroundColor: langTheme ? `#${langTheme.bg}` : undefined,
+              }}
+            >
+              <div
+                className="text-sm font-medium"
+                style={{ color: langTheme ? `#${langTheme.title}` : undefined }}
+              >
+                Top Languages
+              </div>
+              <div
+                className="text-xs mt-1"
+                style={{ color: langTheme ? `#${langTheme.text}` : undefined }}
+              >
+                @{props.username as string}
+              </div>
+              <div
+                className="text-[10px] mt-1"
+                style={{ color: langTheme ? `#${langTheme.text}` : undefined }}
+              >
                 Layout: {props.layout as string}
               </div>
             </div>
@@ -286,32 +374,83 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         );
 
       case 'streak-stats':
+        const streakTheme = getStreakThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <div className="text-sm font-medium">Streak Stats</div>
-              <div className="text-xs text-muted-foreground mt-1">@{props.username as string}</div>
+            <div
+              className="rounded-lg border p-4 text-center"
+              style={{
+                borderColor: streakTheme ? `#${streakTheme.border}` : undefined,
+                backgroundColor: streakTheme ? `#${streakTheme.bg}` : undefined,
+              }}
+            >
+              <div
+                className="text-sm font-medium"
+                style={{ color: streakTheme ? `#${streakTheme.text}` : undefined }}
+              >
+                Streak Stats
+              </div>
+              <div
+                className="text-xs mt-1"
+                style={{ color: streakTheme ? `#${streakTheme.text}` : undefined }}
+              >
+                @{props.username as string}
+              </div>
             </div>
           </div>
         );
 
       case 'activity-graph':
+        const activityTheme = getActivityThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center w-full">
-              <div className="text-sm font-medium">Activity Graph</div>
-              <div className="text-xs text-muted-foreground mt-1">@{props.username as string}</div>
-              <div className="mt-2 h-8 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 rounded" />
+            <div
+              className="rounded-lg border p-4 text-center w-full"
+              style={{
+                borderColor: activityTheme ? `#${activityTheme.border}` : undefined,
+                backgroundColor: activityTheme ? `#${activityTheme.bg}` : undefined,
+              }}
+            >
+              <div
+                className="text-sm font-medium"
+                style={{ color: activityTheme ? `#${activityTheme.text}` : undefined }}
+              >
+                Activity Graph
+              </div>
+              <div
+                className="text-xs mt-1"
+                style={{ color: activityTheme ? `#${activityTheme.text}` : undefined }}
+              >
+                @{props.username as string}
+              </div>
+              <div className="mt-2 h-8 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 rounded" />
             </div>
           </div>
         );
 
       case 'trophies':
+        const trophiesTheme = getStatsThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
-            <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
-              <div className="text-sm font-medium">GitHub Trophies</div>
-              <div className="text-xs text-muted-foreground mt-1">@{props.username as string}</div>
+            <div
+              className="rounded-lg border p-4 text-center"
+              style={{
+                borderColor: trophiesTheme ? `#${trophiesTheme.border}` : undefined,
+                backgroundColor: trophiesTheme ? `#${trophiesTheme.bg}` : undefined,
+              }}
+            >
+              <div
+                className="text-sm font-medium"
+                style={{ color: trophiesTheme ? `#${trophiesTheme.title}` : undefined }}
+              >
+                GitHub Trophies
+              </div>
+              <div
+                className="text-xs mt-1"
+                style={{ color: trophiesTheme ? `#${trophiesTheme.text}` : undefined }}
+              >
+                @{props.username as string}
+              </div>
               <div className="flex gap-1 mt-2 justify-center">
                 {['🏆', '🥇', '🥈', '🥉'].map((trophy, i) => (
                   <span key={i} className="text-lg">

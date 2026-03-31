@@ -406,7 +406,7 @@ export function BlockConfigFields({
     case 'activity-graph':
       return (
         <ActivityGraphConfig
-          theme={(props.theme as string) ?? 'default'}
+          theme={String(props.theme) || 'default'}
           hideBorder={Boolean(props.hideBorder)}
           onThemeChange={(v) => update('theme', v)}
           onHideBorderChange={(v) => update('hideBorder', v)}
@@ -416,7 +416,7 @@ export function BlockConfigFields({
     case 'trophies':
       return (
         <TrophiesConfig
-          theme={(props.theme as string) ?? 'default'}
+          theme={String(props.theme) || 'default'}
           column={Number(props.column) || 4}
           row={Number(props.row) || 2}
           noFrame={Boolean(props.noFrame)}
