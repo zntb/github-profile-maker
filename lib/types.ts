@@ -262,11 +262,11 @@ export interface FooterBannerProps {
 export const STATS_THEMES = [
   'default',
   'dark',
+  'rogue',
   'radical',
   'merko',
   'gruvbox',
   'tokyonight',
-  'tokyo-night',
   'onedark',
   'cobalt',
   'synthwave',
@@ -616,6 +616,7 @@ export const BLOCK_CATEGORIES: BlockCategory[] = [
           gap: 12,
           cardWidth: '49%',
           cardHeight: 230,
+          theme: 'tokyonight',
         },
       },
       {
@@ -664,7 +665,7 @@ export const BLOCK_CATEGORIES: BlockCategory[] = [
         icon: 'Activity',
         defaultProps: {
           username: 'github',
-          theme: 'tokyo-night',
+          theme: 'tokyonight',
           hideBorder: false,
         },
       },

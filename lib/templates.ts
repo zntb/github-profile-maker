@@ -108,7 +108,13 @@ export const templates: Template[] = [
       {
         id: 'tpl-10',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: {
+          direction: 'row',
+          gap: 12,
+          cardWidth: '49%',
+          cardHeight: 230,
+          theme: 'tokyonight',
+        },
         children: [
           {
             id: 'tpl-10a',
@@ -300,7 +306,13 @@ export const templates: Template[] = [
       {
         id: 'stat-4',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: {
+          direction: 'row',
+          gap: 12,
+          cardWidth: '49%',
+          cardHeight: 230,
+          theme: 'tokyonight',
+        },
         children: [
           {
             id: 'stat-4a',
@@ -643,7 +655,13 @@ export const templates: Template[] = [
       {
         id: 'oss-14',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: {
+          direction: 'row',
+          gap: 12,
+          cardWidth: '49%',
+          cardHeight: 230,
+          theme: 'github_dark',
+        },
         children: [
           {
             id: 'oss-14a',
@@ -874,7 +892,13 @@ export const templates: Template[] = [
       {
         id: 'fs-15',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: {
+          direction: 'row',
+          gap: 12,
+          cardWidth: '49%',
+          cardHeight: 230,
+          theme: 'catppuccin_mocha',
+        },
         children: [
           {
             id: 'fs-15a',
@@ -921,7 +945,7 @@ export const templates: Template[] = [
         type: 'activity-graph',
         props: {
           username: 'github',
-          theme: 'tokyo-night',
+          theme: 'tokyonight',
           hideBorder: false,
         },
       },
@@ -1136,7 +1160,7 @@ print(f"Trainable params: {model.num_parameters(only_trainable=True):,}")`,
       {
         id: 'ds-16',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230, theme: 'merko' },
         children: [
           {
             id: 'ds-16a',
@@ -1620,7 +1644,13 @@ kubectl apply -f https://raw.githubusercontent.com/yourusername/platform/main/bo
       {
         id: 'stu-16',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: {
+          direction: 'row',
+          gap: 12,
+          cardWidth: '49%',
+          cardHeight: 230,
+          theme: 'tokyonight',
+        },
         children: [
           {
             id: 'stu-16a',
@@ -1893,7 +1923,7 @@ $ cat /etc/skills
       {
         id: 'sec-14',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230, theme: 'dark' },
         children: [
           {
             id: 'sec-14a',
@@ -2139,7 +2169,7 @@ $ cat /etc/skills
       {
         id: 'gd-17',
         type: 'stats-row',
-        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230 },
+        props: { direction: 'row', gap: 12, cardWidth: '49%', cardHeight: 230, theme: 'dracula' },
         children: [
           {
             id: 'gd-17a',
