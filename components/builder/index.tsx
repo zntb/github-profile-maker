@@ -16,6 +16,7 @@ import { BlockSidebar } from './block-sidebar';
 import { Canvas } from './canvas';
 import { ConfigPanel } from './config-panel';
 import { BuilderHeader } from './header';
+import { KeyboardShortcutsDialog, useKeyboardShortcuts } from './keyboard-shortcuts';
 import { OutputPanel } from './output-panel';
 import { ProfileQuality } from './profile-quality';
 
@@ -30,6 +31,9 @@ export function Builder() {
 
   // Initialize auto-save
   useAutoSave();
+
+  // Initialize keyboard shortcuts
+  const { showHelp, setShowHelp } = useKeyboardShortcuts();
 
   const mobileNavigationItems: {
     id: 'blocks' | 'canvas' | 'preview';
@@ -57,6 +61,9 @@ export function Builder() {
 
   return (
     <div className="h-screen flex flex-col bg-background gradient-bg md:pb-16">
+      {/* Keyboard shortcuts dialog */}
+      <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
+
       <BuilderHeader />
 
       {/* Desktop Layout */}
