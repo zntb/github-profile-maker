@@ -1,13 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-import type { Block, Template } from './types';
+import type { Block, BlockType, Template } from './types';
 
 interface BuilderState {
   blocks: Block[];
   selectedBlockId: string | null;
   isDragging: boolean;
   username: string;
+  recentBlockTypes: BlockType[];
 
   // Actions
   addBlock: (block: Block, index?: number) => void;
@@ -23,6 +24,7 @@ interface BuilderState {
   loadTemplate: (template: Template) => void;
   addChildBlock: (parentId: string, block: Block) => void;
   setUsername: (username: string) => void;
+  addToRecentBlocks: (type: BlockType) => void;
 }
 
 // Generate unique ID
@@ -37,6 +39,7 @@ export const useBuilderStore = create<BuilderState>()(
       selectedBlockId: null,
       isDragging: false,
       username: '',
+      recentBlockTypes: [],
 
       addBlock: (block, index) => {
         set((state) => {
@@ -185,10 +188,21 @@ export const useBuilderStore = create<BuilderState>()(
       setUsername: (username) => {
         set({ username });
       },
+
+      addToRecentBlocks: (type) => {
+        set((state) => {
+          const filtered = state.recentBlockTypes.filter((t) => t !== type);
+          const newRecent = [type, ...filtered].slice(0, 8);
+          return { recentBlockTypes: newRecent };
+        });
+      },
     }),
     {
       name: 'github-readme-builder-storage',
-      partialize: (state) => ({ username: state.username }),
+      partialize: (state) => ({
+        username: state.username,
+        recentBlockTypes: state.recentBlockTypes,
+      }),
     },
   ),
 );
