@@ -1,6 +1,6 @@
 'use client';
 
-import { Download, GitBranch, Menu, RotateCcw, User } from 'lucide-react';
+import { Download, GitBranch, Keyboard, Menu, RotateCcw, User } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -22,6 +22,7 @@ import { ModeToggle } from '../mode-toggle';
 
 import { AutoSaveIndicator } from './auto-save-indicator';
 import { HistoryControls } from './history-controls';
+import { KeyboardShortcutsDialog } from './keyboard-shortcuts';
 import { TemplatesDialog } from './templates-dialog';
 
 export function BuilderHeader() {
@@ -30,6 +31,7 @@ export function BuilderHeader() {
   const username = useBuilderStore((s) => s.username);
   const setUsername = useBuilderStore((s) => s.setUsername);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const handleExport = () => {
     const markdown = renderMarkdown(blocks, window.location.origin);
@@ -57,6 +59,7 @@ export function BuilderHeader() {
 
   return (
     <header className="h-16 border-b border-border bg-card/80 backdrop-blur-md flex items-center justify-between p-4 sm:px-6 sticky top-0 z-50">
+      <KeyboardShortcutsDialog open={showShortcuts} onOpenChange={setShowShortcuts} />
       <div className="flex items-center gap-3 sm:gap-4">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20 group">
@@ -75,6 +78,13 @@ export function BuilderHeader() {
       <div className="hidden sm:flex items-center gap-2 sm:gap-3">
         <AutoSaveIndicator />
         <HistoryControls />
+        <button
+          onClick={() => setShowShortcuts(true)}
+          className="p-2 rounded-lg hover:bg-muted/50 transition-all duration-200"
+          title="Keyboard Shortcuts (?)"
+        >
+          <Keyboard className="w-4 h-4" />
+        </button>
         <ModeToggle />
         <TemplatesDialog />
         <Button

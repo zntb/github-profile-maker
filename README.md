@@ -35,6 +35,7 @@
 - [Overview](#overview)
 - [Table of Contents](#table-of-contents)
 - [Features](#features)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
 - [Block Library](#block-library)
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
@@ -74,6 +75,24 @@
 | 💾 **Auto-Save with History** | Automatic progress saving with undo/redo (last 20 states)            |
 | 📊 **Profile Quality Score**  | Real-time profile completeness analysis with improvement suggestions |
 | 🔍 **Block Tooltips**         | Hover previews with descriptions for easy block discovery            |
+| ⌨️ **Keyboard Shortcuts**     | Navigate, add, reorder, and configure blocks without mouse           |
+
+---
+
+## Keyboard Shortcuts
+
+Power users can navigate, add, reorder, and configure blocks without using the mouse.
+
+| Shortcut                         | Action                        |
+| -------------------------------- | ----------------------------- |
+| `↑` / `↓`                        | Select previous/next block    |
+| `Escape`                         | Deselect block / Close dialog |
+| `Delete` / `Backspace`           | Delete selected block         |
+| `Ctrl + D`                       | Duplicate selected block      |
+| `Ctrl + ↑` / `↓`                 | Move block up/down            |
+| `Ctrl + Z`                       | Undo last change              |
+| `Ctrl + Y`                       | Redo last change              |
+| `Shift + /` (or keyboard button) | Show keyboard shortcuts help  |
 
 ---
 
