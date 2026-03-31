@@ -17,6 +17,7 @@ import { Canvas } from './canvas';
 import { ConfigPanel } from './config-panel';
 import { BuilderHeader } from './header';
 import { OutputPanel } from './output-panel';
+import { ProfileQuality } from './profile-quality';
 
 export function Builder() {
   const selectedBlockId = useBuilderStore((s) => s.selectedBlockId);
@@ -93,6 +94,7 @@ export function Builder() {
                   />
                 </div>
               </div>
+              <ProfileQuality />
               <Tabs defaultValue="preview" className="flex-1 flex flex-col">
                 <div className="border-b border-border/50 p-2 bg-gradient-to-b from-card/50 to-transparent">
                   <TabsList className="w-full bg-muted/50">
@@ -181,6 +183,7 @@ export function Builder() {
                     />
                   </div>
                 </div>
+                <ProfileQuality />
                 <Tabs defaultValue="preview" className="flex-1 flex flex-col h-full">
                   <div className="border-b border-border/50 p-2 bg-gradient-to-b from-card/50 to-transparent">
                     <TabsList className="w-full bg-muted/50">
@@ -307,6 +310,7 @@ export function Builder() {
                   />
                 </div>
               </div>
+              <ProfileQuality />
               <Tabs defaultValue="preview" className="flex-1 flex flex-col h-full">
                 <div className="border-b border-border/50 p-2 bg-gradient-to-b from-card/50 to-transparent">
                   <TabsList className="w-full bg-muted/50">
