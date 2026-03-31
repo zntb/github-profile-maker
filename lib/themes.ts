@@ -1058,16 +1058,6 @@ export const activityThemes: Record<string, ActivityTheme> = {
     color3: '30a14e',
     color4: '216e39',
   },
-  'tokyo-night': {
-    bg: '1a1b27',
-    text: '38bdae',
-    border: 'e4e2e2',
-    color0: '2a2e3f',
-    color1: '3d59a1',
-    color2: '7aa2f7',
-    color3: 'bb9af7',
-    color4: '7dcfff',
-  },
   rogue: {
     bg: '1f1f2e',
     text: 'c5c5c5',
