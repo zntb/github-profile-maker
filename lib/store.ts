@@ -43,6 +43,7 @@ interface BuilderState {
   addChildBlock: (parentId: string, block: Block) => void;
   setUsername: (username: string) => void;
   addToRecentBlocks: (type: BlockType) => void;
+  toggleBlockLock: (id: string) => void;
 
   // History actions
   undo: () => void;
@@ -324,6 +325,32 @@ export const useBuilderStore = create<BuilderState>()(
           const filtered = state.recentBlockTypes.filter((t) => t !== type);
           const newRecent = [type, ...filtered].slice(0, 8);
           return { recentBlockTypes: newRecent };
+        });
+      },
+
+      toggleBlockLock: (id) => {
+        const state = get();
+        const newPast = [...state.history.past, state.blocks].slice(-MAX_HISTORY_STATES);
+
+        set((state) => {
+          const toggleInArray = (blocks: Block[]): Block[] => {
+            return blocks.map((block) => {
+              if (block.id === id) {
+                return { ...block, locked: !block.locked };
+              }
+              if (block.children) {
+                return { ...block, children: toggleInArray(block.children) };
+              }
+              return block;
+            });
+          };
+          return {
+            blocks: toggleInArray(state.blocks),
+            history: {
+              past: newPast,
+              future: [],
+            },
+          };
         });
       },
 
