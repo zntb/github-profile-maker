@@ -43,7 +43,7 @@ export default function Loading() {
         </div>
 
         {/* Canvas Skeleton */}
-        <div className="flex-1 p-4 sm:p-8">
+        <div className="flex-1 mx-auto p-4 sm:p-8">
           <div className="mx-auto max-w-4xl space-y-4">
             <Skeleton className="h-6 w-32 mb-6" />
             {Array.from({ length: 3 }).map((_, i) => (
