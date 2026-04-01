@@ -80,6 +80,24 @@ The Canvas is your workspace where you:
 - Reorder blocks by dragging
 - Click to select and configure blocks
 - See live previews of your profile
+- **Lock blocks** to prevent accidental modifications
+
+### Block Locking
+
+When working on complex profiles, you may want to protect certain blocks from accidental changes. The block locking feature allows you to:
+
+- **Lock a block** by clicking the lock icon in the quick actions (right side of block)
+- **Prevent reordering** - Locked blocks cannot be dragged
+- **Prevent editing** - Configuration panel is hidden for locked blocks
+- **Prevent deletion** - Delete and duplicate buttons are hidden
+- **Visual indicator** - Locked blocks show a lock icon in the drag handle area
+- **Unlock** - Click the unlock icon to restore editing capabilities
+
+Locked blocks are ideal for:
+
+- Finalized sections you don't want to change
+- Header/footer blocks that are complete
+- Complex configurations you've carefully tuned
 
 ### 3. Configuration Panel (Right Panel)
 
