@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 
 import { BlockSidebar } from './block-sidebar';
 import { Canvas } from './canvas';
+import { CommandPalette } from './command-palette';
 import { ConfigPanel } from './config-panel';
 import { BuilderHeader } from './header';
 import { KeyboardShortcutsDialog, useKeyboardShortcuts } from './keyboard-shortcuts';
@@ -63,6 +64,9 @@ export function Builder() {
     <div className="h-screen flex flex-col bg-background gradient-bg md:pb-16">
       {/* Keyboard shortcuts dialog */}
       <KeyboardShortcutsDialog open={showHelp} onOpenChange={setShowHelp} />
+
+      {/* Command Palette */}
+      <CommandPalette />
 
       <BuilderHeader />
 
