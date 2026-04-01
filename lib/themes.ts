@@ -1078,23 +1078,12 @@ export const activityThemes: Record<string, ActivityTheme> = {
     color3: '61dafb',
     color4: 'ffffff',
   },
-  'high-contrast': {
-    bg: '000000',
-    text: 'ffffff',
-    border: 'ffffff',
-    color0: '000000',
-    color1: '003300',
-    color2: '006600',
-    color3: '009900',
-    color4: '00ff00',
-  },
 };
 
 const THEME_ALIASES: Record<string, string> = {
   'github-dark': 'github_dark',
   github: 'default',
   'tokyo-night': 'tokyonight',
-  'high-contrast': 'highcontrast',
   'react-dark': 'react',
 };
 
