@@ -22,7 +22,6 @@ import {
   Minus,
   PieChart,
   Quote,
-  Search,
   Share2,
   Space,
   Sparkles,
@@ -37,7 +36,6 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
 import {
   CommandDialog,
   CommandEmpty,
@@ -296,30 +294,6 @@ export function CommandPalette({ onOpenChange }: CommandPaletteProps) {
 
   return (
     <>
-      {/* Keyboard shortcut hint button */}
-      <Button
-        variant="outline"
-        size="sm"
-        className="gap-2 text-muted-foreground hidden sm:flex"
-        onClick={() => setOpen(true)}
-      >
-        <Search className="h-4 w-4" />
-        <span className="text-xs">Search...</span>
-        <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-          <span className="text-xs">⌘</span>K
-        </kbd>
-      </Button>
-
-      {/* Mobile FAB trigger */}
-      <Button
-        variant="outline"
-        size="icon"
-        className="sm:hidden fixed bottom-4 right-4 rounded-full shadow-lg"
-        onClick={() => setOpen(true)}
-      >
-        <Search className="h-5 w-5" />
-      </Button>
-
       {/* Command Dialog */}
       <CommandDialog open={open} onOpenChange={handleOpenChange}>
         <div className="border-b px-4 py-3">
