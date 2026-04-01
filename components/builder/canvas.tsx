@@ -16,7 +16,7 @@ import {
   sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import { Layers, Sparkles } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   Empty,
@@ -27,9 +27,19 @@ import {
 } from '@/components/ui/empty';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useBuilderStore } from '@/lib/store';
+import type { Block } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 import { CanvasBlock } from './canvas-block';
+
+// Threshold for when to enable virtualization
+const VIRTUALIZATION_THRESHOLD = 20;
+
+// Estimated height for each block (in pixels) - used for initial positioning
+const BLOCK_ESTIMATED_HEIGHT = 140;
+
+// Number of blocks to render beyond the visible area
+const BUFFER_COUNT = 5;
 
 function isHalfWidthBlock(block: { type: string; props: Record<string, unknown> }) {
   const layoutWidth = block.props.layoutWidth as string | undefined;
@@ -38,6 +48,90 @@ function isHalfWidthBlock(block: { type: string; props: Record<string, unknown> 
 
   // Default to full width (100%) for all card types
   return false;
+}
+
+/**
+ * VirtualizedCanvas - renders blocks lazily based on scroll position
+ * Only renders blocks that are within the visible viewport plus a buffer
+ */
+function VirtualizedCanvas({
+  blocks,
+  selectedBlockId,
+  selectBlock,
+}: {
+  blocks: Block[];
+  selectedBlockId: string | null;
+  selectBlock: (id: string | null) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: BUFFER_COUNT * 2 });
+
+  // Calculate the visible range based on scroll position
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const updateVisibleRange = () => {
+      const scrollTop = container.scrollTop;
+      const viewportHeight = container.clientHeight;
+
+      const startIndex = Math.max(0, Math.floor(scrollTop / BLOCK_ESTIMATED_HEIGHT) - BUFFER_COUNT);
+      const endIndex = Math.min(
+        blocks.length,
+        Math.ceil((scrollTop + viewportHeight) / BLOCK_ESTIMATED_HEIGHT) + BUFFER_COUNT,
+      );
+
+      setVisibleRange({ start: startIndex, end: endIndex });
+    };
+
+    container.addEventListener('scroll', updateVisibleRange, { passive: true });
+    updateVisibleRange(); // Initial calculation
+
+    return () => {
+      container.removeEventListener('scroll', updateVisibleRange);
+    };
+  }, [blocks.length]);
+
+  // Render only blocks in the visible range
+  const renderedBlocks = useMemo(() => {
+    return blocks.map((block, index) => {
+      // For large profiles, only render visible blocks
+      const isVisible = index >= visibleRange.start && index < visibleRange.end;
+      if (isVisible) {
+        return (
+          <div
+            key={block.id}
+            className={cn('animate-slide-up', isHalfWidthBlock(block) ? 'lg:w-1/2' : 'w-full')}
+            style={{ animationDelay: `${(index % BUFFER_COUNT) * 30}ms` }}
+          >
+            <CanvasBlock
+              block={block}
+              isSelected={selectedBlockId === block.id}
+              onSelect={() => selectBlock(block.id)}
+            />
+          </div>
+        );
+      }
+
+      // Render a placeholder for non-visible blocks to maintain scroll position
+      return (
+        <div
+          key={block.id}
+          className={cn('animate-slide-up', isHalfWidthBlock(block) ? 'lg:w-1/2' : 'w-full')}
+          style={{ minHeight: `${BLOCK_ESTIMATED_HEIGHT}px` }}
+        />
+      );
+    });
+  }, [blocks, selectedBlockId, selectBlock, visibleRange]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="flex flex-col gap-3 items-stretch lg:items-center overflow-y-auto h-full"
+    >
+      {renderedBlocks}
+    </div>
+  );
 }
 
 export function Canvas() {
@@ -76,6 +170,13 @@ export function Canvas() {
     }
   };
 
+  const handleSelectBlock = useCallback(
+    (id: string | null) => {
+      selectBlock(id);
+    },
+    [selectBlock],
+  );
+
   if (blocks.length === 0) {
     return (
       <div className="flex h-full items-center justify-center bg-background/50 p-4 sm:p-8 relative overflow-hidden">
@@ -107,6 +208,8 @@ export function Canvas() {
     );
   }
 
+  const shouldVirtualize = blocks.length >= VIRTUALIZATION_THRESHOLD;
+
   return (
     <ScrollArea className="h-full bg-background/30">
       <div className="min-h-full p-4 sm:p-8" onClick={handleCanvasClick}>
@@ -118,6 +221,9 @@ export function Canvas() {
               <span>
                 {blocks.length} block{blocks.length !== 1 ? 's' : ''}
               </span>
+              {shouldVirtualize && (
+                <span className="text-xs text-muted-foreground/70">(virtualized)</span>
+              )}
             </div>
           </div>
 
@@ -127,24 +233,32 @@ export function Canvas() {
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={blocks.map((b) => b.id)} strategy={rectSortingStrategy}>
-              <div className="flex flex-col gap-3 items-stretch lg:items-center">
-                {blocks.map((block, index) => (
-                  <div
-                    key={block.id}
-                    className={cn(
-                      'animate-slide-up',
-                      isHalfWidthBlock(block) ? 'lg:w-1/2' : 'w-full',
-                    )}
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
-                    <CanvasBlock
-                      block={block}
-                      isSelected={selectedBlockId === block.id}
-                      onSelect={() => selectBlock(block.id)}
-                    />
-                  </div>
-                ))}
-              </div>
+              {shouldVirtualize ? (
+                <VirtualizedCanvas
+                  blocks={blocks}
+                  selectedBlockId={selectedBlockId}
+                  selectBlock={handleSelectBlock}
+                />
+              ) : (
+                <div className="flex flex-col gap-3 items-stretch lg:items-center">
+                  {blocks.map((block, index) => (
+                    <div
+                      key={block.id}
+                      className={cn(
+                        'animate-slide-up',
+                        isHalfWidthBlock(block) ? 'lg:w-1/2' : 'w-full',
+                      )}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <CanvasBlock
+                        block={block}
+                        isSelected={selectedBlockId === block.id}
+                        onSelect={() => selectBlock(block.id)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </SortableContext>
           </DndContext>
         </div>

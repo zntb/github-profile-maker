@@ -73,6 +73,7 @@
 | ⌘ **Command Palette**         | Ctrl+K / Cmd+K for quick access to all actions, blocks, and templates |
 | 💡 **Smart Notifications**    | Context-aware hints that appear based on your actions                 |
 | ⚡ **Progressive Loading**    | Skeleton loaders show while data and blocks are loading               |
+| 🚀 **Lazy Block Rendering**   | Virtualized canvas for smooth performance with 20+ blocks             |
 
 ---
 
@@ -83,6 +84,7 @@ Frontend          Next.js 16 (App Router) · React 19 · TypeScript 5
 Styling           Tailwind CSS v4 · tw-animate-css · shadcn/ui (radix-nova)
 State             Zustand 5
 Drag & Drop       dnd-kit (sortable)
+Virtualization    react-window · react-virtualized-auto-sizer
 Icons             Lucide React
 Theming           next-themes
 Notifications     Sonner
