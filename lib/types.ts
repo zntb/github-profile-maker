@@ -41,6 +41,7 @@ export interface Block {
   type: BlockType;
   props: Record<string, unknown>;
   children?: Block[];
+  locked?: boolean;
 }
 
 // Block Props Types

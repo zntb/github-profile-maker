@@ -52,6 +52,7 @@
 | Feature                       | Description                                                           |
 | ----------------------------- | --------------------------------------------------------------------- |
 | 🧱 **Drag & Drop Canvas**     | Reorder blocks effortlessly with smooth dnd-kit animations            |
+| 🔒 **Block Locking**          | Lock blocks to prevent accidental modifications and reordering        |
 | 📐 **Stats Row Layout**       | Flexible row/column multi-card layouts for stats widgets              |
 | 👁️ **Live Preview**           | See exactly how your README renders in GitHub's style                 |
 | 📝 **Markdown Export**        | Copy to clipboard or download a ready-to-use `README.md`              |

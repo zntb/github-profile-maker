@@ -9,7 +9,9 @@ import {
   Copy,
   GripHorizontal,
   GripVertical,
+  Lock,
   Trash2,
+  Unlock,
 } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 
@@ -41,6 +43,7 @@ export function CanvasBlock({ block, isSelected, onSelect }: CanvasBlockProps) {
   const removeBlock = useBuilderStore((s) => s.removeBlock);
   const duplicateBlock = useBuilderStore((s) => s.duplicateBlock);
   const updateBlock = useBuilderStore((s) => s.updateBlock);
+  const toggleBlockLock = useBuilderStore((s) => s.toggleBlockLock);
   const blockRef = useRef<HTMLDivElement>(null);
   const [isResizing, setIsResizing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -49,6 +52,7 @@ export function CanvasBlock({ block, isSelected, onSelect }: CanvasBlockProps) {
   const blockWidth = block.props.blockWidth as number | undefined;
   const blockHeight = block.props.blockHeight as number | undefined;
   const blockAlignment = block.props.blockAlignment as string | undefined;
+  const isLocked = block.locked ?? false;
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
@@ -178,13 +182,19 @@ export function CanvasBlock({ block, isSelected, onSelect }: CanvasBlockProps) {
             isSelected && 'sm:opacity-100',
           )}
         >
-          <button
-            {...attributes}
-            {...listeners}
-            className="cursor-grab rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground active:cursor-grabbing active:scale-95 transition-all duration-150"
-          >
-            <GripVertical className="h-4 w-4" />
-          </button>
+          {isLocked ? (
+            <div className="rounded-lg p-1.5 text-amber-500 bg-amber-500/10">
+              <Lock className="h-4 w-4" />
+            </div>
+          ) : (
+            <button
+              {...attributes}
+              {...listeners}
+              className="cursor-grab rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground active:cursor-grabbing active:scale-95 transition-all duration-150"
+            >
+              <GripVertical className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Quick Actions */}
@@ -198,23 +208,44 @@ export function CanvasBlock({ block, isSelected, onSelect }: CanvasBlockProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-all duration-200"
-            onClick={handleDuplicate}
+            className={cn(
+              'h-7 w-7 transition-all duration-200',
+              isLocked
+                ? 'text-amber-500 hover:text-amber-600 hover:bg-amber-500/10'
+                : 'text-muted-foreground hover:text-foreground hover:bg-primary/10',
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleBlockLock(block.id);
+            }}
+            title={isLocked ? 'Unlock block' : 'Lock block'}
           >
-            <Copy className="h-3.5 w-3.5" />
+            {isLocked ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
-            onClick={handleDeleteClick}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
+          {!isLocked && (
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-primary/10 transition-all duration-200"
+                onClick={handleDuplicate}
+              >
+                <Copy className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-200"
+                onClick={handleDeleteClick}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </>
+          )}
         </div>
 
-        {/* Alignment Controls */}
-        {isSelected && (
+        {/* Alignment Controls - Hidden when locked */}
+        {isSelected && !isLocked && (
           <div
             className={cn(
               'absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-0.5 bg-card border rounded-lg p-0.5 shadow-md z-20',
