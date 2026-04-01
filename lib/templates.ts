@@ -647,7 +647,7 @@ export const templates: Template[] = [
         type: 'activity-graph',
         props: {
           username: 'github',
-          theme: 'github-dark',
+          theme: 'github_dark',
           hideBorder: true,
         },
       },
@@ -1960,7 +1960,7 @@ $ cat /etc/skills
         type: 'activity-graph',
         props: {
           username: 'github',
-          theme: 'high-contrast',
+          theme: 'highcontrast',
           hideBorder: false,
         },
       },

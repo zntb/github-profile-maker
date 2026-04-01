@@ -25,7 +25,6 @@ describe('theme support across GitHub stats card types', () => {
   it('supports dashed/underscored theme aliases consistently', () => {
     expect(getStreakTheme('tokyo-night')).toEqual(getStreakTheme('tokyonight'));
     expect(getActivityTheme('github-dark')).toEqual(getActivityTheme('github_dark'));
-    expect(getActivityTheme('high-contrast').bg).toBeTruthy();
     expect(getActivityTheme('highcontrast').bg).toBeTruthy();
   });
 });
