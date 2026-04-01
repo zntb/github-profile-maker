@@ -1,14 +1,5 @@
-import { Toaster } from 'sonner';
-
-import { Builder } from '@/components/builder';
-import { Footer } from '@/components/footer';
+import { HomeContent } from './home-content';
 
 export default function Home() {
-  return (
-    <>
-      <Builder />
-      <Footer />
-      <Toaster position="bottom-right" theme="dark" />
-    </>
-  );
+  return <HomeContent />;
 }
