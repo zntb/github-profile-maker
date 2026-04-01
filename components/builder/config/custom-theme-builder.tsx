@@ -1,11 +1,13 @@
 'use client';
 
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Save } from 'lucide-react';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 
 import { SimpleColorPicker } from './gradient-color-picker';
+import { ThemeSaveDialog } from './theme-save-dialog';
 
 export interface CustomThemeColors {
   bg: string;
@@ -68,6 +70,8 @@ interface CustomThemeBuilderProps {
 }
 
 export function CustomThemeBuilder({ value, onChange }: CustomThemeBuilderProps) {
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
   // Get colors from current value
   const currentColors = getCustomColorsFromTheme(value);
 
@@ -87,10 +91,21 @@ export function CustomThemeBuilder({ value, onChange }: CustomThemeBuilderProps)
     <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
       <div className="flex items-center justify-between">
         <Label className="text-sm font-medium">Custom Colors</Label>
-        <Button variant="ghost" size="sm" onClick={handleReset} className="h-7 text-xs">
-          <RotateCcw className="h-3 w-3 mr-1" />
-          Reset
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSaveDialog(true)}
+            className="h-7 text-xs"
+          >
+            <Save className="h-3 w-3 mr-1" />
+            Save
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleReset} className="h-7 text-xs">
+            <RotateCcw className="h-3 w-3 mr-1" />
+            Reset
+          </Button>
+        </div>
       </div>
 
       {/* Theme Preview */}
@@ -157,6 +172,14 @@ export function CustomThemeBuilder({ value, onChange }: CustomThemeBuilderProps)
         value={currentColors.icon}
         onChange={(color) => handleColorChange('icon', color)}
         placeholder="#bf91f3"
+      />
+
+      {/* Save/Load Theme Dialog */}
+      <ThemeSaveDialog
+        currentTheme={value}
+        onThemeSelect={onChange}
+        open={showSaveDialog}
+        onOpenChange={setShowSaveDialog}
       />
     </div>
   );

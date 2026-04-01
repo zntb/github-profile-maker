@@ -9,6 +9,7 @@ This document provides detailed information about all themes available in the Gi
 - [Theme Categories](#theme-categories)
 - [Using Themes](#using-themes)
 - [Custom Theme Builder](#custom-theme-builder)
+- [Saving & Loading Custom Themes](#saving--loading-custom-themes)
 - [Customizing Colors](#customizing-colors)
 - [Theme Preview](#theme-preview)
 
@@ -184,7 +185,26 @@ The Custom Theme Builder allows you to create personalized themes that match you
    - Icon color
 7. Click **Apply Theme** to save
 
-### Using Custom Themes via URL
+### Saving & Loading Custom Themes
+
+The Custom Theme Builder includes a **Save** button that opens a dialog for managing your custom themes. From this dialog you can:
+
+- **Save**: Save your current custom theme with a name for later use
+- **Load**: Click on any saved theme to apply it to your block
+- **Export**: Download all saved themes as a JSON file for backup
+- **Import**: Load themes from a previously exported JSON file
+- **Delete**: Remove saved themes you no longer need
+
+#### How to Use
+
+1. Create or modify a custom theme using the Custom Theme Builder
+2. Click the **Save** button in the Custom Colors section
+3. Enter a name for your theme and click **Save**
+4. Your theme is now saved to local storage
+5. To load a theme later, click **Save** again and select from your saved themes
+6. Use **Export** to create a backup file you can share or import on another device
+
+---
 
 Custom themes can also be applied via URL by encoding your color choices:
 
