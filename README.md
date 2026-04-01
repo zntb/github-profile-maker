@@ -12,7 +12,7 @@
 
 <br/>
 
-**[🚀 Live Demo](https://github-profile-maker.vercel.app/) · [📖 Documentation](README.md) · [🐛 Report Bug](https://github.com/zntb/github-profile-maker/issues) · [✨ Request Feature](https://github.com/zntb/github-profile-maker/issues)**
+**[🚀 Live Demo](https://github-profile-maker.vercel.app/) · [📖 Documentation](docs/GETTING_STARTED.md) · [🐛 Report Bug](https://github.com/zntb/github-profile-maker/issues) · [✨ Request Feature](https://github.com/zntb/github-profile-maker/issues)**
 
 </div>
 
@@ -35,23 +35,14 @@
 - [Overview](#overview)
 - [Table of Contents](#table-of-contents)
 - [Features](#features)
-- [Keyboard Shortcuts](#keyboard-shortcuts)
-  - [Profile Shortcuts](#profile-shortcuts)
-- [Block Library](#block-library)
 - [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
+- [Quick Start](#quick-start)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
   - [Environment Variables](#environment-variables)
-  - [Development](#development)
-  - [Production Build](#production-build)
-- [Project Structure](#project-structure)
-- [API Routes](#api-routes)
-  - [Supported Themes](#supported-themes)
+  - [Run the App](#run-the-app)
 - [Templates](#templates)
-- [Contributing](#contributing)
-  - [Adding a New Block](#adding-a-new-block)
-  - [Code Style](#code-style)
+- [Documentation](#documentation)
 - [License](#license)
 
 ---
@@ -75,132 +66,11 @@
 | 💬 **Random Quotes**          | Built-in API for fetching random developer quotes                    |
 | 💾 **Auto-Save with History** | Automatic progress saving with undo/redo (last 20 states)            |
 | 💼 **Save & Load Profiles**   | Save multiple profiles locally, switch between configurations        |
-| � **Profile Quality Score**   | Real-time profile completeness analysis with improvement suggestions |
+| 🔍 **Profile Quality Score**  | Real-time profile completeness analysis with improvement suggestions |
 | 🔍 **Block Tooltips**         | Hover previews with descriptions for easy block discovery            |
 | ⌨️ **Keyboard Shortcuts**     | Navigate, add, reorder, and configure blocks without mouse           |
 | 💡 **Smart Notifications**    | Context-aware hints that appear based on your actions                |
 | ⚡ **Progressive Loading**    | Skeleton loaders show while data and blocks are loading              |
-
----
-
-## Keyboard Shortcuts
-
-Power users can navigate, add, reorder, and configure blocks without using the mouse.
-
-| Shortcut                         | Action                        |
-| -------------------------------- | ----------------------------- |
-| `↑` / `↓`                        | Select previous/next block    |
-| `Escape`                         | Deselect block / Close dialog |
-| `Delete` / `Backspace`           | Delete selected block         |
-| `Ctrl + D`                       | Duplicate selected block      |
-| `Ctrl + ↑` / `↓`                 | Move block up/down            |
-| `Ctrl + Z`                       | Undo last change              |
-| `Ctrl + Y`                       | Redo last change              |
-| `Shift + /` (or keyboard button) | Show keyboard shortcuts help  |
-
-### Profile Shortcuts
-
-Quickly switch between saved profiles or create new ones.
-
-| Shortcut           | Action                            |
-| ------------------ | --------------------------------- |
-| `Ctrl + 1-9`       | Switch to profile 1-9             |
-| `Ctrl + Shift + S` | Save current state as new profile |
-
----
-
-## Block Library
-
-Blocks are organized into eight categories:
-
-<details>
-<summary><strong>Layout</strong> — Structure your README</summary>
-
-| Block         | Description                                                          |
-| ------------- | -------------------------------------------------------------------- |
-| **Container** | Flex wrapper supporting `row`/`column` direction, alignment, and gap |
-| **Divider**   | Horizontal rule or a custom animated GIF divider                     |
-| **Spacer**    | Configurable height gap (10–100 px)                                  |
-
-</details>
-
-<details>
-<summary><strong>Hero</strong> — Eye-catching headers</summary>
-
-| Block                | Description                                                                                              |
-| -------------------- | -------------------------------------------------------------------------------------------------------- |
-| **Capsule Header**   | Animated banner via [capsule-render](https://github.com/kyechan99/capsule-render) with 7 animation types |
-| **Avatar**           | Circular or rounded profile image with configurable size                                                 |
-| **Greeting**         | Large `<h1>` greeting with optional emoji                                                                |
-| **Typing Animation** | Animated typing SVG via readme-typing-svg with multiple lines                                            |
-
-</details>
-
-<details>
-<summary><strong>Content</strong> — Text and code</summary>
-
-| Block           | Description                                           |
-| --------------- | ----------------------------------------------------- |
-| **Heading**     | H1–H3 with alignment and emoji prefix                 |
-| **Paragraph**   | Freeform text with alignment control                  |
-| **Collapsible** | GitHub `<details>` block with nested children         |
-| **Code Block**  | Syntax-highlighted fenced code with language selector |
-
-</details>
-
-<details>
-<summary><strong>Media</strong> — Images & GIFs</summary>
-
-| Block     | Description                                            |
-| --------- | ------------------------------------------------------ |
-| **Image** | External image with size, alignment, and border-radius |
-| **GIF**   | Lightweight GIF embed with width control               |
-
-</details>
-
-<details>
-<summary><strong>Social</strong> — Badges & links</summary>
-
-| Block             | Description                                                                                              |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| **Social Badges** | One-click shields.io badges for LinkedIn, Twitter, GitHub, YouTube, Instagram, Discord, Email, Portfolio |
-| **Custom Badge**  | Fully custom label/message/color/logo badge                                                              |
-
-</details>
-
-<details>
-<summary><strong>Tech Stack</strong> — Skills</summary>
-
-| Block           | Description                                                                 |
-| --------------- | --------------------------------------------------------------------------- |
-| **Skill Icons** | Grid of tech icons via [skillicons.dev](https://skillicons.dev) — 80+ icons |
-
-</details>
-
-<details>
-<summary><strong>GitHub Stats</strong> — Activity widgets</summary>
-
-| Block              | Description                                             |
-| ------------------ | ------------------------------------------------------- |
-| **Stats Row**      | Flexible row/column layout for multiple stat cards      |
-| **Stats Card**     | Stars, commits, PRs, issues, and rank ring              |
-| **Top Languages**  | Compact, normal, donut, donut-vertical, or pie layout   |
-| **Streak Stats**   | Current streak, longest streak, and total contributions |
-| **Activity Graph** | 30-day contribution line chart                          |
-| **Trophies**       | Trophy grid with configurable columns/rows              |
-
-</details>
-
-<details>
-<summary><strong>Advanced</strong> — Extra elements</summary>
-
-| Block               | Description                                      |
-| ------------------- | ------------------------------------------------ |
-| **Visitor Counter** | komarev.com page-view badge                      |
-| **Quote**           | Static custom quote or random dev quote from API |
-| **Footer Banner**   | Waving capsule-render footer                     |
-
-</details>
 
 ---
 
@@ -220,7 +90,7 @@ Fonts             Outfit · JetBrains Mono
 
 ---
 
-## Getting Started
+## Quick Start
 
 ### Prerequisites
 
@@ -255,87 +125,13 @@ GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx
 
 > **Without a token** the stat widgets still render but display a "GitHub Token Required" placeholder instead of live data.
 
-### Development
+### Run the App
 
 ```bash
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Production Build
-
-```bash
-npm run build
-npm start
-```
-
----
-
-## Project Structure
-
-```text
-github-profile-maker/
-├── app/
-│   ├── api/
-│   │   ├── activity/route.ts      # Contribution activity graph SVG
-│   │   ├── quotes/route.ts        # Random dev quotes API
-│   │   ├── stats/route.ts         # GitHub stats card SVG
-│   │   ├── streak/route.ts        # Streak stats SVG
-│   │   ├── top-langs/route.ts     # Top languages SVG
-│   │   └── trophies/route.ts      # Trophy grid SVG
-│   ├── globals.css                # Tailwind v4 tokens + custom animations
-│   ├── layout.tsx                 # Root layout with ThemeProvider & fonts
-│   └── page.tsx                   # Entry point → <Builder />
-│
-├── components/
-│   ├── builder/
-│   │   ├── index.tsx              # Responsive layout orchestrator (desktop / tablet / mobile)
-│   │   ├── header.tsx             # Top bar: branding, Templates, Clear, Export
-│   │   ├── block-sidebar.tsx      # Searchable block library with categories
-│   │   ├── canvas.tsx             # dnd-kit sortable drop zone
-│   │   ├── canvas-block.tsx       # Individual draggable block wrapper
-│   │   ├── block-preview.tsx      # Compact canvas-level block previews
-│   │   ├── config-panel.tsx       # Right-side property editor (per block type)
-│   │   ├── live-preview.tsx       # Full GitHub-style README render
-│   │   ├── output-panel.tsx       # Markdown output + copy/download actions
-│   │   ├── config/                  # Block configuration components
-│   │   │   └── blocks/             # Per-block config fields (25+ files)
-│   │   └── templates-dialog.tsx   # Template picker dialog
-│   ├── ui/                        # shadcn/ui components
-│   └── mode-toggle.tsx            # Light/Dark/System theme switcher
-│
-├── lib/
-│   ├── github.ts                  # GitHub REST + GraphQL helpers, rank calc, streak calc
-│   ├── markdown.ts                # Block → Markdown renderer + download/copy utils
-│   ├── store.ts                   # Zustand builder store (blocks, selection, DnD)
-│   ├── templates.ts               # Pre-built template definitions
-│   ├── types.ts                   # Block types, prop interfaces, BLOCK_CATEGORIES
-│   └── utils.ts                   # cn() Tailwind merge helper
-│
-└── public/                        # Static assets & favicons
-```
-
----
-
-## API Routes
-
-All stat widgets are generated server-side by built-in Next.js route handlers. They proxy and render live GitHub data as SVG images, meaning the generated Markdown will work from any host that has `GITHUB_TOKEN` configured.
-
-| Route                | Query Params                                                                                                                                        | Description           |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
-| `GET /api/quotes`    | (none)                                                                                                                                              | Random dev quote      |
-| `GET /api/stats`     | `username`, `theme`, `show_icons`, `hide_border`, `hide_title`, `hide_rank`, `border_radius`, `bg_color`, `text_color`, `title_color`, `icon_color` | GitHub stats card     |
-| `GET /api/streak`    | `username`, `theme`, `hide_border`, `border_radius`, `background`, `fire`, `ring`, `currStreakNum`, `sideNums`, `sideLabels`, `dates`               | Streak stats card     |
-| `GET /api/top-langs` | `username`, `theme`, `layout`, `hide_border`, `hide_progress`, `langs_count`, `border_radius`, `bg_color`, `text_color`, `title_color`              | Top languages card    |
-| `GET /api/activity`  | `username`, `theme`, `hide_border`, `bg_color`, `color`, `line`, `point`, `area_color`                                                              | 30-day activity graph |
-| `GET /api/trophies`  | `username`, `theme`, `column`, `row`, `margin_w`, `margin_h`, `no_frame`, `no_bg`                                                                   | Trophy grid           |
-
-### Supported Themes
-
-Over **65 themes** are supported across all widgets, including:
-
-`default` · `dark` · `radical` · `tokyonight` · `dracula` · `onedark` · `nord` · `github_dark` · `catppuccin_mocha` · `gruvbox` · `merko` · `react` · `midnight-purple` · `rose_pine` · and many more.
 
 ---
 
@@ -361,50 +157,17 @@ Templates are defined in `lib/templates.ts` and can be extended freely.
 
 ---
 
-## Contributing
+## Documentation
 
-Contributions are welcome! Here's how to get involved:
+For detailed documentation, see the `docs` folder:
 
-```bash
-# Fork & clone
-git clone https://github.com/zntb/github-profile-maker.git
-
-# Create a feature branch
-git checkout -b feat/my-new-block
-
-# Make your changes, then commit
-git commit -m "feat: add <block-name> block"
-
-# Push and open a Pull Request
-git push origin feat/my-new-block
-```
-
-### Adding a New Block
-
-1. Add the block type to the `BlockType` union in `lib/types.ts`
-2. Define its `defaultProps` in the relevant `BLOCK_CATEGORIES` entry in `lib/types.ts`
-3. Add a preview renderer case in `components/builder/block-preview.tsx`
-4. Add a config fields case in `components/builder/config-panel.tsx`
-5. Add a live preview case in `components/builder/live-preview.tsx`
-6. Add a Markdown render case in `lib/markdown.ts`
-
-### Code Style
-
-- All code is **TypeScript** — avoid `any`
-- Use **shadcn/ui** components where possible
-- Follow existing Tailwind class conventions (CSS variables, `cn()` helper)
-- Run `npm run lint` before submitting
-
-We use **Prettier** and **ESLint** with a pre-commit hook. The hook will block commits if there are any lint errors or formatting issues:
-
-```bash
-# Format all files
-npm run format
-
-# Check for issues
-npm run format:check
-npm run lint
-```
+| Document                                        | Description                                                          |
+| ----------------------------------------------- | -------------------------------------------------------------------- |
+| [GETTING_STARTED.md](docs/GETTING_STARTED.md)   | User guide with interface overview, block usage, and troubleshooting |
+| [API_REFERENCE.md](docs/API_REFERENCE.md)       | API endpoints for stats, streaks, languages, activity, and trophies  |
+| [BLOCKS_REFERENCE.md](docs/BLOCKS_REFERENCE.md) | Complete reference for all 26+ block types and their configurations  |
+| [DEVELOPMENT.md](docs/DEVELOPMENT.md)           | Developer guide for contributing and extending the project           |
+| [THEMES.md](docs/THEMES.md)                     | Theme customization guide with 65+ available themes                  |
 
 ---
 
