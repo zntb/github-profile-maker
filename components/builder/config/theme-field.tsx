@@ -1,7 +1,9 @@
 'use client';
 
+import { FolderOpen } from 'lucide-react';
 import { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -14,6 +16,7 @@ import { STATS_THEMES } from '@/lib/types';
 
 import { CustomThemeBuilder, isCustomTheme } from './custom-theme-builder';
 import { FieldGroup } from './field-group';
+import { ThemeSaveDialog } from './theme-save-dialog';
 
 interface ThemeFieldProps {
   value: string;
@@ -26,6 +29,8 @@ export function ThemeField({ value, onChange, label = 'Theme' }: ThemeFieldProps
 
   // Track whether user has opened the custom theme builder
   const [showCustomBuilder, setShowCustomBuilder] = useState(isCustom);
+  // Track save dialog open state
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
 
   // Handle selecting a preset theme
   const handlePresetChange = (newValue: string) => {
@@ -44,7 +49,18 @@ export function ThemeField({ value, onChange, label = 'Theme' }: ThemeFieldProps
 
   return (
     <FieldGroup>
-      <Label>{label}</Label>
+      <div className="flex items-center justify-between">
+        <Label>{label}</Label>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowSaveDialog(true)}
+          className="h-7 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <FolderOpen className="h-3 w-3 mr-1" />
+          Saved Themes
+        </Button>
+      </div>
       <div className="space-y-2">
         <Select value={isCustom ? 'custom' : value} onValueChange={handlePresetChange}>
           <SelectTrigger>
@@ -64,6 +80,14 @@ export function ThemeField({ value, onChange, label = 'Theme' }: ThemeFieldProps
         {(showCustomBuilder || isCustom) && (
           <CustomThemeBuilder value={value} onChange={onChange} />
         )}
+
+        {/* Save/Load Theme Dialog */}
+        <ThemeSaveDialog
+          currentTheme={value}
+          onThemeSelect={onChange}
+          open={showSaveDialog}
+          onOpenChange={setShowSaveDialog}
+        />
       </div>
     </FieldGroup>
   );
