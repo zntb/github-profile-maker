@@ -1,0 +1,280 @@
+name: Daily Project Statistics
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  issues: read
+  pull-requests: read
+
+jobs:
+  collect-and-update-stats:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Octokit for GitHub API
+        run: npm install --save-dev octokit tsx
+
+      - name: Create stats collection script
+        run: |
+          mkdir -p scripts
+          cat > scripts/collect-stats.ts << 'ENDOFSCRIPT'
+          import { Octokit } from "octokit";
+          import * as fs from "fs";
+          import * as path from "path";
+
+          const GITHUB_REPO = process.env.GITHUB_REPO || "zenet/github-profile-maker";
+          const [owner, repo] = GITHUB_REPO.split("/");
+
+          interface RepositoryStats {
+            lastUpdated: string;
+            commitCount: number;
+            totalStars: number;
+            totalForks: number;
+            openIssues: number;
+            closedIssues: number;
+            openPullRequests: number;
+            closedPullRequests: number;
+            mergedPullRequests: number;
+            codeCoverage: number | null;
+            contributors: number;
+            branches: number;
+            releases: number;
+            tags: number;
+            totalCommits: number;
+            linesOfCode: number;
+          }
+
+          async function collectStats(): Promise<RepositoryStats> {
+            const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+
+            const [
+              repoData,
+              stats,
+              issues,
+              pulls,
+              contributors,
+              branches,
+              releases,
+              tags,
+            ] = await Promise.all([
+              octokit.rest.repos.get({ owner, repo }),
+              octokit.rest.repos.getCommitActivityStats({ owner, repo }),
+              Promise.all([
+                octokit.rest.issues.listForRepo({
+                  owner,
+                  repo,
+                  state: "open",
+                  per_page: 1,
+                }),
+                octokit.rest.issues.listForRepo({
+                  owner,
+                  repo,
+                  state: "closed",
+                  per_page: 1,
+                }),
+              ]),
+              Promise.all([
+                octokit.rest.pulls.list({ owner, repo, state: "open", per_page: 1 }),
+                octokit.rest.pulls.list({
+                  owner,
+                  repo,
+                  state: "closed",
+                  per_page: 1,
+                }),
+                octokit.rest.pulls.list({
+                  owner,
+                  repo,
+                  state: "all",
+                  per_page: 1,
+                  base: "main",
+                }),
+              ]),
+              octokit.rest.repos.listContributors({
+                owner,
+                repo,
+                per_page: 1,
+              }),
+              octokit.rest.repos.listBranches({ owner, repo, per_page: 1 }),
+              octokit.rest.repos.listReleases({ owner, repo, per_page: 1 }),
+              octokit.rest.repos.listTags({ owner, repo, per_page: 1 }),
+            ]);
+
+            const openIssues = issues[0].data.length;
+            const closedIssues = issues[1].data.length;
+            const openPRs = pulls[0].data.length;
+            const closedPRs = pulls[1].data.length;
+            const mergedPRs = pulls[2].data.length;
+
+            let totalCommits = 0;
+            if (stats.data && stats.data.length > 0) {
+              for (const week of stats.data) {
+                totalCommits += week.total;
+              }
+            }
+
+            const contributorsCount = await octokit.rest.repos.listContributors({
+              owner,
+              repo,
+              per_page: 1,
+              anon: "true",
+            });
+            const totalContributors = parseInt(
+              contributorsCount.headers["link"]?.match(/page=(\d+)>; rel="last")?.[1] ||
+                "1"
+            );
+
+            return {
+              lastUpdated: new Date().toISOString(),
+              commitCount: repoData.data.size > 0 ? totalCommits : repoData.data.size,
+              totalStars: repoData.data.stargazers_count,
+              totalForks: repoData.data.forks_count,
+              openIssues,
+              closedIssues,
+              openPullRequests: openPRs,
+              closedPullRequests: closedPRs,
+              mergedPullRequests: mergedPRs,
+              codeCoverage: null,
+              contributors: totalContributors,
+              branches: branches.data.length,
+              releases: releases.data.length,
+              tags: tags.data.length,
+              totalCommits,
+              linesOfCode: repoData.data.size,
+            };
+          }
+
+          async function main() {
+            console.log("Starting stats collection...");
+
+            const stats = await collectStats();
+            console.log("Stats collected:", JSON.stringify(stats, null, 2));
+
+            const statsPath = path.join(process.cwd(), "docs", "stats.json");
+
+            const docsDir = path.dirname(statsPath);
+            if (!fs.existsSync(docsDir)) {
+              fs.mkdirSync(docsDir, { recursive: true });
+            }
+
+            let existingStats: { history: RepositoryStats[] } = { history: [] };
+            if (fs.existsSync(statsPath)) {
+              try {
+                existingStats = JSON.parse(fs.readFileSync(statsPath, "utf-8"));
+              } catch (e) {
+                console.log("No existing stats found, creating new file");
+              }
+            }
+
+            const ninetyDaysAgo = new Date();
+            ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+            const history = (existingStats.history || []).filter(
+              (entry) => new Date(entry.lastUpdated) > ninetyDaysAgo
+            );
+
+            history.push({
+              lastUpdated: stats.lastUpdated,
+              commitCount: stats.commitCount,
+              totalStars: stats.totalStars,
+              totalForks: stats.totalForks,
+              openIssues: stats.openIssues,
+              closedIssues: stats.closedIssues,
+              openPullRequests: stats.openPullRequests,
+              closedPullRequests: stats.closedPullRequests,
+              mergedPullRequests: stats.mergedPullRequests,
+              codeCoverage: stats.codeCoverage,
+              contributors: stats.contributors,
+              branches: stats.branches,
+              releases: stats.releases,
+              tags: stats.tags,
+              totalCommits: stats.totalCommits,
+              linesOfCode: stats.linesOfCode,
+            });
+
+            const output = {
+              current: stats,
+              history,
+            };
+
+            fs.writeFileSync(statsPath, JSON.stringify(output, null, 2));
+            console.log(`Stats written to ${statsPath}`);
+
+            return stats;
+          }
+
+          main()
+            .then(() => {
+              process.exit(0);
+            })
+            .catch((error) => {
+              console.error("Error collecting stats:", error);
+              process.exit(1);
+            });
+          ENDOFSCRIPT
+
+      - name: Run stats collection
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+        run: npx tsx scripts/collect-stats.ts
+
+      - name: Check if stats changed
+        id: check-changes
+        run: |
+          if [ -f docs/stats.json ]; then
+            if git diff --quiet docs/stats.json; then
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "No changes to stats, skipping commit"
+            else
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "Stats have changed, proceeding with commit"
+            fi
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "New stats file, proceeding with commit"
+          fi
+
+      - name: Commit and push stats
+        if: steps.check-changes.outputs.changed == 'true'
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_EMAIL: ${{ github.actor }}@users.noreply.github.com
+        run: |
+          git config --local user.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --local user.name "${GITHUB_ACTOR}"
+          git add docs/stats.json
+          git commit -m "docs: update project statistics" || echo "No changes to commit"
+          git push || echo "Warning: Failed to push stats"
+
+      - name: Report success
+        if: success()
+        run: echo "Stats collection completed successfully"
+
+      - name: Report failure
+        if: failure()
+        run: |
+          echo "::error::Stats collection failed. Please check the workflow logs for details."
+          echo "Failed workflow: ${{ github.workflow }}"
+          echo "Run URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
