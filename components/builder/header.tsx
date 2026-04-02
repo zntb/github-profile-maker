@@ -4,7 +4,9 @@ import {
   Download,
   GitBranch,
   Keyboard,
+  Link,
   Menu,
+  MoreHorizontal,
   RotateCcw,
   Settings,
   Trash2,
@@ -25,6 +27,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -94,43 +106,11 @@ export function BuilderHeader() {
         </div>
       </div>
 
-      <div className="hidden sm:flex items-center gap-2 sm:gap-3">
+      <div className="hidden md:flex items-center gap-2 sm:gap-3">
         <AutoSaveIndicator />
         <ProfileSelector />
         <HistoryControls />
-        <button
-          onClick={() => setShowShortcuts(true)}
-          className="p-2 rounded-lg hover:bg-muted/50 transition-all duration-200"
-          title="Keyboard Shortcuts (?)"
-        >
-          <Keyboard className="w-4 h-4" />
-        </button>
         <ModeToggle />
-        <Sheet open={showSettings} onOpenChange={setShowSettings}>
-          <SheetTrigger asChild>
-            <button
-              className="p-2 rounded-lg hover:bg-muted/50 transition-all duration-200"
-              title="Image Optimization Settings"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
-          </SheetTrigger>
-          <SheetContent
-            side="right"
-            className="w-[85vw] max-w-sm overflow-y-auto overflow-x-hidden px-3 box-border"
-          >
-            <SheetHeader>
-              <SheetTitle>Image Optimization</SheetTitle>
-              <SheetDescription>
-                Configure automatic image compression and format conversion before uploading to your
-                profile.
-              </SheetDescription>
-            </SheetHeader>
-            <div className="mt-6">
-              <ImageOptimizationSettings />
-            </div>
-          </SheetContent>
-        </Sheet>
         <TemplatesDialog />
         <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
           <AlertDialogTrigger asChild>
@@ -167,17 +147,116 @@ export function BuilderHeader() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <Button
-          size="sm"
-          onClick={handleExport}
-          disabled={blocks.length === 0}
-          className="hidden sm:flex gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 hover:-translate-y-0.5"
-        >
-          <Download className="w-4 h-4" />
-          Export
-        </Button>
-        <SaveToGist />
-        <ShareButton />
+        {/* Image Optimization Settings Sheet */}
+        <Sheet open={showSettings} onOpenChange={setShowSettings}>
+          <SheetContent
+            side="right"
+            className="w-[85vw] max-w-sm overflow-y-auto overflow-x-hidden px-3 box-border"
+          >
+            <SheetHeader>
+              <SheetTitle>Image Optimization</SheetTitle>
+              <SheetDescription>
+                Configure automatic image compression and format conversion before uploading to your
+                profile.
+              </SheetDescription>
+            </SheetHeader>
+            <div className="mt-6">
+              <ImageOptimizationSettings />
+            </div>
+          </SheetContent>
+        </Sheet>
+        {/* Actions dropdown - consolidates secondary actions including Share */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 hover:bg-muted/50"
+              aria-label="Open actions menu"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+              Actions
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onClick={() => setShowSettings(true)}>
+              <Settings className="w-4 h-4 mr-2" />
+              Image Optimization Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowShortcuts(true)}>
+              <Keyboard className="w-4 h-4 mr-2" />
+              Keyboard Shortcuts
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleExport} disabled={blocks.length === 0}>
+              <Download className="w-4 h-4 mr-2" />
+              Export
+            </DropdownMenuItem>
+            {/* Share to Gist - render trigger directly to avoid nested dropdown issues */}
+            <DropdownMenuItem
+              disabled={blocks.length === 0}
+              className="cursor-pointer"
+              onClick={() => {
+                // Programmatically trigger the SaveToGist dialog by dispatching a custom event
+                const event = new CustomEvent('open-save-to-gist');
+                window.dispatchEvent(event);
+              }}
+            >
+              <GitBranch className="w-4 h-4 mr-2" />
+              Share to Gist
+            </DropdownMenuItem>
+            {/* Share - nested submenu with Twitter, LinkedIn, Facebook, Copy Link */}
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="cursor-pointer">
+                <Link className="w-4 h-4 mr-2" />
+                <span>Share</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className="w-48">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => {
+                    const event = new CustomEvent('open-share-dialog');
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  <span className="text-[#1DA1F2]">🐦</span>
+                  <span className="ml-2">Twitter / X</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => {
+                    const event = new CustomEvent('open-share-dialog');
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  <span className="text-[#0A66C2]">💼</span>
+                  <span className="ml-2">LinkedIn</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => {
+                    const event = new CustomEvent('open-share-dialog');
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  <span className="text-[#1877F2]">📘</span>
+                  <span className="ml-2">Facebook</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => {
+                    const event = new CustomEvent('open-share-dialog');
+                    window.dispatchEvent(event);
+                  }}
+                >
+                  <span>🔗</span>
+                  <span className="ml-2">Copy Link</span>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="sm:hidden flex items-center gap-1">

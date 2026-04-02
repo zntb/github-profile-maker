@@ -1,7 +1,7 @@
 'use client';
 
 import { ExternalLink, GitBranch, Loader2, Lock, Save } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,23 @@ export function SaveToGist() {
       setToken(savedToken);
     }
   });
+
+  // Listen for custom event to open SaveToGist dialog from header dropdown
+  useEffect(() => {
+    const handleOpenGist = () => {
+      if (blocks.length > 0) {
+        // Load saved token when opening
+        const savedToken = localStorage.getItem('github_gist_token');
+        if (savedToken) {
+          setToken(savedToken);
+        }
+        setIsOpen(true);
+      }
+    };
+
+    window.addEventListener('open-save-to-gist', handleOpenGist);
+    return () => window.removeEventListener('open-save-to-gist', handleOpenGist);
+  }, [blocks]);
 
   const handleSave = async () => {
     if (!token.trim()) {
