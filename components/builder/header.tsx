@@ -108,10 +108,7 @@ export function BuilderHeader() {
 
       <div className="hidden md:flex items-center gap-2 sm:gap-3">
         <AutoSaveIndicator />
-        <ProfileSelector />
         <HistoryControls />
-        <ModeToggle />
-        <TemplatesDialog />
         <AlertDialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
           <AlertDialogTrigger asChild>
             <Button
@@ -257,6 +254,9 @@ export function BuilderHeader() {
             </DropdownMenuSub>
           </DropdownMenuContent>
         </DropdownMenu>
+        <ProfileSelector />
+        <TemplatesDialog />
+        <ModeToggle />
       </div>
 
       <div className="sm:hidden flex items-center gap-1">
