@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -134,6 +134,18 @@ export function ShareButton() {
   const username = useBuilderStore((s) => s.username);
   const blocks = useBuilderStore((s) => s.blocks);
 
+  // Listen for custom event to open share dialog from header dropdown
+  useEffect(() => {
+    const handleOpenShare = () => {
+      if (blocks.length > 0) {
+        setShareDialogOpen(true);
+      }
+    };
+
+    window.addEventListener('open-share-dialog', handleOpenShare);
+    return () => window.removeEventListener('open-share-dialog', handleOpenShare);
+  }, [blocks]);
+
   // Generate share URL - in production this would be the deployed URL
   const getShareUrl = (): string => {
     if (typeof window !== 'undefined') {
@@ -239,10 +251,8 @@ export function ShareButton() {
     setShareDialogOpen(false);
   };
 
-  // Don't show share button if no content
-  if (blocks.length === 0) {
-    return null;
-  }
+  // Don't show share button if no content - but always show mobile button
+  const showShareButton = blocks.length > 0;
 
   const shareData: ShareData = {
     title: getShareTitle(),
@@ -252,55 +262,61 @@ export function ShareButton() {
 
   return (
     <>
-      {/* Desktop: Dropdown Menu */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size="sm"
-            className="hidden sm:flex gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 hover:-translate-y-0.5"
-          >
-            <LinkIcon className="w-4 h-4" />
-            Share
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuLabel>Share your profile</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => handleShare('twitter')} className="cursor-pointer gap-3">
-            <TwitterIcon className="w-4 h-4" style={{ color: '#1DA1F2' }} />
-            <span>Twitter / X</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleShare('linkedin')}
-            className="cursor-pointer gap-3"
-          >
-            <LinkedInIcon className="w-4 h-4" style={{ color: '#0A66C2' }} />
-            <span>LinkedIn</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleShare('facebook')}
-            className="cursor-pointer gap-3"
-          >
-            <FacebookIcon className="w-4 h-4" style={{ color: '#1877F2' }} />
-            <span>Facebook</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => handleShare('copy')} className="cursor-pointer gap-3">
-            {copied ? (
-              <CheckIcon className="w-4 h-4 text-green-500" />
-            ) : (
-              <CopyIcon className="w-4 h-4" />
-            )}
-            <span>{copied ? 'Copied!' : 'Copy link'}</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Desktop: Dropdown Menu - only show when there are blocks */}
+      {showShareButton && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="sm"
+              className="hidden sm:flex gap-2 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200 hover:-translate-y-0.5"
+            >
+              <LinkIcon className="w-4 h-4" />
+              Share
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>Share your profile</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => handleShare('twitter')}
+              className="cursor-pointer gap-3"
+            >
+              <TwitterIcon className="w-4 h-4" style={{ color: '#1DA1F2' }} />
+              <span>Twitter / X</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleShare('linkedin')}
+              className="cursor-pointer gap-3"
+            >
+              <LinkedInIcon className="w-4 h-4" style={{ color: '#0A66C2' }} />
+              <span>LinkedIn</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => handleShare('facebook')}
+              className="cursor-pointer gap-3"
+            >
+              <FacebookIcon className="w-4 h-4" style={{ color: '#1877F2' }} />
+              <span>Facebook</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleShare('copy')} className="cursor-pointer gap-3">
+              {copied ? (
+                <CheckIcon className="w-4 h-4 text-green-500" />
+              ) : (
+                <CopyIcon className="w-4 h-4" />
+              )}
+              <span>{copied ? 'Copied!' : 'Copy link'}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
-      {/* Mobile: Dialog */}
+      {/* Mobile: Dialog - always show but disabled when no content */}
       <Button
         size="sm"
         className="sm:hidden gap-2 w-full justify-start h-11 bg-gradient-to-r from-primary to-primary/90 px-3"
         onClick={() => setShareDialogOpen(true)}
+        disabled={!showShareButton}
       >
         <LinkIcon className="w-4 h-4" />
         Share Profile
