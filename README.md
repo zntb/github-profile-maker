@@ -75,7 +75,8 @@
 | ⌘ **Command Palette**         | Ctrl+K / Cmd+K for quick access to all actions, blocks, and templates |
 | 💡 **Smart Notifications**    | Context-aware hints that appear based on your actions                 |
 | ⚡ **Progressive Loading**    | Skeleton loaders show while data and blocks are loading               |
-| 🚀 **Lazy Block Rendering**   | Virtualized canvas for smooth performance with 20+ blocks             |
+| 📋 **Actions Dropdown**       | Consolidated menu for secondary actions on desktop                    |
+| � **Lazy Block Rendering**    | Virtualized canvas for smooth performance with 20+ blocks             |
 | ☁️ **Save to GitHub Gist**    | One-click backup to public or private GitHub Gists                    |
 | 📤 **Share to Social Media**  | One-click sharing to Twitter/X, LinkedIn, and Facebook                |
 | 🖼️ **Image Optimization**     | Auto-compress and convert images to WebP for faster loading           |
