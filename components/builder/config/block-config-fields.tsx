@@ -76,7 +76,7 @@ export function BlockConfigFields({
             (props.bgAnimation as 'none' | 'gradient' | 'pulse' | 'wave' | 'shimmer') ?? 'none'
           }
           bgStartColor={(props.bgStartColor as string) ?? 'EEFF00'}
-          bgEndColor={(props.bgEndColor as string) ?? 'a82DA'}
+          bgEndColor={(props.bgEndColor as string) ?? 'A82DAA'}
           bgSolidColor={(props.bgSolidColor as string) ?? 'transparent'}
           onAlignmentChange={(v) => update('alignment', v)}
           onDirectionChange={(v) => update('direction', v)}
@@ -188,8 +188,8 @@ export function BlockConfigFields({
       let bgStartColor = props.bgStartColor as string;
       let bgEndColor = props.bgEndColor as string;
 
-      // Parse legacy color format if new format is not present
-      if (!bgStartColor && !bgEndColor && props.color) {
+      // Parse legacy color format even if modern properties are present
+      if (props.color) {
         const colorValue = props.color as string;
         const colorParts = colorValue.split(',');
         if (colorParts.length >= 2) {
@@ -202,7 +202,7 @@ export function BlockConfigFields({
 
       // Apply defaults after legacy parsing
       bgStartColor = bgStartColor ?? 'EEFF00';
-      bgEndColor = bgEndColor ?? 'a82DA';
+      bgEndColor = bgEndColor ?? 'A82DAA';
 
       return (
         <CapsuleHeaderConfig
@@ -230,14 +230,38 @@ export function BlockConfigFields({
           onTextChange={(v) => update('text', v)}
           onTypeChange={(v) => update('type', v)}
           onSectionChange={(v) => update('section', v)}
-          onHeightChange={(v) => update('height', v)}
-          onFontSizeChange={(v) => update('fontSize', v)}
-          onFontColorChange={(v) => update('fontColor', v)}
-          onBgTypeChange={(v) => update('bgType', v)}
-          onBgGradientDirectionChange={(v) => update('bgGradientDirection', v)}
-          onBgAnimationChange={(v) => update('bgAnimation', v)}
-          onBgStartColorChange={(v) => update('bgStartColor', v)}
-          onBgEndColorChange={(v) => update('bgEndColor', v)}
+          onHeightChange={(v) => {
+            update('height', v);
+            update('color', undefined);
+          }}
+          onFontSizeChange={(v) => {
+            update('fontSize', v);
+            update('color', undefined);
+          }}
+          onFontColorChange={(v) => {
+            update('fontColor', v);
+            update('color', undefined);
+          }}
+          onBgTypeChange={(v) => {
+            update('bgType', v);
+            update('color', undefined);
+          }}
+          onBgGradientDirectionChange={(v) => {
+            update('bgGradientDirection', v);
+            update('color', undefined);
+          }}
+          onBgAnimationChange={(v) => {
+            update('bgAnimation', v);
+            update('color', undefined);
+          }}
+          onBgStartColorChange={(v) => {
+            update('bgStartColor', v);
+            update('color', undefined);
+          }}
+          onBgEndColorChange={(v) => {
+            update('bgEndColor', v);
+            update('color', undefined);
+          }}
           onBgSolidColorChange={(v) => update('bgSolidColor', v)}
         />
       );
