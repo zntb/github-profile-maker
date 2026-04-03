@@ -46,7 +46,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
       case 'container': {
         const bgType = (props.bgType as string) ?? 'solid';
         const bgStartColor = (props.bgStartColor as string) ?? 'EEFF00';
-        const bgEndColor = (props.bgEndColor as string) ?? 'a82DA';
+        const bgEndColor = (props.bgEndColor as string) ?? 'A82DAA';
         const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
         const bgSolidColor = (props.bgSolidColor as string) ?? 'transparent';
 
@@ -117,33 +117,28 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         );
 
       case 'capsule-header': {
-        // Support both new format (bgStartColor/bgEndColor) and legacy format (color)
+        const colorValue = props.color as string;
+        // Fix: bgType should come from props instead of being hardcoded
         const bgType = (props.bgType as string) ?? 'gradient';
         const bgAnimation = (props.bgAnimation as string) ?? 'none';
-        let bgStartColor = props.bgStartColor as string;
-        let bgEndColor = props.bgEndColor as string;
-        const bgSolidColor = (props.bgSolidColor as string) ?? 'transparent';
+        let bgStartColor = props.bgStartColor ? String(props.bgStartColor) : undefined;
+        let bgEndColor = props.bgEndColor ? String(props.bgEndColor) : undefined;
+        const bgSolidColor = (props.bgSolidColor as string) ?? 'EEFF00';
 
-        // Parse legacy color format if new format is not present
-        if (!bgStartColor && !bgEndColor && props.color) {
-          const colorValue = props.color as string;
-          // Handle 'gradient' placeholder - use defaults
-          if (colorValue === 'gradient') {
-            // Use default colors
-          } else {
-            const colorParts = colorValue.split(',');
-            if (colorParts.length >= 2) {
-              const startMatch = colorParts[0].match(/\d+:([0-9a-fA-F]+)/);
-              const endMatch = colorParts[1].match(/\d+:([0-9a-fA-F]+)/);
-              if (startMatch) bgStartColor = startMatch[1].toUpperCase();
-              if (endMatch) bgEndColor = endMatch[1].toUpperCase();
-            }
+        // Parse legacy color format ONLY if modern properties are NOT present
+        if ((!bgStartColor || !bgEndColor) && colorValue && colorValue !== 'gradient') {
+          const colorParts = colorValue.split(',');
+          if (colorParts.length >= 2) {
+            const startMatch = colorParts[0].match(/\d+:([0-9a-fA-F]+)/);
+            const endMatch = colorParts[1].match(/\d+:([0-9a-fA-F]+)/);
+            if (startMatch) bgStartColor = startMatch[1].toUpperCase();
+            if (endMatch) bgEndColor = endMatch[1].toUpperCase();
           }
         }
 
-        // Apply defaults after legacy parsing
+        // Always apply defaults - this ensures new blocks get proper colors immediately
         bgStartColor = bgStartColor ?? 'EEFF00';
-        bgEndColor = bgEndColor ?? 'a82DA';
+        bgEndColor = bgEndColor ?? 'A82DAA';
 
         const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
 
@@ -158,29 +153,29 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
               : bgSolidColor.startsWith('#')
                 ? bgSolidColor
                 : `#${bgSolidColor}`;
-          bgStyle = { background: solidColor };
+          bgStyle = { backgroundColor: solidColor };
         } else {
           // Gradient background
           const start = `#${bgStartColor}`;
           const end = `#${bgEndColor}`;
           switch (bgGradientDirection) {
             case 'horizontal':
-              bgStyle = { background: `linear-gradient(to right, ${start}, ${end})` };
+              bgStyle = { backgroundImage: `linear-gradient(to right, ${start}, ${end})` };
               break;
             case 'vertical':
-              bgStyle = { background: `linear-gradient(to bottom, ${start}, ${end})` };
+              bgStyle = { backgroundImage: `linear-gradient(to bottom, ${start}, ${end})` };
               break;
             case 'diagonal':
-              bgStyle = { background: `linear-gradient(135deg, ${start}, ${end})` };
+              bgStyle = { backgroundImage: `linear-gradient(135deg, ${start}, ${end})` };
               break;
             case 'radial':
-              bgStyle = { background: `radial-gradient(circle, ${start}, ${end})` };
+              bgStyle = { backgroundImage: `radial-gradient(circle, ${start}, ${end})` };
               break;
             case 'conic':
-              bgStyle = { background: `conic-gradient(from 0deg, ${start}, ${end})` };
+              bgStyle = { backgroundImage: `conic-gradient(from 0deg, ${start}, ${end})` };
               break;
             default:
-              bgStyle = { background: `linear-gradient(to right, ${start}, ${end})` };
+              bgStyle = { backgroundImage: `linear-gradient(to right, ${start}, ${end})` };
           }
         }
 
@@ -193,17 +188,25 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           typeof props.fontColor === 'string' ? props.fontColor.replace('#', '').trim() : 'ffffff';
         const fontColor = `#${normalizedFontColor || 'ffffff'}`;
         const animationClass =
-          bgType === 'animated' && bgAnimation !== 'none'
+          bgAnimation !== 'none'
             ? bgAnimation === 'gradient'
               ? 'animate-gradient-flow'
               : bgAnimation === 'pulse'
                 ? 'animate-pulse'
-                : bgAnimation === 'wave'
+                : bgAnimation === 'waving' || bgAnimation === 'wave'
                   ? 'animate-wave'
                   : bgAnimation === 'shimmer'
                     ? 'animate-shimmer'
                     : ''
             : '';
+
+        // Add required background size for animations
+        const animationBgSize =
+          animationClass !== ''
+            ? {
+                backgroundSize: bgAnimation === 'gradient' ? '200% 200%' : '200% 100%',
+              }
+            : {};
         const section = (props.section as string) ?? 'header';
         const type = (props.type as string) ?? 'waving';
         const borderRadius =
@@ -224,6 +227,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             className={`relative rounded-lg flex items-center justify-center w-full overflow-hidden ${animationClass}`}
             style={{
               ...bgStyle,
+              ...animationBgSize,
               height: `${props.height ?? 200}px`,
               borderRadius,
             }}

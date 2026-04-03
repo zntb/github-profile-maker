@@ -567,30 +567,25 @@ function PreviewBlock({
         const bgType = (props.bgType as string) ?? 'gradient';
         const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
         const bgAnimation = (props.bgAnimation as string) ?? 'none';
-        let bgStartColor = props.bgStartColor as string;
-        let bgEndColor = props.bgEndColor as string;
-        const bgSolidColor = (props.bgSolidColor as string) ?? 'transparent';
+        let bgStartColor = props.bgStartColor ? String(props.bgStartColor) : undefined;
+        let bgEndColor = props.bgEndColor ? String(props.bgEndColor) : undefined;
+        const bgSolidColor = (props.bgSolidColor as string) ?? 'EEFF00';
 
-        // Parse legacy color format if new format is not present
-        if (!bgStartColor && !bgEndColor && props.color) {
+        // Parse legacy color format ONLY if modern properties are NOT present
+        if ((!bgStartColor || !bgEndColor) && props.color && props.color !== 'gradient') {
           const colorValue = props.color as string;
-          // Handle 'gradient' placeholder - use defaults
-          if (colorValue === 'gradient') {
-            // Use default colors
-          } else {
-            const colorParts = colorValue.split(',');
-            if (colorParts.length >= 2) {
-              const startMatch = colorParts[0].match(/\d+:([0-9a-fA-F]+)/);
-              const endMatch = colorParts[1].match(/\d+:([0-9a-fA-F]+)/);
-              if (startMatch) bgStartColor = startMatch[1].toUpperCase();
-              if (endMatch) bgEndColor = endMatch[1].toUpperCase();
-            }
+          const colorParts = colorValue.split(',');
+          if (colorParts.length >= 2) {
+            const startMatch = colorParts[0].match(/\d+:([0-9a-fA-F]+)/);
+            const endMatch = colorParts[1].match(/\d+:([0-9a-fA-F]+)/);
+            if (startMatch) bgStartColor = startMatch[1].toUpperCase();
+            if (endMatch) bgEndColor = endMatch[1].toUpperCase();
           }
         }
 
-        // Apply defaults after legacy parsing
+        // Always apply defaults - this ensures new blocks get proper colors immediately
         bgStartColor = bgStartColor ?? 'EEFF00';
-        bgEndColor = bgEndColor ?? 'a82DA';
+        bgEndColor = bgEndColor ?? 'A82DAA';
 
         const normalizeHex = (value: string, fallback: string) => {
           const sanitized = value?.replace('#', '').trim();
@@ -616,42 +611,52 @@ function PreviewBlock({
         const startColor = `#${bgStartColor}`;
         const endColor = `#${bgEndColor}`;
 
-        let gradientStyle: string;
+        let gradientBgImage: string;
         switch (bgGradientDirection) {
           case 'horizontal':
-            gradientStyle = `linear-gradient(to right, ${startColor}, ${endColor})`;
+            gradientBgImage = `linear-gradient(to right, ${startColor}, ${endColor})`;
             break;
           case 'vertical':
-            gradientStyle = `linear-gradient(to bottom, ${startColor}, ${endColor})`;
+            gradientBgImage = `linear-gradient(to bottom, ${startColor}, ${endColor})`;
             break;
           case 'diagonal':
-            gradientStyle = `linear-gradient(135deg, ${startColor}, ${endColor})`;
+            gradientBgImage = `linear-gradient(135deg, ${startColor}, ${endColor})`;
             break;
           case 'radial':
-            gradientStyle = `radial-gradient(circle, ${startColor}, ${endColor})`;
+            gradientBgImage = `radial-gradient(circle, ${startColor}, ${endColor})`;
             break;
           case 'conic':
-            gradientStyle = `conic-gradient(from 0deg, ${startColor}, ${endColor})`;
+            gradientBgImage = `conic-gradient(from 0deg, ${startColor}, ${endColor})`;
             break;
           default:
-            gradientStyle = `linear-gradient(to right, ${startColor}, ${endColor})`;
+            gradientBgImage = `linear-gradient(to right, ${startColor}, ${endColor})`;
         }
 
         // Apply animation for animated type
         const fontSize = (props.fontSize as number) ?? 30;
         const fontColor = `#${normalizeHex((props.fontColor as string) ?? 'ffffff', 'ffffff')}`;
         const animationClass =
-          bgType === 'animated' && bgAnimation !== 'none'
+          bgAnimation !== 'none'
             ? bgAnimation === 'gradient'
               ? 'animate-gradient-flow'
               : bgAnimation === 'pulse'
                 ? 'animate-pulse'
-                : bgAnimation === 'wave'
+                : bgAnimation === 'waving'
                   ? 'animate-wave'
-                  : bgAnimation === 'shimmer'
-                    ? 'animate-shimmer'
-                    : ''
+                  : bgAnimation === 'wave'
+                    ? 'animate-wave'
+                    : bgAnimation === 'shimmer'
+                      ? 'animate-shimmer'
+                      : ''
             : '';
+
+        // Add required background size for animations
+        const animationBgSize =
+          animationClass !== ''
+            ? {
+                backgroundSize: bgAnimation === 'gradient' ? '200% 200%' : '200% 100%',
+              }
+            : {};
         const section = (props.section as string) ?? 'header';
         const type = (props.type as string) ?? 'waving';
         const borderRadius =
@@ -674,8 +679,9 @@ function PreviewBlock({
               width: '100%',
               maxWidth: '896px', // GitHub README max width
               height: `${props.height}px`,
-              background: gradientStyle,
+              backgroundImage: gradientBgImage,
               borderRadius,
+              ...animationBgSize,
             }}
           >
             <div className="absolute inset-0 flex items-center justify-center">

@@ -204,8 +204,10 @@ export function BlockSidebar() {
         : undefined;
 
     addBlock({
-      ...block,
-      children: type === 'stats-row' ? defaultChildren : block.children,
+      id: block.id,
+      type: block.type,
+      props: block.props,
+      children: type === 'stats-row' ? defaultChildren : undefined,
     });
   };
 
