@@ -47,7 +47,7 @@ export function ContainerConfig({
   bgGradientDirection = 'horizontal',
   bgAnimation = 'none',
   bgStartColor = 'EEFF00',
-  bgEndColor = 'a82DA',
+  bgEndColor = 'A82DAA',
   bgSolidColor = 'transparent',
   onAlignmentChange,
   onDirectionChange,
