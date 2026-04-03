@@ -4,18 +4,43 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
   // Get parameters from query string
-  const type = searchParams.get('type') || 'waving';
+  const typeInput = searchParams.get('type') || 'waving';
   const color = searchParams.get('color') || 'EEFF00';
-  const height = parseInt(searchParams.get('height') || '200', 10);
-  const section = searchParams.get('section') || 'header';
-  const text = searchParams.get('text') || '';
-  const fontSize = parseInt(searchParams.get('fontSize') || '30', 10);
+  const height = Math.min(Math.max(parseInt(searchParams.get('height') || '200', 10), 50), 500);
+  const sectionInput = searchParams.get('section') || 'header';
+  let text = searchParams.get('text') || '';
+  const fontSize = Math.min(Math.max(parseInt(searchParams.get('fontSize') || '30', 10), 10), 100);
   const fontColor = searchParams.get('fontColor') || 'ffffff';
-  const animation = searchParams.get('animation') || 'none';
+  const animationInput = searchParams.get('animation') || 'none';
 
-  // Parse color - remove # if present
-  const bgColor = color.startsWith('#') ? color.slice(1) : color;
-  const txtColor = fontColor.startsWith('#') ? fontColor.slice(1) : fontColor;
+  // Validate type parameter - only allow safe values
+  const validTypes = ['waving', 'rect', 'cylinder', 'soft', 'slice'];
+  const type = validTypes.includes(typeInput) ? typeInput : 'waving';
+
+  // Validate section parameter - only allow safe values
+  const validSections = ['header', 'footer'];
+  const section = validSections.includes(sectionInput) ? sectionInput : 'header';
+
+  // Validate animation parameter - only allow safe values
+  const validAnimations = ['none', 'fadeIn', 'waving', 'scale'];
+  const animation = validAnimations.includes(animationInput) ? animationInput : 'none';
+
+  // Sanitize text to prevent XSS attacks
+  text = text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+
+  // Parse color - remove # if present and validate hex format
+  let bgColor = color.startsWith('#') ? color.slice(1) : color;
+  let txtColor = fontColor.startsWith('#') ? fontColor.slice(1) : fontColor;
+
+  // Validate hex color format - only allow alphanumeric characters
+  // This prevents XSS via color parameters
+  bgColor = bgColor.replace(/[^a-fA-F0-9]/g, '').slice(0, 6) || 'EEFF00';
+  txtColor = txtColor.replace(/[^a-fA-F0-9]/g, '').slice(0, 6) || 'ffffff';
 
   // Determine border radius based on type and section
   let borderRadius = '0 0 24px 24px';
