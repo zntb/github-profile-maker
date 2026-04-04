@@ -1,147 +1,209 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const WIDTH = 896;
+
+type GradientDir = 'horizontal' | 'vertical' | 'diagonal' | 'radial';
+
+function buildGradientDef(
+  id: string,
+  startColor: string,
+  endColor: string,
+  direction: GradientDir,
+): string {
+  if (direction === 'radial') {
+    return `<radialGradient id="${id}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#${startColor}"/>
+      <stop offset="100%" stop-color="#${endColor}"/>
+    </radialGradient>`;
+  }
+  const coords: Record<string, string> = {
+    horizontal: 'x1="0%" y1="0%" x2="100%" y2="0%"',
+    vertical: 'x1="0%" y1="0%" x2="0%" y2="100%"',
+    diagonal: 'x1="0%" y1="0%" x2="100%" y2="100%"',
+  };
+  return `<linearGradient id="${id}" ${coords[direction] ?? coords.horizontal}>
+    <stop offset="0%" stop-color="#${startColor}"/>
+    <stop offset="100%" stop-color="#${endColor}"/>
+  </linearGradient>`;
+}
+
+/**
+ * Generate an SVG path for a rectangle with independent corner radii.
+ * Radii are clamped so they cannot exceed half the width or height.
+ */
+function roundedRectPath(
+  w: number,
+  h: number,
+  rtl: number,
+  rtr: number,
+  rbr: number,
+  rbl: number,
+): string {
+  // Clamp radii so adjacent corners don't overlap
+  const maxH = h / 2;
+  const maxW = w / 2;
+  rtl = Math.min(rtl, maxH, maxW);
+  rtr = Math.min(rtr, maxH, maxW);
+  rbr = Math.min(rbr, maxH, maxW);
+  rbl = Math.min(rbl, maxH, maxW);
+
+  return [
+    `M ${rtl} 0`,
+    `H ${w - rtr}`,
+    rtr > 0 ? `Q ${w} 0 ${w} ${rtr}` : '',
+    `V ${h - rbr}`,
+    rbr > 0 ? `Q ${w} ${h} ${w - rbr} ${h}` : '',
+    `H ${rbl}`,
+    rbl > 0 ? `Q 0 ${h} 0 ${h - rbl}` : '',
+    `V ${rtl}`,
+    rtl > 0 ? `Q 0 0 ${rtl} 0` : '',
+    'Z',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+  const sp = request.nextUrl.searchParams;
 
-  // Get parameters from query string
-  const typeInput = searchParams.get('type') || 'waving';
-  const color = searchParams.get('color') || 'EEFF00';
-  const colorEnd = searchParams.get('colorEnd') || '';
-  const height = Math.min(Math.max(parseInt(searchParams.get('height') || '200', 10), 50), 500);
-  const sectionInput = searchParams.get('section') || 'header';
-  let text = searchParams.get('text') || '';
-  const fontSize = Math.min(Math.max(parseInt(searchParams.get('fontSize') || '30', 10), 10), 100);
-  const fontColor = searchParams.get('fontColor') || 'ffffff';
-  const animationInput = searchParams.get('animation') || 'none';
-  const gradientDirection = searchParams.get('gradientDirection') || 'horizontal';
+  /* ── Type & section ───────────────────────────────────────────── */
+  const validTypes = ['waving', 'rect', 'cylinder', 'soft', 'slice'] as const;
+  const validSections = ['header', 'footer'] as const;
+  const validAnimations = ['none', 'fadeIn', 'waving', 'scale'] as const;
+  const validDirs = ['horizontal', 'vertical', 'diagonal', 'radial'] as const;
 
-  // Validate type parameter - only allow safe values
-  const validTypes = ['waving', 'rect', 'cylinder', 'soft', 'slice'];
-  const type = validTypes.includes(typeInput) ? typeInput : 'waving';
+  const type = (validTypes as readonly string[]).includes(sp.get('type') ?? '')
+    ? (sp.get('type') as (typeof validTypes)[number])
+    : 'waving';
+  const section = (validSections as readonly string[]).includes(sp.get('section') ?? '')
+    ? (sp.get('section') as (typeof validSections)[number])
+    : 'header';
+  const animation = (validAnimations as readonly string[]).includes(sp.get('animation') ?? '')
+    ? (sp.get('animation') as (typeof validAnimations)[number])
+    : 'none';
+  const gradDir = (validDirs as readonly string[]).includes(sp.get('gradientDirection') ?? '')
+    ? (sp.get('gradientDirection') as GradientDir)
+    : 'horizontal';
 
-  // Validate section parameter - only allow safe values
-  const validSections = ['header', 'footer'];
-  const section = validSections.includes(sectionInput) ? sectionInput : 'header';
+  /* ── Dimensions ───────────────────────────────────────────────── */
+  const height = Math.min(Math.max(parseInt(sp.get('height') ?? '200', 10), 50), 500);
 
-  // Validate animation parameter - only allow safe values
-  const validAnimations = ['none', 'fadeIn', 'waving', 'scale'];
-  const animation = validAnimations.includes(animationInput) ? animationInput : 'none';
-
-  // Sanitize text to prevent XSS attacks
-  text = text
+  /* ── Text / font ──────────────────────────────────────────────── */
+  const rawText = sp.get('text') ?? '';
+  const text = rawText
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#x27;');
+  const fontSize = Math.min(Math.max(parseInt(sp.get('fontSize') ?? '30', 10), 10), 100);
 
-  // Parse color - remove # if present and validate hex format
-  let bgColor = color.startsWith('#') ? color.slice(1) : color;
-  let bgColorEnd = colorEnd.startsWith('#') ? colorEnd.slice(1) : colorEnd;
-  let txtColor = fontColor.startsWith('#') ? fontColor.slice(1) : fontColor;
+  /* ── Colors ───────────────────────────────────────────────────── */
+  const sanitizeHex = (raw: string | null, fallback: string) =>
+    (raw ?? '').replace(/[^a-fA-F0-9]/g, '').slice(0, 6) || fallback;
 
-  // Validate hex color format - only allow alphanumeric characters
-  // This prevents XSS via color parameters
-  bgColor = bgColor.replace(/[^a-fA-F0-9]/g, '').slice(0, 6) || 'EEFF00';
-  bgColorEnd = bgColorEnd.replace(/[^a-fA-F0-9]/g, '').slice(0, 6) || '';
-  txtColor = txtColor.replace(/[^a-fA-F0-9]/g, '').slice(0, 6) || 'ffffff';
+  const bgColor = sanitizeHex(
+    sp.get('color') ? (sp.get('color') as string).replace(/^#/, '') : null,
+    'EEFF00',
+  );
+  const bgColorEnd = sanitizeHex(
+    sp.get('colorEnd') ? (sp.get('colorEnd') as string).replace(/^#/, '') : null,
+    '',
+  );
+  const txtColor = sanitizeHex(
+    sp.get('fontColor') ? (sp.get('fontColor') as string).replace(/^#/, '') : null,
+    'ffffff',
+  );
 
-  // Determine if we need gradient
-  const useGradient = bgColorEnd !== '';
+  const useGradient = bgColorEnd.length === 6;
 
-  // Build animation CSS
-  let animationStyle = '';
-  let keyframes = '';
-  if (animation === 'fadeIn') {
-    animationStyle = 'animation: fadeIn 1s ease-out forwards';
-    keyframes = `@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }`;
-  } else if (animation === 'waving') {
-    animationStyle = 'animation: wave 2s ease-in-out infinite';
-    keyframes = `@keyframes wave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }`;
-  } else if (animation === 'scale') {
-    animationStyle = 'animation: scale 1s ease-out forwards';
-    keyframes = `@keyframes scale { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }`;
+  /* ── Compute default corner radii from type + section ─────────── */
+  const maxR = Math.floor(height / 2);
+
+  let defTL = 0,
+    defTR = 0,
+    defBR = 0,
+    defBL = 0;
+
+  if (type === 'rect') {
+    defTL = defTR = defBR = defBL = 8;
+  } else if (type === 'cylinder') {
+    defTL = defTR = defBR = defBL = maxR;
+  } else if (type === 'soft') {
+    defTL = defTR = defBR = defBL = 36;
+  } else if (type === 'waving') {
+    if (section === 'header') {
+      defBR = defBL = 24;
+    } else {
+      defTL = defTR = 24;
+    }
   }
+  // 'slice' handled separately below
 
-  // Build gradient SVG definitions
+  /* ── Per-corner radius overrides ──────────────────────────────── */
+  const parseCorner = (key: string, def: number) => {
+    const raw = sp.get(key);
+    if (raw === null) return def;
+    const n = parseInt(raw, 10);
+    return isNaN(n) ? def : Math.min(Math.max(n, 0), maxR);
+  };
+
+  const rtl = parseCorner('rtl', defTL);
+  const rtr = parseCorner('rtr', defTR);
+  const rbr = parseCorner('rbr', defBR);
+  const rbl = parseCorner('rbl', defBL);
+
+  /* ── Gradient definition ──────────────────────────────────────── */
+  const GRAD_ID = 'bg';
   let gradientDef = '';
   let bgFill = `#${bgColor}`;
+
   if (useGradient) {
-    const gradId = 'gradientFill';
-    let gradientAttrs = '';
-    if (gradientDirection === 'vertical') {
-      gradientAttrs = 'x1="0%" y1="0%" x2="0%" y2="100%"';
-    } else if (gradientDirection === 'diagonal') {
-      gradientAttrs = 'x1="0%" y1="0%" x2="100%" y2="100%"';
-    } else if (gradientDirection === 'radial') {
-      gradientAttrs = 'cx="50%" cy="50%" r="50%"';
-    } else {
-      gradientAttrs = 'x1="0%" y1="0%" x2="100%" y2="0%"';
-    }
-    gradientDef = `<linearGradient id="${gradId}" ${gradientAttrs}>
-      <stop offset="0%" stop-color="#${bgColor}"/>
-      <stop offset="100%" stop-color="#${bgColorEnd}"/>
-    </linearGradient>`;
-    bgFill = `url(#${gradId})`;
+    gradientDef = buildGradientDef(GRAD_ID, bgColor, bgColorEnd, gradDir);
+    bgFill = `url(#${GRAD_ID})`;
   }
 
-  // Build SVG shape based on type and section.
-  // NOTE: SVG <rect> only supports numeric rx/ry values, not CSS shorthand.
-  let shapeMarkup = '';
+  /* ── Shape markup ─────────────────────────────────────────────── */
+  let shapeMarkup: string;
+
   if (type === 'slice') {
     const inset = 24;
-    shapeMarkup = `<path d="M0 ${inset} L${inset} 0 H${896 - inset} L896 ${inset} V${height} H0 Z" fill="${bgFill}"/>`;
+    shapeMarkup = `<path d="M0 ${inset} L${inset} 0 H${WIDTH - inset} L${WIDTH} ${inset} V${height} H0 Z" fill="${bgFill}"/>`;
   } else {
-    let radius = 0;
-    if (type === 'rect') {
-      radius = 8;
-    } else if (type === 'cylinder') {
-      radius = Math.floor(height / 2);
-    } else if (type === 'soft') {
-      radius = 36;
-    } else {
-      radius = 24;
-    }
-
-    if (section === 'header') {
-      shapeMarkup = `<path d="M0 0 H896 V${height - radius} Q896 ${height} ${896 - radius} ${height} H${radius} Q0 ${height} 0 ${height - radius} Z" fill="${bgFill}"/>`;
-    } else {
-      shapeMarkup = `<path d="M0 ${radius} Q0 0 ${radius} 0 H${896 - radius} Q896 0 896 ${radius} V${height} H0 Z" fill="${bgFill}"/>`;
-    }
+    const d = roundedRectPath(WIDTH, height, rtl, rtr, rbr, rbl);
+    shapeMarkup = `<path d="${d}" fill="${bgFill}"/>`;
   }
 
-  // Create SVG with the requested parameters.
-  //
-  // IMPORTANT: The @import url() for Google Fonts is intentionally omitted.
-  // GitHub proxies all README images through camo.githubusercontent.com and
-  // enforces a strict Content Security Policy that blocks external resource
-  // loading (fonts, stylesheets, scripts) inside SVGs rendered as <img>.
-  // Including @import url('https://fonts.googleapis.com/...') causes GitHub
-  // to refuse to display the image entirely. System fonts are used instead.
+  /* ── Animation CSS ────────────────────────────────────────────── */
+  let animStyle = '';
+  let keyframes = '';
+
+  if (animation === 'fadeIn') {
+    keyframes = `@keyframes fadeIn{from{opacity:0}to{opacity:1}}`;
+    animStyle = 'animation:fadeIn 1s ease-out forwards';
+  } else if (animation === 'waving') {
+    keyframes = `@keyframes wv{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}`;
+    animStyle = 'animation:wv 2s ease-in-out infinite';
+  } else if (animation === 'scale') {
+    keyframes = `@keyframes sc{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}`;
+    animStyle = 'animation:sc 0.8s ease-out forwards';
+  }
+
+  /* ── Final SVG ────────────────────────────────────────────────── */
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="896" height="${height}" viewBox="0 0 896 ${height}">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${WIDTH}" height="${height}" viewBox="0 0 ${WIDTH} ${height}">
   <defs>
+    ${gradientDef}
     <style>
       ${keyframes}
-      .text {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        font-size: ${fontSize}px;
-        font-weight: 700;
-        fill: #${txtColor};
-        text-anchor: middle;
-        dominant-baseline: middle;
-      }
-      svg {
-        ${animationStyle}
-      }
+      .bg-shape{${animStyle}}
+      .label{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:${fontSize}px;font-weight:700;fill:#${txtColor};text-anchor:middle;dominant-baseline:middle}
     </style>
-    ${gradientDef}
   </defs>
-  ${shapeMarkup}
-  <text class="text" x="448" y="${height / 2}">${text}</text>
+  <g class="bg-shape">${shapeMarkup}</g>
+  ${text ? `<text class="label" x="${WIDTH / 2}" y="${height / 2}">${text}</text>` : ''}
 </svg>`;
 
-  // Return SVG with proper content-type
   return new NextResponse(svg, {
     headers: {
       'Content-Type': 'image/svg+xml',
