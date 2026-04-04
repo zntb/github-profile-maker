@@ -49,20 +49,6 @@ export async function GET(request: NextRequest) {
   // Determine if we need gradient
   const useGradient = bgColorEnd !== '';
 
-  // Determine border radius based on type and section
-  let borderRadius = '0 0 24px 24px';
-  if (type === 'rect') {
-    borderRadius = '8px';
-  } else if (type === 'cylinder') {
-    borderRadius = '9999px';
-  } else if (type === 'soft') {
-    borderRadius = '36px';
-  } else if (type === 'slice') {
-    borderRadius = '48px 10px 48px 10px';
-  } else if (section === 'footer') {
-    borderRadius = '24px 24px 0 0';
-  }
-
   // Build animation CSS
   let animationStyle = '';
   let keyframes = '';
@@ -99,6 +85,31 @@ export async function GET(request: NextRequest) {
     bgFill = `url(#${gradId})`;
   }
 
+  // Build SVG shape based on type and section.
+  // NOTE: SVG <rect> only supports numeric rx/ry values, not CSS shorthand.
+  let shapeMarkup = '';
+  if (type === 'slice') {
+    const inset = 24;
+    shapeMarkup = `<path d="M0 ${inset} L${inset} 0 H${896 - inset} L896 ${inset} V${height} H0 Z" fill="${bgFill}"/>`;
+  } else {
+    let radius = 0;
+    if (type === 'rect') {
+      radius = 8;
+    } else if (type === 'cylinder') {
+      radius = Math.floor(height / 2);
+    } else if (type === 'soft') {
+      radius = 36;
+    } else {
+      radius = 24;
+    }
+
+    if (section === 'header') {
+      shapeMarkup = `<path d="M0 0 H896 V${height - radius} Q896 ${height} ${896 - radius} ${height} H${radius} Q0 ${height} 0 ${height - radius} Z" fill="${bgFill}"/>`;
+    } else {
+      shapeMarkup = `<path d="M0 ${radius} Q0 0 ${radius} 0 H${896 - radius} Q896 0 896 ${radius} V${height} H0 Z" fill="${bgFill}"/>`;
+    }
+  }
+
   // Create SVG with the requested parameters
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="896" height="${height}" viewBox="0 0 896 ${height}">
@@ -120,7 +131,7 @@ export async function GET(request: NextRequest) {
     </style>
     ${gradientDef}
   </defs>
-  <rect x="0" y="0" width="896" height="${height}" rx="${borderRadius}" fill="${bgFill}"/>
+  ${shapeMarkup}
   <text class="text" x="448" y="${height / 2}">${text}</text>
 </svg>`;
 
