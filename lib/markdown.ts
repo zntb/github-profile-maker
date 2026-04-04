@@ -29,6 +29,43 @@ function buildExternalUrl(
   return `${origin}/api/${endpoint}?${query.toString()}`;
 }
 
+/**
+ * Build the /api/capsule URL with per-corner border radius support.
+ * Mirrors the default-radii logic in the API route so canvas preview
+ * and exported Markdown produce identical shapes.
+ */
+function buildCapsuleUrl(props: Record<string, unknown>, origin: string): string {
+  const bgType = (props.bgType as string) ?? 'gradient';
+  const bgStartColor = (props.bgStartColor as string) ?? 'EEFF00';
+  const bgEndColor = (props.bgEndColor as string) ?? 'A82DAA';
+  const bgSolidColor = (props.bgSolidColor as string) ?? 'EEFF00';
+  const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
+
+  const bgColor = bgType === 'solid' ? bgSolidColor || 'EEFF00' : bgStartColor || 'EEFF00';
+  const colorEnd = bgType !== 'solid' ? bgEndColor || 'A82DAA' : '';
+
+  const params: Record<string, unknown> = {
+    type: (props.type as string) ?? 'waving',
+    color: bgColor,
+    colorEnd,
+    height: props.height ?? 200,
+    section: (props.section as string) ?? 'header',
+    text: props.text ?? '',
+    fontSize: props.fontSize ?? 30,
+    fontColor: (props.fontColor as string) ?? 'ffffff',
+    animation: 'fadeIn',
+    gradientDirection: bgGradientDirection,
+  };
+
+  // Pass per-corner radii only when explicitly set (API falls back to type defaults otherwise)
+  if (props.borderRadiusTL !== undefined) params.rtl = props.borderRadiusTL;
+  if (props.borderRadiusTR !== undefined) params.rtr = props.borderRadiusTR;
+  if (props.borderRadiusBR !== undefined) params.rbr = props.borderRadiusBR;
+  if (props.borderRadiusBL !== undefined) params.rbl = props.borderRadiusBL;
+
+  return buildExternalUrl('capsule', params, origin);
+}
+
 // Render a single block to markdown
 export function renderBlock(block: Block, origin: string = ''): string {
   const { type, props, children } = block;
@@ -91,39 +128,7 @@ export function renderBlock(block: Block, origin: string = ''): string {
     }
 
     case 'capsule-header': {
-      const {
-        text,
-        type: headerType = 'waving',
-        height = 200,
-        section = 'header',
-        fontSize = 50,
-        fontColor = 'ffffff',
-        bgType = 'gradient',
-        bgStartColor = 'EEFF00',
-        bgEndColor = 'A82DAA',
-        bgSolidColor = 'EEFF00',
-        bgGradientDirection = 'horizontal',
-      } = props as Record<string, string | number>;
-      // Use native capsule API instead of third-party API
-      // Determine color based on bgType - use gradient colors if not solid
-      const bgColor = bgType === 'solid' ? bgSolidColor || 'EEFF00' : bgStartColor || 'EEFF00';
-      const colorEnd = bgType !== 'solid' ? bgEndColor || 'A82DAA' : '';
-      const capsuleUrl = buildExternalUrl(
-        'capsule',
-        {
-          type: headerType,
-          color: bgColor,
-          colorEnd,
-          height,
-          section,
-          text,
-          fontSize,
-          fontColor,
-          animation: 'fadeIn',
-          gradientDirection: bgGradientDirection,
-        },
-        origin,
-      );
+      const capsuleUrl = buildCapsuleUrl(props, origin);
       return `<div align="center">\n  <img src="${capsuleUrl}" />\n</div>`;
     }
 
@@ -314,7 +319,6 @@ export function renderBlock(block: Block, origin: string = ''): string {
         pointColor,
         areaColor,
       } = props as Record<string, unknown>;
-      // Use global username if block username is empty or is the default placeholder
       const username =
         (!blockUsername || blockUsername === 'github') && globalUsername
           ? globalUsername
@@ -347,7 +351,6 @@ export function renderBlock(block: Block, origin: string = ''): string {
         noFrame,
         noBg,
       } = props as Record<string, unknown>;
-      // Use global username if block username is empty or is the default placeholder
       const username =
         (!blockUsername || blockUsername === 'github') && globalUsername
           ? globalUsername
@@ -371,7 +374,6 @@ export function renderBlock(block: Block, origin: string = ''): string {
     case 'visitor-counter': {
       const globalUsername = useBuilderStore.getState().username;
       const { username: blockUsername, color, style, label } = props as Record<string, string>;
-      // Use global username if block username is empty or is the default placeholder
       const username =
         (!blockUsername || blockUsername === 'github') && globalUsername
           ? globalUsername
@@ -383,14 +385,9 @@ export function renderBlock(block: Block, origin: string = ''): string {
     case 'quote': {
       const { theme, type, quote, author } = props as Record<string, string>;
       if (quote && author) {
-        // Custom quote
         return `<div align="center">\n\n> "${quote}"\n> — ${author}\n\n</div>`;
       }
-      // Random quote from local API
-      const params = {
-        type,
-        theme,
-      };
+      const params = { type, theme };
       const url = origin
         ? buildExternalUrl('quotes', params, origin)
         : buildInternalUrl('quotes', params);
@@ -399,7 +396,6 @@ export function renderBlock(block: Block, origin: string = ''): string {
 
     case 'footer-banner': {
       const { text, waveColor, fontColor, height } = props as Record<string, string | number>;
-      // Use native capsule API instead of third-party API
       const url = `/api/capsule?type=waving&color=${encodeURIComponent(String(waveColor))}&height=${height}&section=footer&text=${encodeURIComponent(String(text))}&fontSize=24&fontColor=${fontColor}`;
       return `<div align="center">\n  <img src="${url}" />\n</div>`;
     }
@@ -454,7 +450,6 @@ function renderStatsCardImageTag(block: Block, origin: string): string {
   const params = {
     username,
     theme,
-    // 'layoutStyle' maps to the API's 'layout' param ('standard' | 'compact')
     layout: (layoutStyle as string | undefined) ?? 'standard',
     show_icons: showIcons ? 'true' : 'false',
     hide_border: hideBorder ? 'true' : 'false',
@@ -550,7 +545,6 @@ function isHalfWidthCard(block: Block): boolean {
   const layoutWidth = block.props.layoutWidth as string | undefined;
   if (layoutWidth === 'half') return true;
   if (layoutWidth === 'full') return false;
-  // Default to full width (100%) for all card types
   return false;
 }
 
@@ -582,15 +576,13 @@ export function renderMarkdown(blocks: Block[], origin: string = ''): string {
           ? getHalfWidthCardImageTag(nextBlock, origin)
           : null;
       if (nextImageTag) {
-        // Determine alt text based on block types
-        const getAltText = (blockType: string, isSecond: boolean = false): string => {
+        const getAltText = (blockType: string): string => {
           if (blockType === 'stats-card') return 'GitHub Stats';
-          if (blockType === 'top-languages') return isSecond ? 'Top Languages' : 'Top Languages';
+          if (blockType === 'top-languages') return 'Top Languages';
           if (blockType === 'streak-stats') return 'GitHub Streak';
           return 'Stats';
         };
 
-        // Get individual card widths from props, default to 50%
         const firstWidthRaw = block.props.width;
         const secondWidthRaw = nextBlock.props.width;
 
@@ -603,11 +595,10 @@ export function renderMarkdown(blocks: Block[], origin: string = ''): string {
             ? secondWidthRaw.trim()
             : '50%';
 
-        // Get cardHeight from block props
         const cardHeight = block.props.cardHeight || nextBlock.props.cardHeight;
 
         rendered.push(
-          `<div align="center">\n  <img src="${imageTag.match(/src="([^"]+)"/)?.[1]}" width="${firstWidth}" alt="${getAltText(block.type)}"${cardHeight ? ` height="${cardHeight}"` : ''} />\n  <img src="${nextImageTag.match(/src="([^"]+)"/)?.[1]}" width="${secondWidth}" alt="${getAltText(nextBlock.type, true)}"${cardHeight ? ` height="${cardHeight}"` : ''} />\n</div>`,
+          `<div align="center">\n  <img src="${imageTag.match(/src="([^"]+)"/)?.[1]}" width="${firstWidth}" alt="${getAltText(block.type)}"${cardHeight ? ` height="${cardHeight}"` : ''} />\n  <img src="${nextImageTag.match(/src="([^"]+)"/)?.[1]}" width="${secondWidth}" alt="${getAltText(nextBlock.type)}"${cardHeight ? ` height="${cardHeight}"` : ''} />\n</div>`,
         );
         i += 1;
         continue;

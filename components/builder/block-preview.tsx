@@ -33,6 +33,24 @@ function getStreakThemeColors(
   return getStreakTheme(themeName);
 }
 
+/** Mirrors the API route's default corner-radii logic. */
+function defaultCapRadii(
+  type: string,
+  section: string,
+  height: number,
+): { tl: number; tr: number; br: number; bl: number } {
+  const maxR = Math.floor(height / 2);
+  if (type === 'rect') return { tl: 8, tr: 8, br: 8, bl: 8 };
+  if (type === 'cylinder') return { tl: maxR, tr: maxR, br: maxR, bl: maxR };
+  if (type === 'soft') return { tl: 36, tr: 36, br: 36, bl: 36 };
+  if (type === 'waving') {
+    return section === 'header'
+      ? { tl: 0, tr: 0, br: 24, bl: 24 }
+      : { tl: 24, tr: 24, br: 0, bl: 0 };
+  }
+  return { tl: 0, tr: 0, br: 0, bl: 0 };
+}
+
 interface BlockPreviewProps {
   block: Block;
   className?: string;
@@ -50,7 +68,6 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
         const bgSolidColor = (props.bgSolidColor as string) ?? 'transparent';
 
-        // Generate background style
         let bgStyle: React.CSSProperties = {};
         if (bgType === 'solid') {
           bgStyle = {
@@ -118,9 +135,12 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
 
       case 'capsule-header': {
         const colorValue = props.color as string;
-        // Fix: bgType should come from props instead of being hardcoded
         const bgType = (props.bgType as string) ?? 'gradient';
         const bgAnimation = (props.bgAnimation as string) ?? 'none';
+        const capHeight = (props.height as number) ?? 200;
+        const capType = (props.type as string) ?? 'waving';
+        const capSection = (props.section as string) ?? 'header';
+
         let bgStartColor = props.bgStartColor ? String(props.bgStartColor) : undefined;
         let bgEndColor = props.bgEndColor ? String(props.bgEndColor) : undefined;
         const bgSolidColor = (props.bgSolidColor as string) ?? 'EEFF00';
@@ -136,17 +156,21 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           }
         }
 
-        // Always apply defaults - this ensures new blocks get proper colors immediately
         bgStartColor = bgStartColor ?? 'EEFF00';
         bgEndColor = bgEndColor ?? 'A82DAA';
-
         const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
 
-        // Generate background style
-        let bgStyle: React.CSSProperties = {};
+        // ── Border radius (per-corner) ──────────────────────────────
+        const def = defaultCapRadii(capType, capSection, capHeight);
+        const tl = props.borderRadiusTL !== undefined ? Number(props.borderRadiusTL) : def.tl;
+        const tr = props.borderRadiusTR !== undefined ? Number(props.borderRadiusTR) : def.tr;
+        const br = props.borderRadiusBR !== undefined ? Number(props.borderRadiusBR) : def.br;
+        const bl = props.borderRadiusBL !== undefined ? Number(props.borderRadiusBL) : def.bl;
+        const borderRadius = `${tl}px ${tr}px ${br}px ${bl}px`;
 
+        // ── Background style ────────────────────────────────────────
+        let bgStyle: React.CSSProperties = {};
         if (bgType === 'solid') {
-          // Solid color background
           const solidColor =
             bgSolidColor === 'transparent'
               ? 'transparent'
@@ -155,7 +179,6 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
                 : `#${bgSolidColor}`;
           bgStyle = { backgroundColor: solidColor };
         } else {
-          // Gradient background
           const start = `#${bgStartColor}`;
           const end = `#${bgEndColor}`;
           switch (bgGradientDirection) {
@@ -169,7 +192,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
               bgStyle = { backgroundImage: `linear-gradient(135deg, ${start}, ${end})` };
               break;
             case 'radial':
-              bgStyle = { backgroundImage: `radial-gradient(circle, ${start}, ${end})` };
+              bgStyle = {
+                backgroundImage: `radial-gradient(circle, ${start}, ${end})`,
+              };
               break;
             case 'conic':
               bgStyle = { backgroundImage: `conic-gradient(from 0deg, ${start}, ${end})` };
@@ -187,6 +212,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         const normalizedFontColor =
           typeof props.fontColor === 'string' ? props.fontColor.replace('#', '').trim() : 'ffffff';
         const fontColor = `#${normalizedFontColor || 'ffffff'}`;
+
         const animationClass =
           bgAnimation !== 'none'
             ? bgAnimation === 'gradient'
@@ -200,27 +226,12 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
                     : ''
             : '';
 
-        // Add required background size for animations
         const animationBgSize =
           animationClass !== ''
             ? {
                 backgroundSize: bgAnimation === 'gradient' ? '200% 200%' : '200% 100%',
               }
             : {};
-        const section = (props.section as string) ?? 'header';
-        const type = (props.type as string) ?? 'waving';
-        const borderRadius =
-          type === 'rect'
-            ? '8px'
-            : type === 'cylinder'
-              ? '9999px'
-              : type === 'soft'
-                ? '36px'
-                : type === 'slice'
-                  ? '48px 10px 48px 10px'
-                  : section === 'footer'
-                    ? '24px 24px 0 0'
-                    : '0 0 24px 24px';
 
         return (
           <div
@@ -228,7 +239,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             style={{
               ...bgStyle,
               ...animationBgSize,
-              height: `${props.height ?? 200}px`,
+              height: `${capHeight}px`,
               borderRadius,
             }}
           >
@@ -281,7 +292,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           </div>
         );
 
-      case 'heading':
+      case 'heading': {
         const level = Number(props.level) || 2;
         const HeadingTag =
           level === 1
@@ -310,6 +321,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             {props.text as string}
           </HeadingTag>
         );
+      }
 
       case 'paragraph':
         return (
@@ -384,7 +396,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           </div>
         );
 
-      case 'social-badges':
+      case 'social-badges': {
         const badges = [];
         if (props.linkedin) badges.push('LinkedIn');
         if (props.twitter) badges.push('Twitter');
@@ -413,6 +425,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             )}
           </div>
         );
+      }
 
       case 'custom-badge':
         return (
@@ -426,7 +439,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           </div>
         );
 
-      case 'skill-icons':
+      case 'skill-icons': {
         const icons = props.icons as string[];
         return (
           <div className="flex flex-wrap gap-2 justify-center">
@@ -440,8 +453,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             )}
           </div>
         );
+      }
 
-      case 'stats-card':
+      case 'stats-card': {
         const statsTheme = getStatsThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
@@ -473,8 +487,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             </div>
           </div>
         );
+      }
 
-      case 'stats-row':
+      case 'stats-row': {
         const rowTheme = getStatsThemeColors(props.theme as string | undefined);
         return (
           <div
@@ -504,8 +519,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             </div>
           </div>
         );
+      }
 
-      case 'top-languages':
+      case 'top-languages': {
         const langTheme = getLangThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
@@ -537,8 +553,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             </div>
           </div>
         );
+      }
 
-      case 'streak-stats':
+      case 'streak-stats': {
         const streakTheme = getStreakThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
@@ -564,8 +581,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             </div>
           </div>
         );
+      }
 
-      case 'activity-graph':
+      case 'activity-graph': {
         const activityTheme = getActivityThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
@@ -592,8 +610,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             </div>
           </div>
         );
+      }
 
-      case 'trophies':
+      case 'trophies': {
         const trophiesTheme = getStatsThemeColors(props.theme as string | undefined);
         return (
           <div className="flex justify-center">
@@ -626,6 +645,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             </div>
           </div>
         );
+      }
 
       case 'visitor-counter':
         return (
