@@ -143,23 +143,13 @@ export function BlockConfigFields({
           onCard2PropsChange={(updates) => updateCardProps(1, updates)}
           onThemeChange={(v) => {
             update('theme', v);
-            // Apply theme to both cards using updateCardProps
-            if (statsChildren[0]) {
-              updateCardProps(0, { theme: v });
-            }
-            if (statsChildren[1]) {
-              updateCardProps(1, { theme: v });
-            }
+            if (statsChildren[0]) updateCardProps(0, { theme: v });
+            if (statsChildren[1]) updateCardProps(1, { theme: v });
           }}
           onHideBorderChange={(v) => {
             update('hideBorder', v);
-            // Apply hideBorder to both cards using updateCardProps
-            if (statsChildren[0]) {
-              updateCardProps(0, { hideBorder: v });
-            }
-            if (statsChildren[1]) {
-              updateCardProps(1, { hideBorder: v });
-            }
+            if (statsChildren[0]) updateCardProps(0, { hideBorder: v });
+            if (statsChildren[1]) updateCardProps(1, { hideBorder: v });
           }}
         />
       );
@@ -183,12 +173,11 @@ export function BlockConfigFields({
         />
       );
 
-    case 'capsule-header':
+    case 'capsule-header': {
       // Support both new format (bgStartColor/bgEndColor) and legacy format (color)
       let bgStartColor = props.bgStartColor as string;
       let bgEndColor = props.bgEndColor as string;
 
-      // Parse legacy color format even if modern properties are present
       if (props.color) {
         const colorValue = props.color as string;
         const colorParts = colorValue.split(',');
@@ -200,16 +189,20 @@ export function BlockConfigFields({
         }
       }
 
-      // Apply defaults after legacy parsing
       bgStartColor = bgStartColor ?? 'EEFF00';
       bgEndColor = bgEndColor ?? 'A82DAA';
+
+      const currentType = (props.type as string) ?? 'waving';
+      const currentSection = (props.section as string) ?? 'header';
+      const currentHeight = getNumberProp('height', 200);
+      const maxR = Math.floor(currentHeight / 2);
 
       return (
         <CapsuleHeaderConfig
           text={props.text as string}
-          type={(props.type as string) ?? 'waving'}
-          section={(props.section as string) ?? 'header'}
-          height={getNumberProp('height', 200)}
+          type={currentType}
+          section={currentSection}
+          height={currentHeight}
           fontSize={getNumberProp('fontSize', 30)}
           bgType={(props.bgType as 'solid' | 'gradient' | 'animated') ?? 'gradient'}
           bgGradientDirection={
@@ -227,9 +220,35 @@ export function BlockConfigFields({
           bgEndColor={bgEndColor}
           bgSolidColor={(props.bgSolidColor as string) ?? 'EEFF00'}
           fontColor={(props.fontColor as string) ?? 'ffffff'}
+          borderRadiusTL={
+            props.borderRadiusTL !== undefined
+              ? Math.min(Number(props.borderRadiusTL), maxR)
+              : undefined
+          }
+          borderRadiusTR={
+            props.borderRadiusTR !== undefined
+              ? Math.min(Number(props.borderRadiusTR), maxR)
+              : undefined
+          }
+          borderRadiusBR={
+            props.borderRadiusBR !== undefined
+              ? Math.min(Number(props.borderRadiusBR), maxR)
+              : undefined
+          }
+          borderRadiusBL={
+            props.borderRadiusBL !== undefined
+              ? Math.min(Number(props.borderRadiusBL), maxR)
+              : undefined
+          }
           onTextChange={(v) => update('text', v)}
-          onTypeChange={(v) => update('type', v)}
-          onSectionChange={(v) => update('section', v)}
+          onTypeChange={(v) => {
+            update('type', v);
+            update('color', undefined);
+          }}
+          onSectionChange={(v) => {
+            update('section', v);
+            update('color', undefined);
+          }}
           onHeightChange={(v) => {
             update('height', v);
             update('color', undefined);
@@ -263,8 +282,13 @@ export function BlockConfigFields({
             update('color', undefined);
           }}
           onBgSolidColorChange={(v) => update('bgSolidColor', v)}
+          onBorderRadiusTLChange={(v) => update('borderRadiusTL', v)}
+          onBorderRadiusTRChange={(v) => update('borderRadiusTR', v)}
+          onBorderRadiusBRChange={(v) => update('borderRadiusBR', v)}
+          onBorderRadiusBLChange={(v) => update('borderRadiusBL', v)}
         />
       );
+    }
 
     case 'avatar':
       return (
