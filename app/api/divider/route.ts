@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Animation types
-type AnimationType = 'none' | 'gradient' | 'pulse' | 'wave' | 'shimmer';
-
 // Gradient direction types
 type GradientDirection = 'horizontal' | 'vertical' | 'diagonal' | 'radial' | 'conic';
 
-// Background type
-type BackgroundType = 'solid' | 'gradient' | 'animated';
+// Background type - only solid and gradient (no animated - use GIF for animation)
+type BackgroundType = 'solid' | 'gradient';
 
 // Expand 3-char hex to 6-char hex
 function expandHexColor(color: string): string {
@@ -42,9 +39,9 @@ function sanitizeAlignment(value: string | null): string {
   return validAlignments.includes(alignment ?? '') ? alignment! : 'center';
 }
 
-// Validate bgType parameter
+// Validate bgType parameter - only solid and gradient
 function sanitizeBgType(value: string | null): BackgroundType {
-  const validTypes: BackgroundType[] = ['solid', 'gradient', 'animated'];
+  const validTypes: BackgroundType[] = ['solid', 'gradient'];
   const bgType = value?.toLowerCase() as BackgroundType;
   return validTypes.includes(bgType) ? bgType : 'solid';
 }
@@ -62,14 +59,7 @@ function sanitizeGradientDirection(value: string | null): GradientDirection {
   return validDirections.includes(direction) ? direction : 'horizontal';
 }
 
-// Validate animation type
-function sanitizeAnimationType(value: string | null): AnimationType {
-  const validAnimations: AnimationType[] = ['none', 'gradient', 'pulse', 'wave', 'shimmer'];
-  const animation = value?.toLowerCase() as AnimationType;
-  return validAnimations.includes(animation) ? animation : 'none';
-}
-
-// Build linear gradient definition with better compatibility
+// Build gradient definition with better compatibility
 function buildGradientDef(
   id: string,
   startColor: string,
@@ -117,41 +107,6 @@ function buildGradientDef(
   </linearGradient>`;
 }
 
-// Build animated gradient with SMIL animations that work in GitHub
-function buildAnimatedGradientDef(
-  id: string,
-  startColor: string,
-  endColor: string,
-  animation: AnimationType,
-): string {
-  if (animation === 'gradient') {
-    // Animated gradient flow using stop-color animation
-    return `<linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%" spreadMethod="pad">
-      <stop offset="0%" stop-color="#${startColor}">
-        <animate attributeName="stop-color" values="#${startColor};#${endColor};#${startColor}" dur="3s" repeatCount="indefinite" />
-      </stop>
-      <stop offset="100%" stop-color="#${endColor}">
-        <animate attributeName="stop-color" values="#${endColor};#${startColor};#${endColor}" dur="3s" repeatCount="indefinite" />
-      </stop>
-    </linearGradient>`;
-  }
-
-  if (animation === 'pulse') {
-    // Pulse animation using stop-color
-    return `<linearGradient id="${id}" x1="0%" y1="0%" x2="100%" y2="0%" spreadMethod="pad">
-      <stop offset="0%" stop-color="#${startColor}">
-        <animate attributeName="stop-color" values="#${startColor};#${startColor};#${startColor}" dur="1s" repeatCount="indefinite" />
-      </stop>
-      <stop offset="100%" stop-color="#${endColor}">
-        <animate attributeName="stop-color" values="#${endColor};#${endColor};#${endColor}" dur="1s" repeatCount="indefinite" />
-      </stop>
-    </linearGradient>`;
-  }
-
-  // Default to gradient animation
-  return buildAnimatedGradientDef(id, startColor, endColor, 'gradient');
-}
-
 export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
 
@@ -166,7 +121,6 @@ export async function GET(request: NextRequest) {
   const bgStartColor = sanitizeColor(sp.get('bgStartColor'), 'CCCCCC');
   const bgEndColor = sanitizeColor(sp.get('bgEndColor'), '999999');
   const bgGradientDirection = sanitizeGradientDirection(sp.get('bgGradientDirection'));
-  const bgAnimation = sanitizeAnimationType(sp.get('bgAnimation'));
 
   // Clamp values
   const clampedThickness = Math.max(1, Math.min(50, thickness));
@@ -189,9 +143,6 @@ export async function GET(request: NextRequest) {
     svgContent = `<rect x="${xOffset}" y="0" width="${clampedWidth}" height="${clampedThickness}" fill="#${bgSolidColor}" rx="${clampedThickness / 2}"/>`;
   } else if (bgType === 'gradient') {
     const gradientDef = buildGradientDef(gradientId, bgStartColor, bgEndColor, bgGradientDirection);
-    svgContent = `<defs>${gradientDef}</defs><rect x="${xOffset}" y="0" width="${clampedWidth}" height="${clampedThickness}" fill="${gradientRef}" rx="${clampedThickness / 2}"/>`;
-  } else if (bgType === 'animated') {
-    const gradientDef = buildAnimatedGradientDef(gradientId, bgStartColor, bgEndColor, bgAnimation);
     svgContent = `<defs>${gradientDef}</defs><rect x="${xOffset}" y="0" width="${clampedWidth}" height="${clampedThickness}" fill="${gradientRef}" rx="${clampedThickness / 2}"/>`;
   } else {
     // Fallback to solid

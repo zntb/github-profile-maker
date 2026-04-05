@@ -40,7 +40,6 @@ function buildDividerUrl(props: Record<string, unknown>, origin: string): string
   const bgStartColor = (props.bgStartColor as string) ?? 'CCCCCC';
   const bgEndColor = (props.bgEndColor as string) ?? '999999';
   const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
-  const bgAnimation = (props.bgAnimation as string) ?? 'none';
 
   const params: Record<string, unknown> = {
     bgType,
@@ -50,7 +49,6 @@ function buildDividerUrl(props: Record<string, unknown>, origin: string): string
     bgStartColor,
     bgEndColor,
     bgGradientDirection,
-    bgAnimation,
   };
 
   const filteredParams: Record<string, string> = {};
