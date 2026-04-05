@@ -30,6 +30,40 @@ function buildExternalUrl(
 }
 
 /**
+ * Build the /api/divider URL with styling parameters.
+ */
+function buildDividerUrl(props: Record<string, unknown>, origin: string): string {
+  const bgType = (props.bgType as string) ?? 'solid';
+  const thickness = (props.thickness as number) ?? 2;
+  const alignment = (props.alignment as string) ?? 'center';
+  const bgSolidColor = (props.bgSolidColor as string) ?? 'CCCCCC';
+  const bgStartColor = (props.bgStartColor as string) ?? 'CCCCCC';
+  const bgEndColor = (props.bgEndColor as string) ?? '999999';
+  const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
+  const bgAnimation = (props.bgAnimation as string) ?? 'none';
+
+  const params: Record<string, unknown> = {
+    bgType,
+    thickness,
+    alignment,
+    bgSolidColor,
+    bgStartColor,
+    bgEndColor,
+    bgGradientDirection,
+    bgAnimation,
+  };
+
+  const filteredParams: Record<string, string> = {};
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') {
+      filteredParams[key] = String(value);
+    }
+  }
+  const query = new URLSearchParams(filteredParams);
+  return `${origin}/api/divider?${query.toString()}`;
+}
+
+/**
  * Build the /api/capsule URL with per-corner border radius support.
  * Mirrors the default-radii logic in the API route so canvas preview
  * and exported Markdown produce identical shapes.
@@ -110,7 +144,17 @@ export function renderBlock(block: Block, origin: string = ''): string {
       if (props.type === 'gif' && props.gifUrl) {
         return `<img src="${props.gifUrl}" width="100%" />`;
       }
-      return '---';
+
+      // Line type with styling - use API for styled output
+      const alignment = (props.alignment as string) ?? 'center';
+
+      // Build the divider API URL
+      const dividerUrl = buildDividerUrl(props, origin);
+
+      // Use the API to generate a styled divider image
+      return `<div align="${alignment}">
+  <img src="${dividerUrl}" alt="Divider" />
+</div>`;
     }
 
     case 'spacer': {
