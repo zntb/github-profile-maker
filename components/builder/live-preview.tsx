@@ -547,10 +547,8 @@ function PreviewBlock({
         const bgStartColor = (props.bgStartColor as string) ?? 'CCCCCC';
         const bgEndColor = (props.bgEndColor as string) ?? '999999';
         const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
-        const bgAnimation = (props.bgAnimation as string) ?? 'none';
 
         let backgroundStyle: React.CSSProperties = {};
-        let animationClass = '';
 
         if (bgType === 'solid') {
           backgroundStyle = { backgroundColor: `#${bgSolidColor}` };
@@ -576,40 +574,6 @@ function PreviewBlock({
             default:
               backgroundStyle = { background: `linear-gradient(to right, ${start}, ${end})` };
           }
-        } else if (bgType === 'animated') {
-          const start = `#${bgStartColor}`;
-          const end = `#${bgEndColor}`;
-          switch (bgAnimation) {
-            case 'gradient':
-              backgroundStyle = {
-                background: `linear-gradient(45deg, ${start}, ${end}, ${start}, ${end})`,
-                backgroundSize: '400% 400%',
-              };
-              animationClass = 'animate-gradient-flow';
-              break;
-            case 'pulse':
-              backgroundStyle = {
-                background: `linear-gradient(to right, ${start}, ${end})`,
-              };
-              animationClass = 'animate-pulse';
-              break;
-            case 'wave':
-              backgroundStyle = {
-                background: `linear-gradient(90deg, ${start}, ${end})`,
-                backgroundSize: '200% 100%',
-              };
-              animationClass = 'animate-wave';
-              break;
-            case 'shimmer':
-              backgroundStyle = {
-                background: `linear-gradient(90deg, ${start} 0%, ${end} 50%, ${start} 100%)`,
-                backgroundSize: '200% 100%',
-              };
-              animationClass = 'animate-shimmer';
-              break;
-            default:
-              backgroundStyle = { backgroundColor: `#${bgSolidColor}` };
-          }
         }
 
         const alignmentClass =
@@ -622,7 +586,7 @@ function PreviewBlock({
         return (
           <div className={`flex w-full ${alignmentClass}`}>
             <div
-              className={`rounded ${animationClass}`}
+              className="rounded"
               style={{
                 height: thickness,
                 width: '100%',
