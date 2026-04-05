@@ -123,6 +123,16 @@
   }
 }
 
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 .animate-gradient-flow {
   animation: gradient-flow 3s ease infinite;
   background-size: 200% 200%;
@@ -136,6 +146,10 @@
 .animate-shimmer {
   animation: shimmer 2s linear infinite;
   background-size: 200% 100%;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
 }
 
 .dark {

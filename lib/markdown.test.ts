@@ -10,21 +10,22 @@ describe('renderBlock', () => {
       const block: Block = {
         id: 'test',
         type: 'divider',
-        props: { style: 'line' },
+        props: { type: 'line' },
       };
       const result = renderBlock(block);
-      expect(result).toContain('---');
+      // Now renders using the divider API for styled output
+      expect(result).toContain('/api/divider');
     });
 
     it('should render gif divider', () => {
       const block: Block = {
         id: 'test',
         type: 'divider',
-        props: { style: 'gif', theme: 'ruby' },
+        props: { type: 'gif', gifUrl: 'https://example.com/divider.gif' },
       };
       const result = renderBlock(block);
-      // GIF dividers can be line or other styles
-      expect(result).toBeTruthy();
+      // GIF dividers render as img tag
+      expect(result).toContain('img src="https://example.com/divider.gif"');
     });
   });
 
