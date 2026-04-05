@@ -1,5 +1,6 @@
 'use client';
 
+import { resolveFooterBannerColors } from '@/lib/footer-banner-utils';
 import { generateId } from '@/lib/store';
 import { SKILL_ICONS, type Block } from '@/lib/types';
 
@@ -568,28 +569,20 @@ export function BlockConfigFields({
       );
 
     case 'footer-banner': {
-      // Support both new format (bgStartColor/bgEndColor) and legacy format (waveColor)
-      let bgStartColor = props.bgStartColor as string;
-      let bgEndColor = props.bgEndColor as string;
-
-      if (props.waveColor) {
-        const colorValue = props.waveColor as string;
-        const colorParts = colorValue.split(':');
-        if (colorParts.length >= 2) {
-          bgStartColor = colorParts[0]?.replace(/.*:/, '') || '3B82F6';
-          bgEndColor = colorParts[1] || '8B5CF6';
-        } else if (colorParts.length === 1) {
-          bgStartColor = colorParts[0] || '3B82F6';
-          bgEndColor = '8B5CF6';
-        }
-      }
-
-      bgStartColor = bgStartColor ?? '3B82F6';
-      bgEndColor = bgEndColor ?? '8B5CF6';
+      /**
+       * FIXED: use the shared resolveFooterBannerColors() helper so that both
+       * legacy blocks (waveColor prop) and modern blocks (bgStartColor /
+       * bgEndColor props) produce correct colour values.
+       *
+       * Previously this case split `waveColor` on ':' which turned
+       * "0:EEFF00,100:A82DAA" into ['0', 'EEFF00,100', 'A82DAA'], yielding
+       * bgStartColor = "0" (not a hex) and bgEndColor = "EEFF00,100" (not a hex).
+       */
+      const { bgStartColor, bgEndColor } = resolveFooterBannerColors(props);
 
       const currentType = (props.type as string) ?? 'waving';
       const currentSection = (props.section as string) ?? 'footer';
-      const currentHeight = getNumberProp('height', 80);
+      const currentHeight = getNumberProp('height', 120);
       const maxR = Math.floor(currentHeight / 2);
 
       return (
@@ -613,7 +606,7 @@ export function BlockConfigFields({
           }
           bgStartColor={bgStartColor}
           bgEndColor={bgEndColor}
-          bgSolidColor={(props.bgSolidColor as string) ?? '3B82F6'}
+          bgSolidColor={(props.bgSolidColor as string) ?? 'EEFF00'}
           fontColor={(props.fontColor as string) ?? 'ffffff'}
           borderRadiusTL={
             props.borderRadiusTL !== undefined

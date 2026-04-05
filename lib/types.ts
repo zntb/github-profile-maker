@@ -738,15 +738,24 @@ export const BLOCK_CATEGORIES: BlockCategory[] = [
           type: 'horizontal',
         },
       },
+      // ─── FIXED: all modern gradient fields included; no legacy waveColor ───
       {
         type: 'footer-banner',
         label: 'Footer Banner',
         icon: 'PanelBottom',
         defaultProps: {
           text: 'Thanks for visiting!',
-          waveColor: '0:EEFF00,100:a82DA',
-          fontColor: 'ffffff',
+          type: 'waving',
+          section: 'footer',
           height: 120,
+          fontSize: 24,
+          fontColor: 'ffffff',
+          bgType: 'gradient',
+          bgGradientDirection: 'horizontal',
+          bgAnimation: 'none',
+          bgStartColor: 'EEFF00',
+          bgEndColor: 'A82DAA',
+          bgSolidColor: 'EEFF00',
         },
       },
       {
