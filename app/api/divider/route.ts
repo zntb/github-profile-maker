@@ -9,6 +9,57 @@ type GradientDirection = 'horizontal' | 'vertical' | 'diagonal' | 'radial' | 'co
 // Background type
 type BackgroundType = 'solid' | 'gradient' | 'animated';
 
+// Validate hex color - only allow 3 or 6 character hex values
+function isValidHexColor(color: string): boolean {
+  return /^[0-9A-F]{3}$/i.test(color) || /^[0-9A-F]{6}$/i.test(color);
+}
+
+// Sanitize and validate color parameter
+function sanitizeColor(value: string | null, defaultColor: string): string {
+  const color = (value ?? defaultColor).toUpperCase();
+  // Only allow valid hex characters (0-9, A-F)
+  const sanitized = color.replace(/[^0-9A-F]/g, '');
+  // Validate it's a valid hex color (3 or 6 chars)
+  if (isValidHexColor(sanitized)) {
+    return sanitized;
+  }
+  return defaultColor;
+}
+
+// Validate alignment parameter
+function sanitizeAlignment(value: string | null): string {
+  const validAlignments = ['left', 'center', 'right'];
+  const alignment = value?.toLowerCase();
+  return validAlignments.includes(alignment ?? '') ? alignment! : 'center';
+}
+
+// Validate bgType parameter
+function sanitizeBgType(value: string | null): BackgroundType {
+  const validTypes: BackgroundType[] = ['solid', 'gradient', 'animated'];
+  const bgType = value?.toLowerCase() as BackgroundType;
+  return validTypes.includes(bgType) ? bgType : 'solid';
+}
+
+// Validate gradient direction
+function sanitizeGradientDirection(value: string | null): GradientDirection {
+  const validDirections: GradientDirection[] = [
+    'horizontal',
+    'vertical',
+    'diagonal',
+    'radial',
+    'conic',
+  ];
+  const direction = value?.toLowerCase() as GradientDirection;
+  return validDirections.includes(direction) ? direction : 'horizontal';
+}
+
+// Validate animation type
+function sanitizeAnimationType(value: string | null): AnimationType {
+  const validAnimations: AnimationType[] = ['none', 'gradient', 'pulse', 'wave', 'shimmer'];
+  const animation = value?.toLowerCase() as AnimationType;
+  return validAnimations.includes(animation) ? animation : 'none';
+}
+
 function buildGradientDef(
   id: string,
   startColor: string,
@@ -75,18 +126,18 @@ function buildAnimatedGradientDef(
 export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
 
-  // Get parameters
-  const bgType = (sp.get('bgType') as BackgroundType) ?? 'solid';
+  // Get and sanitize parameters
+  const bgType = sanitizeBgType(sp.get('bgType'));
   const thickness = parseInt(sp.get('thickness') ?? '2', 10);
   const width = parseInt(sp.get('width') ?? '800', 10);
-  const alignment = sp.get('alignment') ?? 'center';
+  const alignment = sanitizeAlignment(sp.get('alignment'));
 
-  // Color parameters
-  const bgSolidColor = (sp.get('bgSolidColor') ?? 'CCCCCC').toUpperCase();
-  const bgStartColor = (sp.get('bgStartColor') ?? 'CCCCCC').toUpperCase();
-  const bgEndColor = (sp.get('bgEndColor') ?? '999999').toUpperCase();
-  const bgGradientDirection = (sp.get('bgGradientDirection') as GradientDirection) ?? 'horizontal';
-  const bgAnimation = (sp.get('bgAnimation') as AnimationType) ?? 'none';
+  // Color parameters - sanitized
+  const bgSolidColor = sanitizeColor(sp.get('bgSolidColor'), 'CCCCCC');
+  const bgStartColor = sanitizeColor(sp.get('bgStartColor'), 'CCCCCC');
+  const bgEndColor = sanitizeColor(sp.get('bgEndColor'), '999999');
+  const bgGradientDirection = sanitizeGradientDirection(sp.get('bgGradientDirection'));
+  const bgAnimation = sanitizeAnimationType(sp.get('bgAnimation'));
 
   // Clamp thickness
   const clampedThickness = Math.max(1, Math.min(50, thickness));
