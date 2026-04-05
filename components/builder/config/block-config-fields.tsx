@@ -29,6 +29,11 @@ import { TopLanguagesConfig } from './blocks/top-languages-config';
 import { TrophiesConfig } from './blocks/trophies-config';
 import { TypingAnimationConfig } from './blocks/typing-animation-config';
 import { VisitorCounterConfig } from './blocks/visitor-counter-config';
+import {
+  type AnimationType,
+  type BackgroundType,
+  type GradientDirection,
+} from './gradient-color-picker';
 
 interface BlockConfigFieldsProps {
   block: Block;
@@ -127,8 +132,24 @@ export function BlockConfigFields({
         <DividerConfig
           type={(props.type as string) ?? 'line'}
           gifUrl={(props.gifUrl as string) ?? ''}
+          bgType={(props.bgType as BackgroundType) ?? 'solid'}
+          bgGradientDirection={(props.bgGradientDirection as GradientDirection) ?? 'horizontal'}
+          bgAnimation={(props.bgAnimation as AnimationType) ?? 'none'}
+          bgStartColor={(props.bgStartColor as string) ?? 'CCCCCC'}
+          bgEndColor={(props.bgEndColor as string) ?? '999999'}
+          bgSolidColor={(props.bgSolidColor as string) ?? 'CCCCCC'}
+          thickness={(props.thickness as number) ?? 2}
+          alignment={(props.alignment as string) ?? 'center'}
           onTypeChange={(v) => update('type', v)}
           onGifUrlChange={(v) => update('gifUrl', v)}
+          onBgTypeChange={(v) => update('bgType', v)}
+          onBgGradientDirectionChange={(v) => update('bgGradientDirection', v)}
+          onBgAnimationChange={(v) => update('bgAnimation', v)}
+          onBgStartColorChange={(v) => update('bgStartColor', v)}
+          onBgEndColorChange={(v) => update('bgEndColor', v)}
+          onBgSolidColorChange={(v) => update('bgSolidColor', v)}
+          onThicknessChange={(v) => update('thickness', v)}
+          onAlignmentChange={(v) => update('alignment', v)}
         />
       );
 

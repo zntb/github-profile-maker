@@ -526,16 +526,112 @@ function PreviewBlock({
         );
       }
 
-      case 'divider':
-        return props.type === 'gif' && props.gifUrl ? (
-          <img
-            src={props.gifUrl as string}
-            alt="Divider"
-            style={{ width: '100%', height: 'auto', display: 'block' }}
-          />
-        ) : (
-          <hr className="my-4" />
+      case 'divider': {
+        if (props.type === 'gif' && props.gifUrl) {
+          return (
+            <img
+              src={props.gifUrl as string}
+              alt="Divider"
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+          );
+        }
+
+        // Line type with new styling options
+        const bgType = (props.bgType as string) ?? 'solid';
+        const thickness = (props.thickness as number) ?? 2;
+        const alignment = (props.alignment as string) ?? 'center';
+
+        // Color handling
+        const bgSolidColor = (props.bgSolidColor as string) ?? 'CCCCCC';
+        const bgStartColor = (props.bgStartColor as string) ?? 'CCCCCC';
+        const bgEndColor = (props.bgEndColor as string) ?? '999999';
+        const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
+        const bgAnimation = (props.bgAnimation as string) ?? 'none';
+
+        let backgroundStyle: React.CSSProperties = {};
+        let animationClass = '';
+
+        if (bgType === 'solid') {
+          backgroundStyle = { backgroundColor: `#${bgSolidColor}` };
+        } else if (bgType === 'gradient') {
+          const start = `#${bgStartColor}`;
+          const end = `#${bgEndColor}`;
+          switch (bgGradientDirection) {
+            case 'horizontal':
+              backgroundStyle = { background: `linear-gradient(to right, ${start}, ${end})` };
+              break;
+            case 'vertical':
+              backgroundStyle = { background: `linear-gradient(to bottom, ${start}, ${end})` };
+              break;
+            case 'diagonal':
+              backgroundStyle = { background: `linear-gradient(135deg, ${start}, ${end})` };
+              break;
+            case 'radial':
+              backgroundStyle = { background: `radial-gradient(circle, ${start}, ${end})` };
+              break;
+            case 'conic':
+              backgroundStyle = { background: `conic-gradient(from 0deg, ${start}, ${end})` };
+              break;
+            default:
+              backgroundStyle = { background: `linear-gradient(to right, ${start}, ${end})` };
+          }
+        } else if (bgType === 'animated') {
+          const start = `#${bgStartColor}`;
+          const end = `#${bgEndColor}`;
+          switch (bgAnimation) {
+            case 'gradient':
+              backgroundStyle = {
+                background: `linear-gradient(45deg, ${start}, ${end}, ${start}, ${end})`,
+                backgroundSize: '400% 400%',
+              };
+              animationClass = 'animate-gradient-flow';
+              break;
+            case 'pulse':
+              backgroundStyle = {
+                background: `linear-gradient(to right, ${start}, ${end})`,
+              };
+              animationClass = 'animate-pulse';
+              break;
+            case 'wave':
+              backgroundStyle = {
+                background: `linear-gradient(90deg, ${start}, ${end})`,
+                backgroundSize: '200% 100%',
+              };
+              animationClass = 'animate-wave';
+              break;
+            case 'shimmer':
+              backgroundStyle = {
+                background: `linear-gradient(90deg, ${start} 0%, ${end} 50%, ${start} 100%)`,
+                backgroundSize: '200% 100%',
+              };
+              animationClass = 'animate-shimmer';
+              break;
+            default:
+              backgroundStyle = { backgroundColor: `#${bgSolidColor}` };
+          }
+        }
+
+        const alignmentClass =
+          alignment === 'left'
+            ? 'justify-start'
+            : alignment === 'right'
+              ? 'justify-end'
+              : 'justify-center';
+
+        return (
+          <div className={`flex w-full ${alignmentClass}`}>
+            <div
+              className={`rounded ${animationClass}`}
+              style={{
+                height: thickness,
+                width: '100%',
+                ...backgroundStyle,
+              }}
+            />
+          </div>
         );
+      }
 
       case 'spacer':
         return <div style={{ height: `${props.height}px` }} />;
