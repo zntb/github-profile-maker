@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
+import { resolveFooterBannerColors } from '@/lib/footer-banner-utils';
 import { getActivityTheme, getLangTheme, getStatsTheme, getStreakTheme } from '@/lib/themes';
 import type { Block } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -670,27 +671,14 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
 
       case 'footer-banner': {
         // Determine background settings
+        // FIXED: resolveFooterBannerColors() correctly handles both legacy
+        // waveColor ("0:EEFF00,100:A82DAA") and modern (bgStartColor / bgEndColor)
+        // props.  The old code split on ':' and produced startColor='0' (not a
+        // valid hex) and endColor='EEFF00,100' (also invalid).
+        const { bgStartColor, bgEndColor } = resolveFooterBannerColors(props);
         const bgType = (props.bgType as string) ?? 'gradient';
         const bgAnimation = (props.bgAnimation as string) ?? 'none';
-        let bgStartColor = props.bgStartColor ? String(props.bgStartColor) : undefined;
-        let bgEndColor = props.bgEndColor ? String(props.bgEndColor) : undefined;
         const bgSolidColor = (props.bgSolidColor as string) ?? '3B82F6';
-
-        // Parse legacy waveColor format ONLY if modern properties are NOT present
-        if ((!bgStartColor || !bgEndColor) && props.waveColor) {
-          const colorValue = props.waveColor as string;
-          const colorParts = colorValue.split(':');
-          if (colorParts.length >= 2) {
-            bgStartColor = colorParts[0]?.replace(/.*:/, '') || '3B82F6';
-            bgEndColor = colorParts[1] || '8B5CF6';
-          } else if (colorParts.length === 1) {
-            bgStartColor = colorParts[0] || '3B82F6';
-            bgEndColor = '8B5CF6';
-          }
-        }
-
-        bgStartColor = bgStartColor ?? '3B82F6';
-        bgEndColor = bgEndColor ?? '8B5CF6';
 
         const type = (props.type as string) ?? 'waving';
         const height = Number(props.height) || 80;
