@@ -429,7 +429,16 @@ export function renderBlock(block: Block, origin: string = ''): string {
 
     case 'footer-banner': {
       const { text, waveColor, fontColor, height } = props as Record<string, string | number>;
-      const url = `/api/capsule?type=waving&color=${encodeURIComponent(String(waveColor))}&height=${height}&section=footer&text=${encodeURIComponent(String(text))}&fontSize=24&fontColor=${fontColor}`;
+      const capsuleProps = {
+        type: 'waving',
+        color: waveColor,
+        height: height ?? 100,
+        section: 'footer',
+        text: text ?? '',
+        fontSize: 24,
+        fontColor: fontColor ?? 'ffffff',
+      };
+      const url = buildCapsuleUrl(capsuleProps, origin);
       return `<div align="center">\n  <img src="${url}" />\n</div>`;
     }
 
