@@ -416,15 +416,21 @@ export function renderBlock(block: Block, origin: string = ''): string {
     }
 
     case 'quote': {
-      const { theme, type, quote, author, textAlign } = props as Record<string, string>;
+      const { theme, type, quote, author, textAlign, authorAlign } = props as Record<
+        string,
+        string
+      >;
       const align = textAlign || 'center';
-      if (quote && author) {
-        // Use align attribute only if not left (GitHub default)
-        const wrapper = align === 'left' ? '' : `<div align="${align}">`;
-        const wrapperEnd = align === 'left' ? '' : '</div>';
-        return `${wrapper}\n\n> "${quote}"\n> <br/>\n> — ${author}\n\n${wrapperEnd}`;
-      }
-      const params = { type, theme };
+      // Always use the API to ensure theme settings are applied correctly
+      // Pass all relevant params including custom quote/author
+      const params = {
+        type,
+        theme,
+        quote: quote || undefined,
+        author: author || undefined,
+        textAlign: align,
+        authorAlign: authorAlign || 'center',
+      };
       const url = origin
         ? buildExternalUrl('quotes', params, origin)
         : buildInternalUrl('quotes', params);
