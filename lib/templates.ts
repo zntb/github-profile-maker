@@ -834,6 +834,7 @@ export const templates: Template[] = [
         id: 'fs-1',
         type: 'capsule-header',
         props: {
+          alignment: 'center',
           text: 'Full Stack Engineer',
           type: 'slice',
           height: 200,
