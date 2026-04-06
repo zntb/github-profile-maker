@@ -755,7 +755,7 @@ function PreviewBlock({
 
         return (
           <div
-            className={`relative overflow-hidden ${animationClass}`}
+            className={`relative flex items-center justify-center w-full overflow-hidden ${animationClass}`}
             style={{
               width: '100%',
               maxWidth: '896px', // GitHub README max width
@@ -765,11 +765,12 @@ function PreviewBlock({
               ...animationBgSize,
             }}
           >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-bold" style={{ fontSize: `${fontSize}px`, color: fontColor }}>
-                {props.text as string}
-              </span>
-            </div>
+            <span
+              className="font-bold drop-shadow-md"
+              style={{ fontSize: `${fontSize}px`, color: fontColor }}
+            >
+              {props.text as string}
+            </span>
           </div>
         );
       }
