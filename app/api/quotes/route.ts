@@ -258,13 +258,25 @@ const themes: Record<string, { bg: string; text: string; accent: string; border:
   blue: { bg: '0d1117', text: 'c9d1d9', accent: '58a6ff', border: '30363d' },
 };
 
-function generateQuoteSvg(quote: { text: string; author: string }, themeName: string): string {
+function generateQuoteSvg(
+  quote: { text: string; author: string },
+  themeName: string,
+  textAlign: string = 'center',
+  authorAlign: string = 'center',
+): string {
   const theme = themes[themeName] || themes.default;
   const { bg, text, accent, border } = theme;
 
   // Escape user-provided content to prevent XSS
   const escapedText = escapeHtml(quote.text);
   const escapedAuthor = escapeHtml(quote.author);
+
+  // Calculate text positions based on alignment
+  const quoteX = textAlign === 'left' ? 25 : textAlign === 'right' ? 25 : 247;
+  const quoteAnchor = textAlign === 'left' ? 'start' : textAlign === 'right' ? 'end' : 'middle';
+  const authorX = authorAlign === 'left' ? 25 : authorAlign === 'right' ? 470 : 247;
+  const authorAnchor =
+    authorAlign === 'left' ? 'start' : authorAlign === 'right' ? 'end' : 'middle';
 
   return `
 <svg width="495" height="160" viewBox="0 0 495 160" xmlns="http://www.w3.org/2000/svg">
@@ -299,14 +311,14 @@ function generateQuoteSvg(quote: { text: string; author: string }, themeName: st
   <rect width="495" height="160" fill="url(#bgGradient)" rx="10"/>
   <rect x="0" y="0" width="495" height="160" fill="none" rx="10" stroke="#${border}" stroke-width="1"/>
 
-  <text x="20" y="45" class="quote-mark">"</text>
-  <text x="25" y="85" class="quote-text" width="445">
-    <tspan x="25" dy="0">${escapedText}</tspan>
+  <text x="${textAlign === 'left' ? 20 : textAlign === 'right' ? 460 : 247}" y="45" class="quote-mark" text-anchor="${quoteAnchor}">"</text>
+  <text x="${quoteX}" y="85" class="quote-text" text-anchor="${quoteAnchor}">
+    <tspan x="${quoteX}" dy="0">${escapedText}</tspan>
   </text>
 
-  <line x1="25" y1="110" x2="100" y2="110" class="divider"/>
+  <line x1="${textAlign === 'left' ? 25 : textAlign === 'right' ? 395 : 247}" y1="110" x2="${textAlign === 'left' ? 100 : textAlign === 'right' ? 470 : 395}" y2="110" class="divider"/>
 
-  <text x="25" y="135" class="author">— ${escapedAuthor}</text>
+  <text x="${authorX}" y="135" class="author" text-anchor="${authorAnchor}">— ${escapedAuthor}</text>
   <text x="380" y="145" font-family="Inter, sans-serif" font-size="10" fill="#${text}" opacity="0.5">github-profile-maker</text>
 </svg>
   `.trim();
@@ -320,10 +332,17 @@ export async function GET(request: NextRequest) {
     const themeName = searchParams.get('theme') || 'default';
     const customQuote = searchParams.get('quote');
     const customAuthor = searchParams.get('author');
+    const textAlign = searchParams.get('textAlign') || 'center';
+    const authorAlign = searchParams.get('authorAlign') || 'center';
 
     // Use custom quote if provided
     if (customQuote && customAuthor) {
-      const svg = generateQuoteSvg({ text: customQuote, author: customAuthor }, themeName);
+      const svg = generateQuoteSvg(
+        { text: customQuote, author: customAuthor },
+        themeName,
+        textAlign,
+        authorAlign,
+      );
       return new NextResponse(svg, {
         headers: {
           'Content-Type': 'image/svg+xml',
@@ -349,7 +368,7 @@ export async function GET(request: NextRequest) {
       return new NextResponse('No quote selected', { status: 500 });
     }
 
-    const svg = generateQuoteSvg(quote, themeName);
+    const svg = generateQuoteSvg(quote, themeName, textAlign, authorAlign);
 
     return new NextResponse(svg, {
       headers: {
