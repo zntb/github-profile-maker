@@ -779,6 +779,17 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
                   ? '48px 10px 48px 10px'
                   : '0 0 24px 24px';
 
+        // Font color from props
+        const normalizedFontColor =
+          typeof props.fontColor === 'string' ? props.fontColor.replace('#', '').trim() : 'ffffff';
+        const fontColor = `#${normalizedFontColor || 'ffffff'}`;
+
+        // Font size from props with bounds checking
+        let fontSize = 24;
+        if (props.fontSize && typeof props.fontSize === 'number' && isFinite(props.fontSize)) {
+          fontSize = Math.max(12, Math.min(72, props.fontSize as number));
+        }
+
         return (
           <div
             className={`relative flex items-center justify-center ${animationClass}`}
@@ -788,7 +799,9 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
               height: `${height}px`,
             }}
           >
-            <span className="font-medium text-white">{props.text as string}</span>
+            <span className="font-medium" style={{ color: fontColor, fontSize: `${fontSize}px` }}>
+              {props.text as string}
+            </span>
           </div>
         );
       }
