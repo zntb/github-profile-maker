@@ -287,9 +287,8 @@ function generateQuoteSvg(
     </linearGradient>
   </defs>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,400;1,400&display=swap');
     .quote-text {
-      font: 400 16px 'Merriweather', Georgia, serif;
+      font: 400 16px Georgia, 'Times New Roman', serif;
       fill: #${text};
       font-style: italic;
     }
@@ -299,7 +298,7 @@ function generateQuoteSvg(
       opacity: 0.3;
     }
     .author {
-      font: 500 14px 'Inter', 'Segoe UI', sans-serif;
+      font: 500 14px 'Segoe UI', Ubuntu, Sans-Serif;
       fill: #${accent};
     }
     .divider {
@@ -319,7 +318,7 @@ function generateQuoteSvg(
   <line x1="${textAlign === 'left' ? 25 : textAlign === 'right' ? 395 : 247}" y1="110" x2="${textAlign === 'left' ? 100 : textAlign === 'right' ? 470 : 395}" y2="110" class="divider"/>
 
   <text x="${authorX}" y="135" class="author" text-anchor="${authorAnchor}">— ${escapedAuthor}</text>
-  <text x="380" y="145" font-family="Inter, sans-serif" font-size="10" fill="#${text}" opacity="0.5">github-profile-maker</text>
+  <text x="380" y="145" font-family="'Segoe UI', Ubuntu, Sans-Serif" font-size="10" fill="#${text}" opacity="0.5">github-profile-maker</text>
 </svg>
   `.trim();
 }
