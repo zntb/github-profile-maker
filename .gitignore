@@ -41,5 +41,5 @@ yarn-error.log*
 next-env.d.ts
 
 docs/FEATURE_RECOMMENDATIONS.md
-
+docs/UX_RECOMMENDATIONS.md
 playwright-report
