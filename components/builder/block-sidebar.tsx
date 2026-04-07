@@ -273,7 +273,7 @@ export function BlockSidebar() {
   };
 
   return (
-    <div className="flex h-full w-full lg:w-76 flex-col border-r border-border bg-sidebar/50 backdrop-blur-sm">
+    <div className="flex h-full w-full lg:w-76 md:w-72 flex-col border-r border-border bg-sidebar/50 backdrop-blur-sm">
       <div className="border-b border-border p-4 bg-gradient-to-b from-card/50 to-transparent">
         <h2 className="mb-3 text-sm font-semibold text-sidebar-foreground flex items-center gap-2">
           <Box className="w-4 h-4 text-primary" />
@@ -418,7 +418,7 @@ export function BlockSidebar() {
               >
                 <button
                   onClick={() => toggleCategory(category.name)}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-all duration-200 group"
+                  className="flex w-full touch-target-min items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent/50 transition-all duration-200 group"
                 >
                   <span className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary/60 group-hover:bg-primary transition-colors duration-200" />
