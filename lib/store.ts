@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 import type { Block, BlockType, Template } from './types';
+import { isUploadThingUrl } from './uploadthing';
 
 export const MAX_HISTORY_STATES = 20;
 
@@ -234,7 +235,7 @@ export const useBuilderStore = create<BuilderState>()(
         set({ isDragging });
       },
 
-      duplicateBlock: (id) => {
+      duplicateBlock: async (id) => {
         const state = get();
         const findBlock = (blocks: Block[]): Block | null => {
           for (const block of blocks) {
@@ -255,7 +256,47 @@ export const useBuilderStore = create<BuilderState>()(
             children: block.children?.map(duplicateWithNewIds),
           });
 
-          const duplicated = duplicateWithNewIds(blockToDuplicate);
+          let duplicated = duplicateWithNewIds(blockToDuplicate);
+
+          // Handle image duplication - if the block is an image or gif with an UploadThing URL,
+          // we need to upload a copy to UploadThing
+          const isImageBlock = blockToDuplicate.type === 'image';
+          const isGifBlock = blockToDuplicate.type === 'gif';
+
+          if (isImageBlock || isGifBlock) {
+            const props = blockToDuplicate.props as Record<string, unknown>;
+            const url = props.url as string;
+
+            // Check if the URL is an UploadThing URL
+            if (url && isUploadThingUrl(url)) {
+              try {
+                const response = await fetch('/api/uploadthing/duplicate', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ sourceUrl: url }),
+                });
+
+                if (response.ok) {
+                  const result = await response.json();
+                  if (result.success && result.url) {
+                    // Update the duplicated block's URL to the new uploaded file
+                    duplicated = {
+                      ...duplicated,
+                      props: {
+                        ...duplicated.props,
+                        url: result.url,
+                      },
+                    };
+                  }
+                }
+              } catch (error) {
+                console.error('Failed to duplicate image:', error);
+                // If duplication fails, we'll still create the block but with the same URL
+                // The user can manually handle this case
+              }
+            }
+          }
+
           const index = state.blocks.findIndex((b) => b.id === id);
           state.addBlock(duplicated, index + 1);
         }
