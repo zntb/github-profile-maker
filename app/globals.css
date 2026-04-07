@@ -499,6 +499,126 @@
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
+/* WCAG 2.5.5 Target Size - Minimum 44x44px touch targets */
+.touch-target-min {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Touch target with flexible sizing */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive font scaling with clamp() */
+.text-responsive-xs {
+  font-size: clamp(0.625rem, 0.8rem + 0.25vw, 0.75rem);
+}
+
+.text-responsive-sm {
+  font-size: clamp(0.75rem, 0.9rem + 0.25vw, 0.875rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(0.875rem, 1rem + 0.25vw, 1rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1rem, 1.1rem + 0.5vw, 1.125rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.125rem, 1.25rem + 0.5vw, 1.25rem);
+}
+
+.text-responsive-2xl {
+  font-size: clamp(1.25rem, 1.5rem + 0.5vw, 1.5rem);
+}
+
+.text-responsive-3xl {
+  font-size: clamp(1.5rem, 1.75rem + 0.75vw, 1.875rem);
+}
+
+.text-responsive-4xl {
+  font-size: clamp(1.875rem, 2.25rem + 0.75vw, 2.25rem);
+}
+
+/* Landscape orientation support */
+@media (orientation: landscape) and (max-height: 500px) {
+  .landscape-hidden {
+    display: none !important;
+  }
+
+  .landscape-flex {
+    display: flex !important;
+  }
+
+  .landscape-grid {
+    display: grid !important;
+  }
+
+  .landscape-compact {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .landscape-compact > * {
+    max-height: 40vh;
+    overflow-y: auto;
+  }
+}
+
+/* Tablet improvements */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tablet-sidebar {
+    width: 280px;
+  }
+
+  .tablet-panel {
+    width: 320px;
+  }
+}
+
+/* Responsive spacing utilities */
+.p-responsive {
+  padding: clamp(0.5rem, 1vw, 1rem);
+}
+
+.m-responsive {
+  margin: clamp(0.5rem, 1vw, 1rem);
+}
+
+.gap-responsive {
+  gap: clamp(0.5rem, 1vw, 1rem);
+}
+
+/* Collapsible section styles */
+.collapsible-trigger {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.collapsible-content {
+  overflow: hidden;
+  transition:
+    max-height 300ms ease-out,
+    opacity 200ms ease-out;
+}
+
+.collapsible-content[data-state='open'] {
+  max-height: 500px;
+  opacity: 1;
+}
+
+.collapsible-content[data-state='closed'] {
+  max-height: 0;
+  opacity: 0;
+}
+
 .safe-area-inset-top {
   padding-top: env(safe-area-inset-top, 0);
 }
