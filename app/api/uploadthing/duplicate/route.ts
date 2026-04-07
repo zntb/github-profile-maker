@@ -117,6 +117,26 @@ async function isUrlAllowedWithDNS(url: URL): Promise<boolean> {
   return false;
 }
 
+// Derive a safe, constrained path for UploadThing resources.
+// This prevents the user from arbitrarily controlling the request target path.
+function getSafeUploadThingPath(url: URL): string | null {
+  // Only allow paths of the form /f/<fileKey> or /file/<fileKey>, where fileKey is a single
+  // path segment made of safe characters and contains no traversal.
+  const segments = url.pathname.split('/').filter(Boolean);
+  if (segments.length !== 2) {
+    return null;
+  }
+  const [prefix, fileKey] = segments;
+  if (prefix !== 'f' && prefix !== 'file') {
+    return null;
+  }
+  // Restrict fileKey to a safe character set (alphanumeric, dash, underscore, dot).
+  if (!/^[A-Za-z0-9._-]+$/.test(fileKey)) {
+    return null;
+  }
+  return `/${prefix}/${fileKey}`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -147,19 +167,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Source URL host is not allowed' }, { status: 400 });
     }
 
-    // Create a new sanitized URL string after all validation
-    // This ensures CodeQL sees the validated value being used
-    const sanitizedUrl = validatedUrl.toString();
+    // Derive a safe, constrained path for UploadThing resources.
+    // This prevents the user from arbitrarily controlling the request target path.
+    const safePath = getSafeUploadThingPath(validatedUrl);
+    if (!safePath) {
+      return NextResponse.json({ error: 'Source URL path is not allowed' }, { status: 400 });
+    }
+
+    // Reconstruct a sanitized URL using the validated origin and the constrained path.
+    const origin = `${validatedUrl.protocol}//${validatedUrl.hostname}`;
+    const sanitizedUrl = new URL(safePath, origin).toString();
 
     const utapi = new UTApi({ token: process.env.UPLOADTHING_TOKEN });
 
-    // Download the source image using the sanitized URL
-    const response = await fetch(sanitizedUrl);
+    // Download the source image using the sanitized URL with timeout and size limit
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+    let response: Response;
+    try {
+      response = await fetch(sanitizedUrl, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'GitHub-Profile-Maker/1.0',
+        },
+      });
+    } catch (fetchError) {
+      clearTimeout(timeout);
+      // Handle abort errors specially
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        return NextResponse.json({ error: 'Request timed out' }, { status: 500 });
+      }
+      return NextResponse.json({ error: 'Failed to download source image' }, { status: 500 });
+    }
+
+    clearTimeout(timeout);
+
     if (!response.ok) {
       return NextResponse.json({ error: 'Failed to download source image' }, { status: 500 });
     }
 
+    // Check response size to prevent memory exhaustion (max 10MB)
+    const contentLength = response.headers.get('content-length');
+    if (contentLength && parseInt(contentLength, 10) > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Source file too large' }, { status: 500 });
+    }
+
     const arrayBuffer = await response.arrayBuffer();
+
+    // Additional size check after reading
+    if (arrayBuffer.byteLength > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'Source file too large' }, { status: 500 });
+    }
+
     const uint8Array = new Uint8Array(arrayBuffer);
 
     // Determine content type from the source URL or response
@@ -206,14 +266,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // If we got here, the upload might have failed or returned an error
-    console.error('Unexpected upload result:', result);
     return NextResponse.json(
       { error: 'Failed to upload duplicated image', details: result },
       { status: 500 },
     );
-  } catch (error) {
-    console.error('Error duplicating file:', error);
+  } catch {
     return NextResponse.json({ error: 'Failed to duplicate file' }, { status: 500 });
   }
 }
