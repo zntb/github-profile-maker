@@ -49,42 +49,42 @@
 
 ## Features
 
-| Feature                       | Description                                                           |
-| ----------------------------- | --------------------------------------------------------------------- |
-| 🧱 **Drag & Drop Canvas**     | Reorder blocks effortlessly with smooth dnd-kit animations            |
-| 🔒 **Block Locking**          | Lock blocks to prevent accidental modifications and reordering        |
-| 📐 **Stats Row Layout**       | Flexible row/column multi-card layouts for stats widgets              |
-| 👁️ **Live Preview**           | See exactly how your README renders in GitHub's style                 |
-| 📝 **Markdown Export**        | Copy to clipboard or download a ready-to-use `README.md`              |
-| 🎨 **65+ Themes**             | Tokyo Night, Dracula, Radical, Catppuccin, and many more              |
-| 🎨 **Custom Theme Builder**   | Create fully custom themes with visual color picker for stats cards   |
-| 💾 **Save Custom Themes**     | Save custom themes to local storage or export to file for backup      |
-| 🎨 **Live Theme Preview**     | Real-time theme colors shown in canvas when selecting themes          |
-| 🌈 **Gradient Backgrounds**   | Add stunning gradient backgrounds to containers and headers           |
-| ✨ **Animated Backgrounds**   | Animate backgrounds with gradient flow, pulse, wave, and shimmer      |
-| 📦 **25+ Block Types**        | Headers, stats cards, badges, skill icons, graphs, and more           |
-| 🖼️ **Template Library**       | 11 ready-to-use templates for different developer profiles            |
-| 📱 **Fully Responsive**       | Optimized three-layout system for desktop, tablet, and mobile         |
-| 🌙 **Dark / Light Mode**      | System-aware theming powered by `next-themes`                         |
-| ⚡ **Self-hosted Stats**      | Built-in Next.js API routes generate GitHub stat SVGs server-side     |
-| 🔑 **GitHub GraphQL**         | Optional `GITHUB_TOKEN` for real, live stats from the GitHub API      |
-| 💬 **Random Quotes**          | Built-in API for fetching random developer quotes                     |
-| 💾 **Auto-Save with History** | Automatic progress saving with undo/redo (last 20 states)             |
-| 💼 **Save & Load Profiles**   | Save multiple profiles locally, switch between configurations         |
-| 🔍 **Profile Quality Score**  | Real-time profile completeness analysis with improvement suggestions  |
-| 🔍 **Block Tooltips**         | Hover previews with descriptions for easy block discovery             |
-| ⌨️ **Keyboard Shortcuts**     | Navigate, add, reorder, and configure blocks without mouse            |
-| ⌘ **Command Palette**         | Ctrl+K / Cmd+K for quick access to all actions, blocks, and templates |
-| 💡 **Smart Notifications**    | Context-aware hints that appear based on your actions                 |
-| ⚡ **Bundle Optimization**    | Code splitting & lazy loading for faster initial load time            |
-| ⚡ **Progressive Loading**    | Skeleton loaders show while data and blocks are loading               |
-| 📋 **Actions Dropdown**       | Consolidated menu for secondary actions on desktop                    |
-| � **Lazy Block Rendering**    | Virtualized canvas for smooth performance with 20+ blocks             |
-| ☁️ **Save to GitHub Gist**    | One-click backup to public or private GitHub Gists                    |
-| 📤 **Share to Social Media**  | One-click sharing to Twitter/X, LinkedIn, and Facebook                |
-| 🔗 **URL State Sharing**      | Share configurations via URL - send links with embedded state         |
-| 📋 **Shareable Templates**    | Create shareable templates by copying URL with builder state          |
-| �️ **Image Optimization**      | Auto-compress and convert images to WebP for faster loading           |
+| Feature                       | Description                                                                                                                                                           |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧱 **Drag & Drop Canvas**     | Reorder blocks effortlessly with smooth dnd-kit animations                                                                                                            |
+| 🔒 **Block Locking**          | Lock blocks to prevent accidental modifications and reordering                                                                                                        |
+| 📐 **Stats Row Layout**       | Flexible row/column multi-card layouts for stats widgets                                                                                                              |
+| 👁️ **Live Preview**           | See exactly how your README renders in GitHub's style                                                                                                                 |
+| 📝 **Markdown Export**        | Copy to clipboard or download a ready-to-use `README.md`                                                                                                              |
+| 🎨 **65+ Themes**             | Tokyo Night, Dracula, Radical, Catppuccin, and many more                                                                                                              |
+| 🎨 **Custom Theme Builder**   | Create fully custom themes with visual color picker for stats cards                                                                                                   |
+| 💾 **Save Custom Themes**     | Save custom themes to local storage or export to file for backup                                                                                                      |
+| 🎨 **Live Theme Preview**     | Real-time theme colors shown in canvas when selecting themes                                                                                                          |
+| 🌈 **Gradient Backgrounds**   | Add stunning gradient backgrounds to containers and headers                                                                                                           |
+| ✨ **Animated Backgrounds**   | Animate backgrounds with gradient flow, pulse, wave, and shimmer                                                                                                      |
+| 📦 **25+ Block Types**        | Headers, stats cards, badges, skill icons, graphs, and more                                                                                                           |
+| 🖼️ **Template Library**       | 11 ready-to-use templates for different developer profiles                                                                                                            |
+| 📱 **Fully Responsive**       | Three-layout system with WCAG 2.5.5 touch targets (44x44px min), landscape orientation support, collapsible mobile sections, and responsive font scaling with clamp() |
+| 🌙 **Dark / Light Mode**      | System-aware theming powered by `next-themes`                                                                                                                         |
+| ⚡ **Self-hosted Stats**      | Built-in Next.js API routes generate GitHub stat SVGs server-side                                                                                                     |
+| 🔑 **GitHub GraphQL**         | Optional `GITHUB_TOKEN` for real, live stats from the GitHub API                                                                                                      |
+| 💬 **Random Quotes**          | Built-in API for fetching random developer quotes                                                                                                                     |
+| 💾 **Auto-Save with History** | Automatic progress saving with undo/redo (last 20 states)                                                                                                             |
+| 💼 **Save & Load Profiles**   | Save multiple profiles locally, switch between configurations                                                                                                         |
+| 🔍 **Profile Quality Score**  | Real-time profile completeness analysis with improvement suggestions                                                                                                  |
+| 🔍 **Block Tooltips**         | Hover previews with descriptions for easy block discovery                                                                                                             |
+| ⌨️ **Keyboard Shortcuts**     | Navigate, add, reorder, and configure blocks without mouse                                                                                                            |
+| ⌘ **Command Palette**         | Ctrl+K / Cmd+K for quick access to all actions, blocks, and templates                                                                                                 |
+| 💡 **Smart Notifications**    | Context-aware hints that appear based on your actions                                                                                                                 |
+| ⚡ **Bundle Optimization**    | Code splitting & lazy loading for faster initial load time                                                                                                            |
+| ⚡ **Progressive Loading**    | Skeleton loaders show while data and blocks are loading                                                                                                               |
+| 📋 **Actions Dropdown**       | Consolidated menu for secondary actions on desktop                                                                                                                    |
+| � **Lazy Block Rendering**    | Virtualized canvas for smooth performance with 20+ blocks                                                                                                             |
+| ☁️ **Save to GitHub Gist**    | One-click backup to public or private GitHub Gists                                                                                                                    |
+| 📤 **Share to Social Media**  | One-click sharing to Twitter/X, LinkedIn, and Facebook                                                                                                                |
+| 🔗 **URL State Sharing**      | Share configurations via URL - send links with embedded state                                                                                                         |
+| 📋 **Shareable Templates**    | Create shareable templates by copying URL with builder state                                                                                                          |
+| �️ **Image Optimization**      | Auto-compress and convert images to WebP for faster loading                                                                                                           |
 
 ---
 
