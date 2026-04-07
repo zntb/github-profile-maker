@@ -1,3 +1,5 @@
+import { lookup } from 'node:dns/promises';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { UTApi } from 'uploadthing/server';
 
@@ -69,21 +71,50 @@ function isHostnameBlocked(hostname: string): boolean {
   return false;
 }
 
-function isUrlAllowed(url: URL): boolean {
+async function isUrlAllowedWithDNS(url: URL): Promise<boolean> {
   const hostname = url.hostname.toLowerCase().replace(/\.$/, '');
 
-  // First, check if hostname is blocked (private IP or reserved)
+  // First, check if hostname is blocked (private IP or reserved) directly
   if (isHostnameBlocked(hostname)) {
     return false;
   }
 
-  // Check if hostname is in allowed list
+  // Check if hostname is in allowed list (skip DNS for known domains)
   if (ALLOWED_HOSTS.includes(hostname)) {
     return true;
   }
 
   // Check if hostname ends with an allowed domain
-  return ALLOWED_HOSTS.some((allowedHost) => hostname.endsWith(`.${allowedHost}`));
+  if (ALLOWED_HOSTS.some((allowedHost) => hostname.endsWith(`.${allowedHost}`))) {
+    return true;
+  }
+
+  // For non-uploadthing domains, perform DNS resolution to check for SSRF via DNS rebinding
+  try {
+    const addresses = await lookup(hostname, { all: true });
+    for (const addr of addresses) {
+      // Check IPv4 addresses
+      if (addr.address && isPrivateIP(addr.address)) {
+        return false;
+      }
+      // Check IPv6 addresses
+      if (addr.family === 6) {
+        // Block link-local and unique local addresses
+        if (
+          addr.address.startsWith('fe80:') ||
+          addr.address.startsWith('fc') ||
+          addr.address.startsWith('fd')
+        ) {
+          return false;
+        }
+      }
+    }
+  } catch {
+    // DNS lookup failed - block the request
+    return false;
+  }
+
+  return false;
 }
 
 export async function POST(req: NextRequest) {
@@ -94,8 +125,6 @@ export async function POST(req: NextRequest) {
     if (!sourceUrl) {
       return NextResponse.json({ error: 'Source URL is required' }, { status: 400 });
     }
-
-    console.log('Duplicate API received:', { sourceUrl, customFileName });
 
     // Validate and restrict the source URL to mitigate SSRF
     let validatedUrl: URL;
@@ -113,8 +142,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if the hostname is allowed
-    if (!isUrlAllowed(validatedUrl)) {
+    // Check if the hostname is allowed (with DNS resolution for DNS rebinding protection)
+    if (!(await isUrlAllowedWithDNS(validatedUrl))) {
       return NextResponse.json({ error: 'Source URL host is not allowed' }, { status: 400 });
     }
 
@@ -125,9 +154,7 @@ export async function POST(req: NextRequest) {
     const utapi = new UTApi({ token: process.env.UPLOADTHING_TOKEN });
 
     // Download the source image using the sanitized URL
-    console.log('Downloading source image from:', sanitizedUrl);
     const response = await fetch(sanitizedUrl);
-    console.log('Download response status:', response.status, response.statusText);
     if (!response.ok) {
       return NextResponse.json({ error: 'Failed to download source image' }, { status: 500 });
     }
