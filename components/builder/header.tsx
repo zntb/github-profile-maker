@@ -326,8 +326,7 @@ export function BuilderHeader() {
             <Button
               variant="ghost"
               size="icon"
-              disabled={blocks.length === 0}
-              className="hover:bg-destructive/10 hover:text-destructive"
+              className="touch-target-min hover:bg-destructive/10 hover:text-destructive"
               aria-label="Clear canvas"
             >
               <Trash2 className="w-4 h-4" />
@@ -358,7 +357,12 @@ export function BuilderHeader() {
         <ModeToggle />
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Open mobile navigation menu">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="touch-target-min"
+              aria-label="Open mobile navigation menu"
+            >
               <Menu className="w-5 h-5" />
             </Button>
           </SheetTrigger>

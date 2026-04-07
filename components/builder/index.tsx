@@ -149,7 +149,7 @@ export function Builder() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute left-2 top-16 z-20 md:flex hidden lg:hidden hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                className="touch-target-min absolute left-2 top-16 z-20 md:flex hidden lg:hidden hover:bg-primary/10 hover:text-primary transition-colors duration-200"
                 aria-label="Open blocks panel"
               >
                 <Blocks className="w-5 h-5" />
@@ -177,7 +177,7 @@ export function Builder() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute right-2 top-16 z-20 md:flex hidden lg:hidden hover:bg-primary/10 hover:text-primary transition-colors duration-200"
+                className="touch-target-min absolute right-2 top-16 z-20 md:flex hidden lg:hidden hover:bg-primary/10 hover:text-primary transition-colors duration-200"
                 aria-label="Open configuration panel"
               >
                 {selectedBlockId ? <Settings2 className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
@@ -254,7 +254,7 @@ export function Builder() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-8 gap-1.5 text-xs"
+                      className="h-11 touch-target-min gap-1.5 text-xs"
                       onClick={() => setMobileTab('canvas')}
                     >
                       <PanelLeft className="h-3.5 w-3.5" />
@@ -264,7 +264,7 @@ export function Builder() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="h-8 gap-1.5 text-xs"
+                      className="h-11 touch-target-min gap-1.5 text-xs"
                       onClick={() => setMobileTab('preview')}
                     >
                       <Eye className="h-3.5 w-3.5" />
@@ -276,7 +276,7 @@ export function Builder() {
                       size="sm"
                       disabled={!selectedBlockId}
                       className={cn(
-                        'h-8 gap-1.5 text-xs',
+                        'h-11 touch-target-min gap-1.5 text-xs',
                         !selectedBlockId && 'cursor-not-allowed opacity-50',
                       )}
                       onClick={() => setConfigOpen(true)}
