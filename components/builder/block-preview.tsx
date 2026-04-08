@@ -174,6 +174,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           const wavePosition = props.wavePosition ?? 70;
           const waveAmplitude = props.waveAmplitude ?? 20;
           const waveSpeed = props.waveSpeed ?? 20;
+          const waveFlip = props.waveFlip === true;
 
           const params = new URLSearchParams({
             type: capType,
@@ -189,6 +190,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             wavePosition: String(wavePosition),
             waveAmplitude: String(waveAmplitude),
             waveSpeed: String(waveSpeed),
+            flipWave: waveFlip ? 'true' : 'false',
           });
 
           return (
@@ -780,6 +782,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           const wavePosition = props.wavePosition ?? 70;
           const waveAmplitude = props.waveAmplitude ?? 20;
           const waveSpeed = props.waveSpeed ?? 20;
+          const waveFlip = props.waveFlip === true;
 
           const params = new URLSearchParams({
             type,
@@ -795,6 +798,7 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             wavePosition: String(wavePosition),
             waveAmplitude: String(waveAmplitude),
             waveSpeed: String(waveSpeed),
+            flipWave: waveFlip ? 'true' : 'false',
           });
 
           return (
