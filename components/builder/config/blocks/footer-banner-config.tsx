@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 
 import { FieldGroup } from '../field-group';
 import {
@@ -42,6 +43,7 @@ interface FooterBannerConfigProps {
   borderRadiusTR?: number;
   borderRadiusBR?: number;
   borderRadiusBL?: number;
+  parallaxEffect?: boolean;
   onTextChange: (value: string) => void;
   onTypeChange: (value: string) => void;
   onSectionChange: (value: string) => void;
@@ -58,6 +60,7 @@ interface FooterBannerConfigProps {
   onBorderRadiusTRChange?: (value: number) => void;
   onBorderRadiusBRChange?: (value: number) => void;
   onBorderRadiusBLChange?: (value: number) => void;
+  onParallaxEffectChange?: (value: boolean) => void;
 }
 
 /** Compute default corner radii from type + section (mirrors the API logic). */
@@ -66,9 +69,25 @@ function defaultRadii(type: string, section: string, height: number): CornerRadi
   if (type === 'rect') return { tl: 8, tr: 8, br: 8, bl: 8 };
   if (type === 'cylinder') return { tl: maxR, tr: maxR, br: maxR, bl: maxR };
   if (type === 'soft') return { tl: 36, tr: 36, br: 36, bl: 36 };
+  if (type === 'wave') {
+    // Footer banner always uses rounded bottom corners (like Capsule Header header section)
+    return { tl: 0, tr: 0, br: 40, bl: 40 };
+  }
+  if (type === 'egg') {
+    return { tl: 0, tr: 0, br: 50, bl: 50 };
+  }
+  if (type === 'shark') {
+    return { tl: 0, tr: 10, br: 20, bl: 20 };
+  }
   if (type === 'waving') {
     // Footer banner always uses rounded bottom corners (like Capsule Header header section)
     return { tl: 0, tr: 0, br: 24, bl: 24 };
+  }
+  if (type === 'speech') {
+    return { tl: 0, tr: 0, br: 24, bl: 24 };
+  }
+  if (type === 'transparent' || type === 'blur') {
+    return { tl: 0, tr: 0, br: 0, bl: 0 };
   }
   return { tl: 0, tr: 0, br: 0, bl: 0 };
 }
@@ -118,6 +137,7 @@ export function FooterBannerConfig({
   borderRadiusTR,
   borderRadiusBR,
   borderRadiusBL,
+  parallaxEffect,
   onTextChange,
   onTypeChange,
   onSectionChange,
@@ -134,6 +154,7 @@ export function FooterBannerConfig({
   onBorderRadiusTRChange,
   onBorderRadiusBRChange,
   onBorderRadiusBLChange,
+  onParallaxEffectChange,
 }: FooterBannerConfigProps) {
   const defaults = defaultRadii(type, section, height);
   const maxR = Math.floor(height / 2);
@@ -194,16 +215,36 @@ export function FooterBannerConfig({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="wave">Wave</SelectItem>
+            <SelectItem value="egg">Egg</SelectItem>
+            <SelectItem value="shark">Shark</SelectItem>
+            <SelectItem value="slice">Slice</SelectItem>
             <SelectItem value="waving">Waving</SelectItem>
-            <SelectItem value="typing">Typing</SelectItem>
-            <SelectItem value="static">Static</SelectItem>
+            <SelectItem value="speech">Speech</SelectItem>
+            <SelectItem value="transparent">Transparent</SelectItem>
+            <SelectItem value="blur">Blur</SelectItem>
             <SelectItem value="cylinder">Cylinder</SelectItem>
             <SelectItem value="rect">Rectangle</SelectItem>
             <SelectItem value="soft">Soft</SelectItem>
-            <SelectItem value="slice">Slice</SelectItem>
           </SelectContent>
         </Select>
       </FieldGroup>
+
+      {/* Parallax Effect - only for Waving shape */}
+      {type === 'waving' && (
+        <FieldGroup>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm">Parallax Effect</Label>
+            <Switch
+              checked={parallaxEffect ?? false}
+              onCheckedChange={(checked) => onParallaxEffectChange?.(checked)}
+            />
+          </div>
+          <span className="text-[10px] text-muted-foreground">
+            Adds a smooth parallax wave animation to the Waving shape
+          </span>
+        </FieldGroup>
+      )}
 
       <FieldGroup>
         <Label>Section</Label>

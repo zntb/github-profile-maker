@@ -67,10 +67,23 @@ export async function GET(request: NextRequest) {
   const sp = request.nextUrl.searchParams;
 
   /* ── Type & section ───────────────────────────────────────────── */
-  const validTypes = ['waving', 'rect', 'cylinder', 'soft', 'slice'] as const;
+  const validTypes = [
+    'wave',
+    'egg',
+    'shark',
+    'waving',
+    'rect',
+    'cylinder',
+    'soft',
+    'slice',
+    'speech',
+    'transparent',
+    'blur',
+  ] as const;
   const validSections = ['header', 'footer'] as const;
   const validAnimations = ['none', 'fadeIn', 'waving', 'scale'] as const;
   const validDirs = ['horizontal', 'vertical', 'diagonal', 'radial'] as const;
+  const parallax = sp.get('parallax') === 'true';
 
   const type = (validTypes as readonly string[]).includes(sp.get('type') ?? '')
     ? (sp.get('type') as (typeof validTypes)[number])
@@ -131,6 +144,31 @@ export async function GET(request: NextRequest) {
     defTL = defTR = defBR = defBL = maxR;
   } else if (type === 'soft') {
     defTL = defTR = defBR = defBL = 36;
+  } else if (type === 'wave') {
+    if (section === 'header') {
+      defTL = defTR = 0;
+      defBR = defBL = 40;
+    } else {
+      defTL = defTR = 40;
+      defBR = defBL = 0;
+    }
+  } else if (type === 'egg') {
+    if (section === 'header') {
+      defTL = defTR = 50;
+      defBR = defBL = 0;
+    } else {
+      defTL = defTR = 0;
+      defBR = defBL = 50;
+    }
+  } else if (type === 'shark') {
+    if (section === 'header') {
+      defTL = defTR = 20;
+      defBR = 0;
+      defBL = 10;
+    } else {
+      defTL = 0;
+      defTR = defBR = defBL = 20;
+    }
   } else if (type === 'waving') {
     if (section === 'header') {
       defTL = defTR = 24;
@@ -139,6 +177,16 @@ export async function GET(request: NextRequest) {
       defTL = defTR = 0;
       defBR = defBL = 24;
     }
+  } else if (type === 'speech') {
+    if (section === 'header') {
+      defTL = defTR = 24;
+      defBR = defBL = 0;
+    } else {
+      defTL = defTR = 0;
+      defBR = defBL = 24;
+    }
+  } else if (type === 'transparent' || type === 'blur') {
+    defTL = defTR = defBR = defBL = 0;
   }
   // 'slice' handled separately below
 
@@ -167,10 +215,58 @@ export async function GET(request: NextRequest) {
 
   /* ── Shape markup ─────────────────────────────────────────────── */
   let shapeMarkup: string;
+  let extraDefs = '';
 
   if (type === 'slice') {
     const inset = 24;
     shapeMarkup = `<path d="M0 ${inset} L${inset} 0 H${WIDTH - inset} L${WIDTH} ${inset} V${height} H0 Z" fill="${bgFill}"/>`;
+  } else if (type === 'waving') {
+    // Waving shape with parallax visualization effect
+    const waveHeight = 20;
+    if (section === 'header') {
+      // Header: rounded top with wavy bottom edge (parallax effect)
+      shapeMarkup = `<path d="M0 ${waveHeight} Q${WIDTH / 4} ${waveHeight - 10} ${WIDTH / 2} ${waveHeight} T${WIDTH} ${waveHeight} V${height} H0 Z" fill="${bgFill}"/>`;
+    } else {
+      // Footer: rounded bottom with wavy top edge (parallax effect)
+      shapeMarkup = `<path d="M0 0 H${WIDTH} V${height - waveHeight} Q${(WIDTH * 3) / 4} ${height - waveHeight + 10} ${WIDTH / 2} ${height - waveHeight} T0 ${height - waveHeight} Z" fill="${bgFill}"/>`;
+    }
+  } else if (type === 'wave') {
+    // Wave shape - creates a wave pattern at the bottom or top
+    const waveHeight = 30;
+    if (section === 'header') {
+      shapeMarkup = `<path d="M0 ${waveHeight} Q${WIDTH / 4} ${waveHeight + 15} ${WIDTH / 2} ${waveHeight} T${WIDTH} ${waveHeight} V${height} H0 Z" fill="${bgFill}"/>`;
+    } else {
+      shapeMarkup = `<path d="M0 0 H${WIDTH} V${height - waveHeight} Q${(WIDTH * 3) / 4} ${height - waveHeight - 15} ${WIDTH / 2} ${height - waveHeight} T0 ${height - waveHeight} Z" fill="${bgFill}"/>`;
+    }
+  } else if (type === 'egg') {
+    // Egg shape - oval with more rounded top
+    if (section === 'header') {
+      shapeMarkup = `<ellipse cx="${WIDTH / 2}" cy="${height / 2}" rx="${WIDTH / 2 - 10}" ry="${height / 2 - 5}" fill="${bgFill}"/>`;
+    } else {
+      shapeMarkup = `<ellipse cx="${WIDTH / 2}" cy="${height / 2}" rx="${WIDTH / 2 - 10}" ry="${height / 2 - 5}" fill="${bgFill}"/>`;
+    }
+  } else if (type === 'shark') {
+    // Shark fin shape
+    if (section === 'header') {
+      shapeMarkup = `<path d="M0 ${height} L0 40 Q${WIDTH / 3} 0 ${WIDTH / 2} 40 L${WIDTH} 40 V${height} H0 Z" fill="${bgFill}"/>`;
+    } else {
+      shapeMarkup = `<path d="M0 0 H${WIDTH} V${height - 40} L${WIDTH / 2} ${height - 40} Q${WIDTH / 3} ${height} 0 ${height - 40} Z" fill="${bgFill}"/>`;
+    }
+  } else if (type === 'speech') {
+    // Speech bubble shape with tail
+    const tailSize = 20;
+    if (section === 'header') {
+      shapeMarkup = `<path d="M${tailSize} 0 H${WIDTH - tailSize} Q${WIDTH} 0 ${WIDTH} ${tailSize} V${height - tailSize} Q${WIDTH} ${height} ${WIDTH - tailSize} ${height} H${tailSize} Q0 ${height} 0 ${height - tailSize} V${tailSize} Q0 0 ${tailSize} 0 Z" fill="${bgFill}"/>`;
+    } else {
+      shapeMarkup = `<path d="M${tailSize} 0 H${WIDTH - tailSize} Q${WIDTH} 0 ${WIDTH} ${tailSize} V${height - tailSize} Q${WIDTH} ${height} ${WIDTH - tailSize} ${height} H${WIDTH / 2 + tailSize} L${WIDTH / 2} ${height + tailSize} L${WIDTH / 2 - tailSize} ${height} H${tailSize} Q0 ${height} 0 ${height - tailSize} V${tailSize} Q0 0 ${tailSize} 0 Z" fill="${bgFill}"/>`;
+    }
+  } else if (type === 'transparent') {
+    // Transparent background - no fill
+    shapeMarkup = `<rect width="${WIDTH}" height="${height}" fill="transparent"/>`;
+  } else if (type === 'blur') {
+    // Blur effect background
+    extraDefs = `<filter id="blurFilter"><feGaussianBlur in="SourceGraphic" stdDeviation="10" /></filter>`;
+    shapeMarkup = `<rect width="${WIDTH}" height="${height}" fill="${bgFill}" filter="url(#blurFilter)"/>`;
   } else {
     const d = roundedRectPath(WIDTH, height, rtl, rtr, rbr, rbl);
     shapeMarkup = `<path d="${d}" fill="${bgFill}"/>`;
@@ -191,11 +287,18 @@ export async function GET(request: NextRequest) {
     animStyle = 'animation:sc 0.8s ease-out forwards';
   }
 
+  // Parallax effect for Waving shape - creates a wave motion effect
+  if (parallax && type === 'waving') {
+    keyframes += `@keyframes parallax{0%{transform:translateY(0)}50%{transform:translateY(4px)}100%{transform:translateY(0)}}`;
+    animStyle = 'animation:parallax 3s ease-in-out infinite';
+  }
+
   /* ── Final SVG ────────────────────────────────────────────────── */
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${WIDTH}" height="${height}" viewBox="0 0 ${WIDTH} ${height}">
   <defs>
     ${gradientDef}
+    ${extraDefs}
     <style>
       ${keyframes}
       .bg-shape{${animStyle}}

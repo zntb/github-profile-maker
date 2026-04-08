@@ -45,10 +45,33 @@ function defaultCapRadii(
   if (type === 'rect') return { tl: 8, tr: 8, br: 8, bl: 8 };
   if (type === 'cylinder') return { tl: maxR, tr: maxR, br: maxR, bl: maxR };
   if (type === 'soft') return { tl: 36, tr: 36, br: 36, bl: 36 };
+  if (type === 'wave') {
+    return section === 'header'
+      ? { tl: 0, tr: 0, br: 40, bl: 40 }
+      : { tl: 40, tr: 40, br: 0, bl: 0 };
+  }
+  if (type === 'egg') {
+    return section === 'header'
+      ? { tl: 50, tr: 50, br: 0, bl: 0 }
+      : { tl: 0, tr: 0, br: 50, bl: 50 };
+  }
+  if (type === 'shark') {
+    return section === 'header'
+      ? { tl: 20, tr: 20, br: 0, bl: 10 }
+      : { tl: 0, tr: 10, br: 20, bl: 20 };
+  }
   if (type === 'waving') {
     return section === 'header'
       ? { tl: 24, tr: 24, br: 0, bl: 0 }
       : { tl: 0, tr: 0, br: 24, bl: 24 };
+  }
+  if (type === 'speech') {
+    return section === 'header'
+      ? { tl: 24, tr: 24, br: 0, bl: 0 }
+      : { tl: 0, tr: 0, br: 24, bl: 24 };
+  }
+  if (type === 'transparent' || type === 'blur') {
+    return { tl: 0, tr: 0, br: 0, bl: 0 };
   }
   return { tl: 0, tr: 0, br: 0, bl: 0 };
 }
@@ -177,14 +200,20 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
 
         // ── Background style ────────────────────────────────────────
         let bgStyle: React.CSSProperties = {};
-        if (bgType === 'solid') {
+        const isTransparent = capType === 'transparent';
+        const isBlur = capType === 'blur';
+
+        if (bgType === 'solid' || isTransparent || isBlur) {
           const solidColor =
-            bgSolidColor === 'transparent'
+            bgSolidColor === 'transparent' || isTransparent
               ? 'transparent'
               : bgSolidColor.startsWith('#')
                 ? bgSolidColor
                 : `#${bgSolidColor}`;
-          bgStyle = { backgroundColor: solidColor };
+          bgStyle = {
+            backgroundColor: solidColor,
+            ...(isBlur ? { backdropFilter: 'blur(10px)' } : {}),
+          };
         } else {
           const start = `#${bgStartColor}`;
           const end = `#${bgEndColor}`;
@@ -767,17 +796,22 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
           props.borderRadiusTR !== undefined ||
           props.borderRadiusBR !== undefined ||
           props.borderRadiusBL !== undefined;
+
+        // Compute default border radius based on type
+        let defaultBorderRadius = '0 0 24px 24px';
+        if (type === 'rect') defaultBorderRadius = '8px';
+        else if (type === 'cylinder') defaultBorderRadius = '9999px';
+        else if (type === 'soft') defaultBorderRadius = '36px';
+        else if (type === 'slice') defaultBorderRadius = '48px 10px 48px 10px';
+        else if (type === 'wave') defaultBorderRadius = '0 0 40px 40px';
+        else if (type === 'egg') defaultBorderRadius = '0 0 50px 50px';
+        else if (type === 'shark') defaultBorderRadius = '0 10px 20px 20px';
+        else if (type === 'speech') defaultBorderRadius = '0 0 24px 24px';
+        else if (type === 'transparent' || type === 'blur') defaultBorderRadius = '0';
+
         const borderRadiusValue = hasCustomRadius
           ? `${borderRadiusTL}px ${borderRadiusTR}px ${borderRadiusBR}px ${borderRadiusBL}px`
-          : type === 'rect'
-            ? '8px'
-            : type === 'cylinder'
-              ? '9999px'
-              : type === 'soft'
-                ? '36px'
-                : type === 'slice'
-                  ? '48px 10px 48px 10px'
-                  : '0 0 24px 24px';
+          : defaultBorderRadius;
 
         // Font color from props
         const normalizedFontColor =

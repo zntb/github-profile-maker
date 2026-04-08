@@ -314,6 +314,7 @@ export function BlockConfigFields({
               ? Math.min(Number(props.borderRadiusBL), maxR)
               : undefined
           }
+          parallaxEffect={(props.parallaxEffect as boolean) ?? false}
           onTextChange={(v) => update('text', v)}
           onTypeChange={(v) => {
             update('type', v);
@@ -360,6 +361,7 @@ export function BlockConfigFields({
           onBorderRadiusTRChange={(v) => update('borderRadiusTR', v)}
           onBorderRadiusBRChange={(v) => update('borderRadiusBR', v)}
           onBorderRadiusBLChange={(v) => update('borderRadiusBL', v)}
+          onParallaxEffectChange={(v) => update('parallaxEffect', v)}
         />
       );
     }
@@ -705,6 +707,7 @@ export function BlockConfigFields({
               ? Math.min(Number(props.borderRadiusBL), maxR)
               : undefined
           }
+          parallaxEffect={(props.parallaxEffect as boolean) ?? false}
           onTextChange={(v) => update('text', v)}
           onTypeChange={(v) => {
             update('type', v);
@@ -757,6 +760,7 @@ export function BlockConfigFields({
             update('borderRadiusBL', v);
             update('waveColor', undefined);
           }}
+          onParallaxEffectChange={(v) => update('parallaxEffect', v)}
         />
       );
     }
