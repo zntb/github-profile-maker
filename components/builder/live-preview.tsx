@@ -785,18 +785,27 @@ function PreviewBlock({
 
           const section = (props.section as string) ?? 'header';
           const type = (props.type as string) ?? 'waving';
-          const borderRadius =
-            type === 'rect'
-              ? '8px'
-              : type === 'cylinder'
-                ? '9999px'
-                : type === 'soft'
-                  ? '36px'
-                  : type === 'slice'
-                    ? '48px 10px 48px 10px'
-                    : section === 'footer'
-                      ? '24px 24px 0 0'
-                      : '0 0 24px 24px';
+
+          // Compute border radius based on type
+          let borderRadius = '0 0 24px 24px';
+          if (type === 'rect') borderRadius = '8px';
+          else if (type === 'cylinder') borderRadius = '9999px';
+          else if (type === 'soft') borderRadius = '36px';
+          else if (type === 'slice') borderRadius = '48px 10px 48px 10px';
+          else if (type === 'wave')
+            borderRadius = section === 'footer' ? '24px 24px 0 0' : '0 0 40px 40px';
+          else if (type === 'egg')
+            borderRadius = section === 'footer' ? '24px 24px 0 0' : '50px 50px 0 0';
+          else if (type === 'shark')
+            borderRadius = section === 'footer' ? '24px 24px 0 0' : '20px 20px 0 10px';
+          else if (type === 'speech')
+            borderRadius = section === 'footer' ? '24px 24px 0 0' : '24px 24px 0 0';
+          else if (type === 'transparent' || type === 'blur') borderRadius = '0';
+          else if (section === 'footer') borderRadius = '24px 24px 0 0';
+
+          // Special handling for transparent and blur types
+          const isTransparent = type === 'transparent';
+          const isBlur = type === 'blur';
 
           return (
             <div
@@ -805,8 +814,11 @@ function PreviewBlock({
                 width: '100%',
                 maxWidth: '896px',
                 height: `${props.height}px`,
-                backgroundColor: normalizedSolidColor,
+                backgroundColor: isTransparent ? 'transparent' : normalizedSolidColor,
                 borderRadius,
+                ...(isBlur
+                  ? { backdropFilter: 'blur(10px)', backgroundColor: normalizedSolidColor }
+                  : {}),
               }}
             >
               <div className="absolute inset-0 flex items-center justify-center">
@@ -870,18 +882,31 @@ function PreviewBlock({
             : {};
         const section = (props.section as string) ?? 'header';
         const type = (props.type as string) ?? 'waving';
-        const borderRadius =
-          type === 'rect'
-            ? '8px'
-            : type === 'cylinder'
-              ? '9999px'
-              : type === 'soft'
-                ? '36px'
-                : type === 'slice'
-                  ? '48px 10px 48px 10px'
-                  : section === 'footer'
-                    ? '24px 24px 0 0'
-                    : '0 0 24px 24px';
+
+        // Normalize solid color for blur background
+        const solidColor = normalizeHex(bgSolidColor, 'EEFF00');
+        const normalizedSolidColor = solidColor.startsWith('#') ? solidColor : `#${solidColor}`;
+
+        // Compute border radius based on type
+        let borderRadius = '0 0 24px 24px';
+        if (type === 'rect') borderRadius = '8px';
+        else if (type === 'cylinder') borderRadius = '9999px';
+        else if (type === 'soft') borderRadius = '36px';
+        else if (type === 'slice') borderRadius = '48px 10px 48px 10px';
+        else if (type === 'wave')
+          borderRadius = section === 'footer' ? '24px 24px 0 0' : '0 0 40px 40px';
+        else if (type === 'egg')
+          borderRadius = section === 'footer' ? '24px 24px 0 0' : '50px 50px 0 0';
+        else if (type === 'shark')
+          borderRadius = section === 'footer' ? '24px 24px 0 0' : '20px 20px 0 10px';
+        else if (type === 'speech')
+          borderRadius = section === 'footer' ? '24px 24px 0 0' : '24px 24px 0 0';
+        else if (type === 'transparent' || type === 'blur') borderRadius = '0';
+        else if (section === 'footer') borderRadius = '24px 24px 0 0';
+
+        // Special handling for transparent and blur types
+        const isTransparent = type === 'transparent';
+        const isBlur = type === 'blur';
 
         return (
           <div
@@ -890,8 +915,14 @@ function PreviewBlock({
               width: '100%',
               maxWidth: '896px', // GitHub README max width
               height: `${props.height}px`,
-              backgroundImage: gradientBgImage,
+              backgroundImage: isTransparent ? 'none' : gradientBgImage,
+              backgroundColor: isTransparent
+                ? 'transparent'
+                : isBlur
+                  ? normalizedSolidColor
+                  : undefined,
               borderRadius,
+              ...(isBlur ? { backdropFilter: 'blur(10px)' } : {}),
               ...animationBgSize,
             }}
           >
@@ -1334,8 +1365,7 @@ function PreviewBlock({
 
           const type = (props.type as string) ?? 'waving';
 
-          // Compute border radius based on type and section - with proper operator precedence
-          // Footer banner always uses rounded bottom corners (matching Capsule Header header styling)
+          // Compute border radius based on type and section
           let borderRadiusValue: string;
           if (type === 'rect') {
             borderRadiusValue = '8px';
@@ -1345,10 +1375,24 @@ function PreviewBlock({
             borderRadiusValue = '36px';
           } else if (type === 'slice') {
             borderRadiusValue = '48px 10px 48px 10px';
+          } else if (type === 'wave') {
+            borderRadiusValue = '0 0 40px 40px';
+          } else if (type === 'egg') {
+            borderRadiusValue = '0 0 50px 50px';
+          } else if (type === 'shark') {
+            borderRadiusValue = '0 10px 20px 20px';
+          } else if (type === 'speech') {
+            borderRadiusValue = '0 0 24px 24px';
+          } else if (type === 'transparent' || type === 'blur') {
+            borderRadiusValue = '0';
           } else {
-            // Default: waving or other types - use rounded bottom corners for footer banner
+            // Default: waving or other types - use rounded bottom corners
             borderRadiusValue = '0 0 24px 24px';
           }
+
+          // Special handling for transparent and blur types
+          const isTransparent = type === 'transparent';
+          const isBlur = type === 'blur';
 
           return (
             <div
@@ -1357,11 +1401,12 @@ function PreviewBlock({
                 width: '100%',
                 maxWidth: '896px',
                 height: `${props.height}px`,
-                backgroundColor: normalizedSolidColor,
+                backgroundColor: isTransparent ? 'transparent' : normalizedSolidColor,
                 borderRadius: borderRadiusValue,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                ...(isBlur ? { backdropFilter: 'blur(10px)' } : {}),
               }}
             >
               <span className="font-bold" style={{ fontSize: `${fontSize}px`, color: fontColor }}>
@@ -1400,6 +1445,12 @@ function PreviewBlock({
         const type = (props.type as string) ?? 'waving';
         const fontSize = (props.fontSize as number) ?? 24;
         const fontColor = `#${normalizeHex((props.fontColor as string) ?? 'ffffff', 'ffffff')}`;
+
+        // Normalize solid color for blur background
+        const solidColorFB = normalizeHex(bgSolidColor, '3B82F6');
+        const normalizedSolidColor = solidColorFB.startsWith('#')
+          ? solidColorFB
+          : `#${solidColorFB}`;
 
         // Apply animation for animated type
         const animationClass =
@@ -1446,9 +1497,19 @@ function PreviewBlock({
                 ? '36px'
                 : type === 'slice'
                   ? '48px 10px 48px 10px'
-                  : section === 'footer'
-                    ? '0 0 24px 24px'
-                    : '24px 24px 0 0';
+                  : type === 'wave'
+                    ? '0 0 40px 40px'
+                    : type === 'egg'
+                      ? '0 0 50px 50px'
+                      : type === 'shark'
+                        ? '0 10px 20px 20px'
+                        : type === 'speech'
+                          ? '0 0 24px 24px'
+                          : type === 'transparent' || type === 'blur'
+                            ? '0'
+                            : section === 'footer'
+                              ? '0 0 24px 24px'
+                              : '24px 24px 0 0';
 
         const borderRadius =
           props.borderRadiusTL !== undefined ||
@@ -1465,8 +1526,15 @@ function PreviewBlock({
               width: '100%',
               maxWidth: '896px',
               height: `${height}px`,
-              backgroundImage: gradientBgImage,
+              backgroundImage: type === 'transparent' ? 'none' : gradientBgImage,
+              backgroundColor:
+                type === 'transparent'
+                  ? 'transparent'
+                  : type === 'blur'
+                    ? normalizedSolidColor
+                    : undefined,
               borderRadius,
+              ...(type === 'blur' ? { backdropFilter: 'blur(10px)' } : {}),
               ...animationBgSize,
               display: 'flex',
               alignItems: 'center',

@@ -108,6 +108,7 @@ function buildCapsuleUrl(props: Record<string, unknown>, origin: string): string
     fontColor: (props.fontColor as string) ?? 'ffffff',
     animation: 'fadeIn',
     gradientDirection: bgGradientDirection,
+    parallax: props.parallaxEffect === true,
   };
 
   // Pass per-corner radii only when explicitly set (API falls back to type defaults otherwise)
@@ -461,6 +462,7 @@ export function renderBlock(block: Block, origin: string = ''): string {
     case 'footer-banner': {
       const {
         text,
+        type,
         waveColor,
         fontColor,
         height,
@@ -469,9 +471,14 @@ export function renderBlock(block: Block, origin: string = ''): string {
         bgStartColor,
         bgEndColor,
         bgSolidColor,
-      } = props as Record<string, string | number>;
+        borderRadiusTL,
+        borderRadiusTR,
+        borderRadiusBR,
+        borderRadiusBL,
+        parallaxEffect,
+      } = props as Record<string, string | number | boolean>;
       const capsuleProps = {
-        type: 'waving',
+        type: (type as string) ?? 'waving',
         color: waveColor,
         height: height ?? 100,
         section: 'footer',
@@ -483,6 +490,11 @@ export function renderBlock(block: Block, origin: string = ''): string {
         bgStartColor: bgStartColor ?? 'EEFF00',
         bgEndColor: bgEndColor ?? 'A82DAA',
         bgSolidColor: bgSolidColor ?? 'EEFF00',
+        borderRadiusTL,
+        borderRadiusTR,
+        borderRadiusBR,
+        borderRadiusBL,
+        parallaxEffect: parallaxEffect ?? false,
       };
       const url = buildCapsuleUrl(capsuleProps, origin);
       return `<div align="center">\n  <img src="${url}" />\n</div>`;

@@ -62,6 +62,7 @@
 | 🎨 **Live Theme Preview**     | Real-time theme colors shown in canvas when selecting themes                                                                                                          |
 | 🌈 **Gradient Backgrounds**   | Add stunning gradient backgrounds to containers and headers                                                                                                           |
 | ✨ **Animated Backgrounds**   | Animate backgrounds with gradient flow, pulse, wave, and shimmer                                                                                                      |
+| 🌀 **Shape Effects**          | 8 background shapes: Wave, Egg, Shark, Slice, Waving (parallax), Speech bubble, Transparent, and Blur                                                                 |
 | 📦 **25+ Block Types**        | Headers, stats cards, badges, skill icons, graphs, and more                                                                                                           |
 | 🖼️ **Template Library**       | 11 ready-to-use templates for different developer profiles                                                                                                            |
 | 📱 **Fully Responsive**       | Three-layout system with WCAG 2.5.5 touch targets (44x44px min), landscape orientation support, collapsible mobile sections, and responsive font scaling with clamp() |
