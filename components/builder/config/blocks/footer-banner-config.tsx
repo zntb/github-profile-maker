@@ -47,6 +47,7 @@ interface FooterBannerConfigProps {
   wavePosition?: number;
   waveAmplitude?: number;
   waveSpeed?: number;
+  waveFlip?: boolean;
   onTextChange: (value: string) => void;
   onTypeChange: (value: string) => void;
   onSectionChange: (value: string) => void;
@@ -67,6 +68,7 @@ interface FooterBannerConfigProps {
   onWavePositionChange?: (value: number) => void;
   onWaveAmplitudeChange?: (value: number) => void;
   onWaveSpeedChange?: (value: number) => void;
+  onWaveFlipChange?: (value: boolean) => void;
 }
 
 /** Compute default corner radii from type + section (mirrors the API logic). */
@@ -147,6 +149,7 @@ export function FooterBannerConfig({
   wavePosition = 70,
   waveAmplitude = 20,
   waveSpeed = 20,
+  waveFlip = false,
   onTextChange,
   onTypeChange,
   onSectionChange,
@@ -167,6 +170,7 @@ export function FooterBannerConfig({
   onWavePositionChange,
   onWaveAmplitudeChange,
   onWaveSpeedChange,
+  onWaveFlipChange,
 }: FooterBannerConfigProps) {
   const defaults = defaultRadii(type, section, height);
   const maxR = Math.floor(height / 2);
@@ -315,6 +319,20 @@ export function FooterBannerConfig({
             />
             <span className="text-[10px] text-muted-foreground">
               Animation speed (lower = faster)
+            </span>
+          </FieldGroup>
+
+          {/* Wave Flip */}
+          <FieldGroup>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">Flip Image</Label>
+              <Switch
+                checked={waveFlip ?? false}
+                onCheckedChange={(checked) => onWaveFlipChange?.(checked)}
+              />
+            </div>
+            <span className="text-[10px] text-muted-foreground">
+              Flip image vertically to show wave at top/bottom
             </span>
           </FieldGroup>
         </div>
