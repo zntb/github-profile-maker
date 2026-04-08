@@ -84,12 +84,14 @@ export async function GET(request: NextRequest) {
   const validAnimations = ['none', 'fadeIn', 'waving', 'scale'] as const;
   const validDirs = ['horizontal', 'vertical', 'diagonal', 'radial'] as const;
   const parallax = sp.get('parallax') === 'true';
-  const flipWave = sp.get('flipWave') === 'true';
 
   // Wave parameters for Waving shape
   const wavePosition = Math.min(Math.max(parseInt(sp.get('wavePosition') ?? '70', 10), 0), 100); // Percentage of height where wave starts (0-100)
   const waveAmplitude = Math.min(Math.max(parseInt(sp.get('waveAmplitude') ?? '20', 10), 5), 50); // Wave height in pixels
   const waveSpeed = Math.min(Math.max(parseInt(sp.get('waveSpeed') ?? '20', 10), 5), 60); // Animation duration in seconds
+  const flipWave = sp.get('flipWave') === 'true';
+  // When flipped, invert the wave position (0% becomes 100%, 100% becomes 0%)
+  const actualWavePosition = flipWave ? 100 - wavePosition : wavePosition;
 
   const type = (validTypes as readonly string[]).includes(sp.get('type') ?? '')
     ? (sp.get('type') as (typeof validTypes)[number])
@@ -247,8 +249,10 @@ export async function GET(request: NextRequest) {
     // Waving shape. With parallax enabled, render dual animated layers.
     if (parallax) {
       const dur = `${waveSpeed}s`;
+      // When flipped, swap the section to show wave on opposite side
+      const effectiveSection = flipWave ? (section === 'header' ? 'footer' : 'header') : section;
       // Calculate wave positions based on parameters
-      const baseWaveY = (height * wavePosition) / 100;
+      const baseWaveY = (height * actualWavePosition) / 100;
       // Flip wave direction for browser preview (flipWave=true) to match GitHub display
       const amplitude = flipWave ? -waveAmplitude : waveAmplitude;
 
@@ -261,7 +265,7 @@ export async function GET(request: NextRequest) {
       // Animation phases - layer 2 starts at different time for parallax effect
       const layer2Offset = waveSpeed * 0.33;
 
-      if (section === 'header') {
+      if (effectiveSection === 'header') {
         // Header section - waves at the bottom
         shapeMarkup = `
 <!-- Background wave layer (slower, creates depth) -->
@@ -310,9 +314,10 @@ export async function GET(request: NextRequest) {
       }
     } else {
       // Waving shape without parallax - use wave parameters
-      const waveY = Math.round((height * wavePosition) / 100);
+      const useFlipWave = flipWave ? (section === 'header' ? 'footer' : 'header') : section;
+      const waveY = Math.round((height * actualWavePosition) / 100);
       const waveVar = Math.round(waveAmplitude * 0.5);
-      if (section === 'header') {
+      if (useFlipWave === 'header') {
         shapeMarkup = `<path d="M0 ${waveY} Q${WIDTH / 4} ${waveY - waveVar} ${WIDTH / 2} ${waveY} T${WIDTH} ${waveY} V${height} H0 Z" fill="${bgFill}"/>`;
       } else {
         shapeMarkup = `<path d="M0 0 H${WIDTH} V${height - waveY} Q${(WIDTH * 3) / 4} ${height - waveY + waveVar} ${WIDTH / 2} ${height - waveY} T0 ${height - waveY} Z" fill="${bgFill}"/>`;

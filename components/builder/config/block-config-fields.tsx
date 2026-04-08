@@ -365,9 +365,11 @@ export function BlockConfigFields({
           wavePosition={getNumberProp('wavePosition', 70)}
           waveAmplitude={getNumberProp('waveAmplitude', 20)}
           waveSpeed={getNumberProp('waveSpeed', 20)}
+          waveFlip={(props.waveFlip as boolean) ?? false}
           onWavePositionChange={(v) => update('wavePosition', v)}
           onWaveAmplitudeChange={(v) => update('waveAmplitude', v)}
           onWaveSpeedChange={(v) => update('waveSpeed', v)}
+          onWaveFlipChange={(v) => update('waveFlip', v)}
         />
       );
     }
@@ -770,9 +772,11 @@ export function BlockConfigFields({
           wavePosition={getNumberProp('wavePosition', 70)}
           waveAmplitude={getNumberProp('waveAmplitude', 20)}
           waveSpeed={getNumberProp('waveSpeed', 20)}
+          waveFlip={(props.waveFlip as boolean) ?? false}
           onWavePositionChange={(v) => update('wavePosition', v)}
           onWaveAmplitudeChange={(v) => update('waveAmplitude', v)}
           onWaveSpeedChange={(v) => update('waveSpeed', v)}
+          onWaveFlipChange={(v) => update('waveFlip', v)}
         />
       );
     }

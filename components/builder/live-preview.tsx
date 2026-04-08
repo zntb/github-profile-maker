@@ -909,6 +909,7 @@ function PreviewBlock({
           const wavePosition = props.wavePosition ?? 70;
           const waveAmplitude = props.waveAmplitude ?? 20;
           const waveSpeed = props.waveSpeed ?? 20;
+          const waveFlip = props.waveFlip === true;
 
           const params = new URLSearchParams({
             type,
@@ -924,6 +925,7 @@ function PreviewBlock({
             wavePosition: String(wavePosition),
             waveAmplitude: String(waveAmplitude),
             waveSpeed: String(waveSpeed),
+            flipWave: waveFlip ? 'true' : 'false',
           });
 
           return (
@@ -1430,6 +1432,7 @@ function PreviewBlock({
             const wavePosition = props.wavePosition ?? 70;
             const waveAmplitude = props.waveAmplitude ?? 20;
             const waveSpeed = props.waveSpeed ?? 20;
+            const waveFlip = props.waveFlip === true;
 
             const params = new URLSearchParams({
               type,
@@ -1445,6 +1448,7 @@ function PreviewBlock({
               wavePosition: String(wavePosition),
               waveAmplitude: String(waveAmplitude),
               waveSpeed: String(waveSpeed),
+              flipWave: waveFlip ? 'true' : 'false',
             });
 
             return (
