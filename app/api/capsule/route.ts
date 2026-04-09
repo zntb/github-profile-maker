@@ -54,23 +54,39 @@ async function generateAnimatedGif(
 
   // Create animated GIF
   const gif = GIFEncoder();
+  const delay = Math.round(1000 / fps);
 
-  for (const pngBuffer of frames) {
-    // Decode PNG to RGBA
-    const { data, info } = await sharp(pngBuffer)
-      .removeAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
+  for (let i = 0; i < frames.length; i++) {
+    const pngBuffer = frames[i];
 
-    // Quantize colors to 256 (GIF limit)
-    const palette = quantize(data, 256);
-    const index = applyPalette(data, palette);
+    // Get image metadata first
+    const metadata = await sharp(pngBuffer).metadata();
+    const width = metadata.width || 896;
+    const height = metadata.height || 100;
+
+    // Get raw pixels as RGB (3 bytes per pixel)
+    const rgbData = await sharp(pngBuffer).removeAlpha().ensureAlpha().raw().toBuffer();
+
+    // Convert RGB to RGBA by adding alpha channel
+    const rgbaData = Buffer.alloc(width * height * 4);
+    for (let j = 0; j < width * height; j++) {
+      rgbaData[j * 4] = rgbData[j * 3]; // R
+      rgbaData[j * 4 + 1] = rgbData[j * 3 + 1]; // G
+      rgbaData[j * 4 + 2] = rgbData[j * 3 + 2]; // B
+      rgbaData[j * 4 + 3] = 255; // A (fully opaque)
+    }
+
+    // Quantize to create palette
+    const palette = quantize(rgbaData, 256, { oneBitAlpha: false });
+    const index = applyPalette(rgbaData, palette);
 
     // Add frame to GIF
-    gif.writeFrame(index, info.width, info.height, {
+    gif.writeFrame(index, width, height, {
       palette,
-      delay: Math.round(1000 / fps),
+      delay: delay,
     });
+
+    console.log('[GIF] Frame', i, ':', width, 'x', height, '- palette colors:', palette.length);
   }
 
   gif.finish();
