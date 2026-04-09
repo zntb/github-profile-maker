@@ -81,7 +81,16 @@ export async function GET(request: NextRequest) {
     'blur',
   ] as const;
   const validSections = ['header', 'footer'] as const;
-  const validAnimations = ['none', 'fadeIn', 'waving', 'scale'] as const;
+  const validAnimations = [
+    'none',
+    'fadeIn',
+    'waving',
+    'scale',
+    'gradient',
+    'pulse',
+    'shimmer',
+    'bounce',
+  ] as const;
   const validDirs = ['horizontal', 'vertical', 'diagonal', 'radial'] as const;
   const parallax = sp.get('parallax') === 'true';
 
@@ -382,6 +391,18 @@ export async function GET(request: NextRequest) {
   } else if (animation === 'scale') {
     keyframes = `@keyframes sc{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}`;
     animStyle = 'animation:sc 0.8s ease-out forwards';
+  } else if (animation === 'gradient') {
+    keyframes = `@keyframes gradientShift{0%{stop-color:#${bgColor}}50%{stop-color:#${bgColorEnd}}100%{stop-color:#${bgColor}}}@keyframes gradientMove{0%{background-position:0%50%}50%{background-position:100%50%}100%{background-position:0%50%}}`;
+    animStyle = 'animation:gradientMove 3s ease infinite';
+  } else if (animation === 'pulse') {
+    keyframes = `@keyframes pulseAnim{0%,100%{opacity:1}50%{opacity:0.7}}`;
+    animStyle = 'animation:pulseAnim 2s ease-in-out infinite';
+  } else if (animation === 'shimmer') {
+    keyframes = `@keyframes shimmerAnim{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}`;
+    animStyle = 'animation:shimmerAnim 2s linear infinite';
+  } else if (animation === 'bounce') {
+    keyframes = `@keyframes bounceAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`;
+    animStyle = 'animation:bounceAnim 0.5s ease-in-out infinite';
   }
 
   // Parallax for waving is encoded directly in SVG path animations.
