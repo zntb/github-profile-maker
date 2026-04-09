@@ -113,6 +113,7 @@ function buildCapsuleUrl(props: Record<string, unknown>, origin: string): string
     wavePosition: props.wavePosition ?? 70,
     waveAmplitude: props.waveAmplitude ?? 20,
     waveSpeed: props.waveSpeed ?? 20,
+    flipWave: props.waveFlip === true,
   };
 
   // Pass per-corner radii only when explicitly set (API falls back to type defaults otherwise)
