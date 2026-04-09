@@ -243,7 +243,79 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         const isTransparent = capType === 'transparent';
         const isBlur = capType === 'blur';
 
-        if (bgType === 'solid' || isTransparent || isBlur) {
+        // For blur effect in the canvas/preview (where there's no content behind),
+        // we need to simulate the blur by using a frosted glass effect with a
+        // semi-transparent background and filter instead of backdrop-filter
+        if (isBlur) {
+          // Use CSS filter to blur the element itself (simulating the API behavior)
+          // and add a semi-transparent background for visibility
+          if (bgType === 'solid' || isTransparent) {
+            const solidColor =
+              bgSolidColor === 'transparent' || isTransparent
+                ? 'transparent'
+                : bgSolidColor.startsWith('#')
+                  ? bgSolidColor
+                  : `#${bgSolidColor}`;
+            bgStyle = {
+              backgroundColor: isTransparent ? 'transparent' : `${solidColor}CC`, // 80% opacity
+              filter: 'blur(10px)',
+              WebkitFilter: 'blur(10px)',
+            };
+          } else {
+            const start = `#${bgStartColor}`;
+            const end = `#${bgEndColor}`;
+            const blurBackgroundColor = { backgroundColor: `${start}99` }; // 60% opacity
+            switch (bgGradientDirection) {
+              case 'horizontal':
+                bgStyle = {
+                  backgroundImage: `linear-gradient(to right, ${start}, ${end})`,
+                  ...blurBackgroundColor,
+                  filter: 'blur(10px)',
+                  WebkitFilter: 'blur(10px)',
+                };
+                break;
+              case 'vertical':
+                bgStyle = {
+                  backgroundImage: `linear-gradient(to bottom, ${start}, ${end})`,
+                  ...blurBackgroundColor,
+                  filter: 'blur(10px)',
+                  WebkitFilter: 'blur(10px)',
+                };
+                break;
+              case 'diagonal':
+                bgStyle = {
+                  backgroundImage: `linear-gradient(135deg, ${start}, ${end})`,
+                  ...blurBackgroundColor,
+                  filter: 'blur(10px)',
+                  WebkitFilter: 'blur(10px)',
+                };
+                break;
+              case 'radial':
+                bgStyle = {
+                  backgroundImage: `radial-gradient(circle, ${start}, ${end})`,
+                  ...blurBackgroundColor,
+                  filter: 'blur(10px)',
+                  WebkitFilter: 'blur(10px)',
+                };
+                break;
+              case 'conic':
+                bgStyle = {
+                  backgroundImage: `conic-gradient(from 0deg, ${start}, ${end})`,
+                  ...blurBackgroundColor,
+                  filter: 'blur(10px)',
+                  WebkitFilter: 'blur(10px)',
+                };
+                break;
+              default:
+                bgStyle = {
+                  backgroundImage: `linear-gradient(to right, ${start}, ${end})`,
+                  ...blurBackgroundColor,
+                  filter: 'blur(10px)',
+                  WebkitFilter: 'blur(10px)',
+                };
+            }
+          }
+        } else if (bgType === 'solid' || isTransparent) {
           const solidColor =
             bgSolidColor === 'transparent' || isTransparent
               ? 'transparent'
@@ -252,20 +324,25 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
                 : `#${bgSolidColor}`;
           bgStyle = {
             backgroundColor: solidColor,
-            ...(isBlur ? { backdropFilter: 'blur(10px)' } : {}),
           };
         } else {
           const start = `#${bgStartColor}`;
           const end = `#${bgEndColor}`;
           switch (bgGradientDirection) {
             case 'horizontal':
-              bgStyle = { backgroundImage: `linear-gradient(to right, ${start}, ${end})` };
+              bgStyle = {
+                backgroundImage: `linear-gradient(to right, ${start}, ${end})`,
+              };
               break;
             case 'vertical':
-              bgStyle = { backgroundImage: `linear-gradient(to bottom, ${start}, ${end})` };
+              bgStyle = {
+                backgroundImage: `linear-gradient(to bottom, ${start}, ${end})`,
+              };
               break;
             case 'diagonal':
-              bgStyle = { backgroundImage: `linear-gradient(135deg, ${start}, ${end})` };
+              bgStyle = {
+                backgroundImage: `linear-gradient(135deg, ${start}, ${end})`,
+              };
               break;
             case 'radial':
               bgStyle = {
@@ -273,10 +350,14 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
               };
               break;
             case 'conic':
-              bgStyle = { backgroundImage: `conic-gradient(from 0deg, ${start}, ${end})` };
+              bgStyle = {
+                backgroundImage: `conic-gradient(from 0deg, ${start}, ${end})`,
+              };
               break;
             default:
-              bgStyle = { backgroundImage: `linear-gradient(to right, ${start}, ${end})` };
+              bgStyle = {
+                backgroundImage: `linear-gradient(to right, ${start}, ${end})`,
+              };
           }
         }
 
@@ -861,13 +942,43 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
             : {};
 
         // Build gradient style
-        const gradientStyle =
-          bgType === 'solid'
-            ? { backgroundColor: `#${bgSolidColor}` }
-            : {
-                backgroundImage: `linear-gradient(to right, #${bgStartColor}, #${bgEndColor})`,
-                ...animationBgSize,
-              };
+        // Special handling for blur type
+        const isBlur = type === 'blur';
+
+        // For blur effect in the canvas/preview (where there's no content behind),
+        // we need to simulate the blur by using a frosted glass effect with a
+        // semi-transparent background and filter instead of backdrop-filter
+        let gradientStyle: React.CSSProperties;
+
+        if (isBlur) {
+          if (bgType === 'solid') {
+            // For solid background with blur
+            const solidColor = `#${bgSolidColor}`;
+            gradientStyle = {
+              backgroundColor: `${solidColor}CC`, // 80% opacity
+              filter: 'blur(10px)',
+              WebkitFilter: 'blur(10px)',
+            };
+          } else {
+            // For gradient background with blur
+            gradientStyle = {
+              backgroundImage: `linear-gradient(to right, #${bgStartColor}, #${bgEndColor})`,
+              backgroundColor: `#${bgStartColor}99`, // 60% opacity
+              filter: 'blur(10px)',
+              WebkitFilter: 'blur(10px)',
+              ...animationBgSize,
+            };
+          }
+        } else if (bgType === 'solid') {
+          gradientStyle = {
+            backgroundColor: `#${bgSolidColor}`,
+          };
+        } else {
+          gradientStyle = {
+            backgroundImage: `linear-gradient(to right, #${bgStartColor}, #${bgEndColor})`,
+            ...animationBgSize,
+          };
+        }
 
         // Build border radius - use explicit undefined check to respect explicit 0 values
         // Footer banner always uses rounded bottom corners (matching Capsule Header header styling)
