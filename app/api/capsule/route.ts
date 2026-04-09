@@ -1,7 +1,97 @@
-// app/api/capsule/route.ts
+import { applyPalette, GIFEncoder, quantize } from 'gifenc';
 import { NextRequest, NextResponse } from 'next/server';
+import sharp from 'sharp';
 
 const WIDTH = 896;
+
+// Interpolate between two hex colors
+function lerpColor(color1: string, color2: string, t: number): string {
+  const r1 = parseInt(color1.substring(0, 2), 16);
+  const g1 = parseInt(color1.substring(2, 4), 16);
+  const b1 = parseInt(color1.substring(4, 6), 16);
+  const r2 = parseInt(color2.substring(0, 2), 16);
+  const g2 = parseInt(color2.substring(2, 4), 16);
+  const b2 = parseInt(color2.substring(4, 6), 16);
+
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const b = Math.round(b1 + (b2 - b1) * t);
+
+  return [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
+}
+
+// Generate animated GIF from SVG frames
+async function generateAnimatedGif(
+  svgContent: string,
+  startColor: string,
+  endColor: string,
+  duration: number = 3,
+  fps: number = 10,
+): Promise<Buffer> {
+  const numFrames = Math.ceil(duration * fps);
+  const frames: Buffer[] = [];
+
+  // Generate frames with interpolated colors
+  for (let i = 0; i < numFrames; i++) {
+    // Use sine wave for smooth color interpolation (full cycle from 0 to 2π)
+    const t = (i / (numFrames - 1)) * 2 * Math.PI;
+    const blend = (Math.sin(t) + 1) / 2;
+    const currentStart = lerpColor(startColor, endColor, blend);
+    const currentEnd = lerpColor(endColor, startColor, blend);
+
+    // Create SVG with current colors
+    const frameSvg = svgContent.replace(/stop-color="#[A-Fa-f0-9]{6}"/g, (match) => {
+      if (match.includes('0%')) {
+        return `stop-color="#${currentStart}"`;
+      }
+      return `stop-color="#${currentEnd}"`;
+    });
+
+    // Render SVG to PNG using sharp
+    const pngBuffer = await sharp(Buffer.from(frameSvg)).png().toBuffer();
+    frames.push(pngBuffer);
+  }
+
+  // Create animated GIF
+  const gif = GIFEncoder();
+  const delay = Math.round(1000 / fps);
+
+  for (let i = 0; i < frames.length; i++) {
+    const pngBuffer = frames[i];
+
+    // Get image metadata first
+    const metadata = await sharp(pngBuffer).metadata();
+    const width = metadata.width || 896;
+    const height = metadata.height || 100;
+
+    // Get raw pixels as RGB (3 bytes per pixel)
+    const rgbData = await sharp(pngBuffer).removeAlpha().ensureAlpha().raw().toBuffer();
+
+    // Convert RGB to RGBA by adding alpha channel
+    const rgbaData = Buffer.alloc(width * height * 4);
+    for (let j = 0; j < width * height; j++) {
+      rgbaData[j * 4] = rgbData[j * 3]; // R
+      rgbaData[j * 4 + 1] = rgbData[j * 3 + 1]; // G
+      rgbaData[j * 4 + 2] = rgbData[j * 3 + 2]; // B
+      rgbaData[j * 4 + 3] = 255; // A (fully opaque)
+    }
+
+    // Quantize to create palette
+    const palette = quantize(rgbaData, 256, { oneBitAlpha: false });
+    const index = applyPalette(rgbaData, palette);
+
+    // Add frame to GIF
+    gif.writeFrame(index, width, height, {
+      palette,
+      delay: delay,
+    });
+
+    console.log('[GIF] Frame', i, ':', width, 'x', height, '- palette colors:', palette.length);
+  }
+
+  gif.finish();
+  return Buffer.from(gif.bytes());
+}
 
 type GradientDir = 'horizontal' | 'vertical' | 'diagonal' | 'radial';
 
@@ -438,6 +528,22 @@ export async function GET(request: NextRequest) {
   <g class="bg-shape">${shapeMarkup}</g>
   ${text ? `<text class="label" x="${(WIDTH * textAlignX) / 100}" y="${(height * textAlignY) / 100}">${text}</text>` : ''}
 </svg>`;
+
+  // If gradient animation is enabled, generate animated GIF
+  if (animation === 'gradient') {
+    try {
+      const gifBuffer = await generateAnimatedGif(svg, bgColor, bgColorEnd, 3, 10);
+      return new NextResponse(gifBuffer as unknown as Blob, {
+        headers: {
+          'Content-Type': 'image/gif',
+          'Cache-Control': 'public, max-age=3600',
+        },
+      });
+    } catch (error) {
+      console.error('Failed to generate GIF, falling back to SVG:', error);
+      // Fall back to SVG if GIF generation fails
+    }
+  }
 
   return new NextResponse(svg, {
     headers: {
