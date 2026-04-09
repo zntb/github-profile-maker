@@ -807,21 +807,26 @@ function PreviewBlock({
           const isTransparent = type === 'transparent';
           const isBlur = type === 'blur';
 
-          return (
-            <div
-              className="relative overflow-hidden"
-              style={{
-                width: '100%',
-                maxWidth: '896px',
-                height: `${props.height}px`,
-                backgroundColor: isTransparent ? 'transparent' : normalizedSolidColor,
-                borderRadius,
-                ...(isBlur
-                  ? { backdropFilter: 'blur(10px)', backgroundColor: normalizedSolidColor }
-                  : {}),
-              }}
-            >
-              <div className="absolute inset-0 flex items-center justify-center">
+          // For blur effect in the preview (where there's no content behind),
+          // we need to simulate the blur by using a filter instead of backdrop-filter
+          if (isBlur) {
+            const blurBackgroundColor = normalizedSolidColor;
+            return (
+              <div
+                className="relative overflow-hidden"
+                style={{
+                  width: '100%',
+                  maxWidth: '896px',
+                  height: `${props.height}px`,
+                  backgroundColor: isTransparent ? 'transparent' : `${blurBackgroundColor}CC`, // 80% opacity
+                  borderRadius,
+                  filter: 'blur(10px)',
+                  WebkitFilter: 'blur(10px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <span
                   className="font-bold"
                   style={{
@@ -837,6 +842,37 @@ function PreviewBlock({
                   {props.text as string}
                 </span>
               </div>
+            );
+          }
+
+          return (
+            <div
+              className="relative overflow-hidden"
+              style={{
+                width: '100%',
+                maxWidth: '896px',
+                height: `${props.height}px`,
+                backgroundColor: isTransparent ? 'transparent' : normalizedSolidColor,
+                borderRadius,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span
+                className="font-bold"
+                style={{
+                  fontSize: `${fontSize}px`,
+                  color: fontColor,
+                  position: 'absolute',
+                  left: `${props.textAlignX ?? 50}%`,
+                  top: `${props.textAlignY ?? 50}%`,
+                  transform: 'translate(-50%, -50%)',
+                  width: 'max-content',
+                }}
+              >
+                {props.text as string}
+              </span>
             </div>
           );
         }
@@ -958,6 +994,42 @@ function PreviewBlock({
         const isTransparent = type === 'transparent';
         const isBlur = type === 'blur';
 
+        // For blur effect in the preview (where there's no content behind),
+        // we need to simulate the blur by using a filter instead of backdrop-filter
+        if (isBlur) {
+          return (
+            <div
+              className={`relative flex items-center justify-center w-full overflow-hidden ${animationClass}`}
+              style={{
+                width: '100%',
+                maxWidth: '896px', // GitHub README max width
+                height: `${props.height}px`,
+                backgroundImage: gradientBgImage,
+                backgroundColor: normalizedSolidColor,
+                borderRadius,
+                filter: 'blur(10px)',
+                WebkitFilter: 'blur(10px)',
+                ...animationBgSize,
+              }}
+            >
+              <span
+                className="font-bold drop-shadow-md"
+                style={{
+                  fontSize: `${fontSize}px`,
+                  color: fontColor,
+                  position: 'absolute',
+                  left: `${props.textAlignX ?? 50}%`,
+                  top: `${props.textAlignY ?? 50}%`,
+                  transform: 'translate(-50%, -50%)',
+                  width: 'max-content',
+                }}
+              >
+                {props.text as string}
+              </span>
+            </div>
+          );
+        }
+
         return (
           <div
             className={`relative flex items-center justify-center w-full overflow-hidden ${animationClass}`}
@@ -972,7 +1044,6 @@ function PreviewBlock({
                   ? normalizedSolidColor
                   : undefined,
               borderRadius,
-              ...(isBlur ? { backdropFilter: 'blur(10px)' } : {}),
               ...animationBgSize,
             }}
           >
@@ -1627,6 +1698,34 @@ function PreviewBlock({
             ? `${borderRadiusTL}px ${borderRadiusTR}px ${borderRadiusBR}px ${borderRadiusBL}px`
             : defaultRadiusValue;
 
+        // For blur effect in the preview (where there's no content behind),
+        // we need to simulate the blur by using a filter instead of backdrop-filter
+        if (type === 'blur') {
+          return (
+            <div
+              className={`relative overflow-hidden ${animationClass}`}
+              style={{
+                width: '100%',
+                maxWidth: '896px',
+                height: `${height}px`,
+                backgroundImage: gradientBgImage,
+                backgroundColor: normalizedSolidColor,
+                borderRadius,
+                filter: 'blur(10px)',
+                WebkitFilter: 'blur(10px)',
+                ...animationBgSize,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span className="font-bold" style={{ fontSize: `${fontSize}px`, color: fontColor }}>
+                {props.text as string}
+              </span>
+            </div>
+          );
+        }
+
         return (
           <div
             className={`relative overflow-hidden ${animationClass}`}
@@ -1642,7 +1741,6 @@ function PreviewBlock({
                     ? normalizedSolidColor
                     : undefined,
               borderRadius,
-              ...(type === 'blur' ? { backdropFilter: 'blur(10px)' } : {}),
               ...animationBgSize,
               display: 'flex',
               alignItems: 'center',
