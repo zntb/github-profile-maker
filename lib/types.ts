@@ -60,6 +60,15 @@ export interface DividerProps {
   type: 'line' | 'gif';
   gifUrl?: string;
   color?: string;
+  // Background style
+  bgType?: 'solid' | 'gradient';
+  bgGradientDirection?: 'horizontal' | 'vertical' | 'diagonal' | 'radial' | 'conic';
+  bgStartColor?: string;
+  bgEndColor?: string;
+  bgSolidColor?: string;
+  // Line properties
+  thickness?: number;
+  alignment?: 'left' | 'center' | 'right';
 }
 
 export interface SpacerProps {
@@ -446,7 +455,17 @@ export const BLOCK_CATEGORIES: BlockCategory[] = [
         type: 'divider',
         label: 'Divider',
         icon: 'Minus',
-        defaultProps: { type: 'line', color: '#e1e4e8' },
+        defaultProps: {
+          type: 'line',
+          color: '#e1e4e8',
+          bgType: 'solid',
+          bgGradientDirection: 'horizontal',
+          bgStartColor: 'CCCCCC',
+          bgEndColor: '999999',
+          bgSolidColor: 'CCCCCC',
+          thickness: 2,
+          alignment: 'center',
+        },
       },
       {
         type: 'spacer',
