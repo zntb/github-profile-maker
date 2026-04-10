@@ -292,9 +292,34 @@ export interface QuoteProps {
 
 export interface FooterBannerProps {
   text: string;
-  waveColor: string;
-  fontColor: string;
+  type?: string;
+  section?: string;
   height: number;
+  waveColor: string;
+  fontSize?: number;
+  fontColor?: string;
+  // Background support
+  bgType?: 'solid' | 'gradient' | 'animated';
+  bgGradientDirection?: 'horizontal' | 'vertical' | 'diagonal' | 'radial' | 'conic';
+  bgAnimation?: 'none' | 'gradient' | 'pulse' | 'wave' | 'shimmer';
+  bgStartColor?: string;
+  bgEndColor?: string;
+  bgSolidColor?: string;
+  // Border radius (individual corners)
+  borderRadiusTL?: number;
+  borderRadiusTR?: number;
+  borderRadiusBR?: number;
+  borderRadiusBL?: number;
+  // Parallax effect
+  parallaxEffect?: boolean;
+  // Wave configuration
+  wavePosition?: number;
+  waveAmplitude?: number;
+  waveSpeed?: number;
+  waveFlip?: boolean;
+  // Text alignment
+  textAlignX?: number;
+  textAlignY?: number;
 }
 
 // Theme definitions for stats cards
