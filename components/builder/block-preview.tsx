@@ -53,14 +53,38 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         }
 
         // Line type with new styling options
-        const bgType = (props.bgType as string) ?? 'solid';
+        // Support both new format (bgStartColor/bgEndColor) and legacy format (color)
+        let bgType = (props.bgType as string) ?? 'solid';
+        let bgStartColor = props.bgStartColor as string;
+        let bgEndColor = props.bgEndColor as string;
+        let bgSolidColor = props.bgSolidColor as string;
+
+        // Parse legacy color format ONLY if modern properties are NOT present
+        if (!bgStartColor && !bgEndColor && !bgSolidColor && props.color) {
+          const colorValue = props.color as string;
+          // Legacy format might be a single color or comma-separated
+          if (colorValue.includes(',')) {
+            const colorParts = colorValue.split(',');
+            if (colorParts.length >= 2) {
+              const startMatch = colorParts[0].match(/\d+:([0-9a-fA-F]+)/);
+              const endMatch = colorParts[1].match(/\d+:([0-9a-fA-F]+)/);
+              if (startMatch) bgStartColor = startMatch[1].toUpperCase();
+              if (endMatch) bgEndColor = endMatch[1].toUpperCase();
+              bgType = 'gradient';
+            }
+          } else {
+            // Single color - treat as solid
+            bgSolidColor = colorValue.replace('#', '').toUpperCase();
+            bgType = 'solid';
+          }
+        }
+
+        bgSolidColor = bgSolidColor ?? 'CCCCCC';
+        bgStartColor = bgStartColor ?? 'CCCCCC';
+        bgEndColor = bgEndColor ?? '999999';
+
         const thickness = (props.thickness as number) ?? 2;
         const alignment = (props.alignment as string) ?? 'center';
-
-        // Color handling
-        const bgSolidColor = (props.bgSolidColor as string) ?? 'CCCCCC';
-        const bgStartColor = (props.bgStartColor as string) ?? 'CCCCCC';
-        const bgEndColor = (props.bgEndColor as string) ?? '999999';
         const bgGradientDirection = (props.bgGradientDirection as string) ?? 'horizontal';
 
         let backgroundStyle: React.CSSProperties = {};
@@ -136,9 +160,25 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         const waveFlip = props.waveFlip === true;
 
         // Handle bgType to build proper color parameters
+        // Support both new format (bgStartColor/bgEndColor) and legacy format (color)
         const bgType = (props.bgType as string) ?? 'gradient';
-        const bgStartColor = (props.bgStartColor as string) ?? 'EEFF00';
-        const bgEndColor = (props.bgEndColor as string) ?? 'A82DAA';
+        let bgStartColor = props.bgStartColor as string;
+        let bgEndColor = props.bgEndColor as string;
+
+        // Parse legacy color format ONLY if modern properties are NOT present
+        if (!bgStartColor && !bgEndColor && props.color) {
+          const colorValue = props.color as string;
+          const colorParts = colorValue.split(',');
+          if (colorParts.length >= 2) {
+            const startMatch = colorParts[0].match(/\d+:([0-9a-fA-F]+)/);
+            const endMatch = colorParts[1].match(/\d+:([0-9a-fA-F]+)/);
+            if (startMatch) bgStartColor = startMatch[1].toUpperCase();
+            if (endMatch) bgEndColor = endMatch[1].toUpperCase();
+          }
+        }
+
+        bgStartColor = bgStartColor ?? 'EEFF00';
+        bgEndColor = bgEndColor ?? 'A82DAA';
         const bgSolidColor = (props.bgSolidColor as string) ?? 'EEFF00';
 
         const bgColor = bgType === 'solid' ? bgSolidColor || 'EEFF00' : bgStartColor || 'EEFF00';
