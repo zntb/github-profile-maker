@@ -216,13 +216,39 @@ export function BlockConfigFields({
           onCard2PropsChange={(updates) => updateCardProps(1, updates)}
           onThemeChange={(v) => {
             update('theme', v);
-            updateCardProps(0, { theme: v });
-            updateCardProps(1, { theme: v });
+            // Update both cards' props directly
+            const currentStatsChildren = block.children
+              ? [
+                  ...block.children.filter((child): child is Block & { type: StatsChildType } =>
+                    statsChildTypes.includes(child.type as StatsChildType),
+                  ),
+                ]
+              : [];
+            const updatedChildren = currentStatsChildren.map((child) => ({
+              ...child,
+              props: { ...child.props, theme: v },
+            }));
+            if (updatedChildren.length > 0) {
+              updateBlockChildren(id, updatedChildren);
+            }
           }}
           onHideBorderChange={(v) => {
             update('hideBorder', v);
-            updateCardProps(0, { hideBorder: v });
-            updateCardProps(1, { hideBorder: v });
+            // Update both cards' props directly
+            const currentStatsChildren = block.children
+              ? [
+                  ...block.children.filter((child): child is Block & { type: StatsChildType } =>
+                    statsChildTypes.includes(child.type as StatsChildType),
+                  ),
+                ]
+              : [];
+            const updatedChildren = currentStatsChildren.map((child) => ({
+              ...child,
+              props: { ...child.props, hideBorder: v },
+            }));
+            if (updatedChildren.length > 0) {
+              updateBlockChildren(id, updatedChildren);
+            }
           }}
         />
       );
