@@ -1,8 +1,8 @@
-import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
 import prettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -45,9 +45,18 @@ const eslintConfig = defineConfig([
     files: ['eslint.config.mjs', 'next.config.ts', 'postcss.config.mjs'],
     rules: {
       'import/no-default-export': 'off',
+      'import/order': 'off',
+      'import/first': 'off',
     },
   },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts', 'playwright-report']),
+  globalIgnores([
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    'playwright-report',
+    'coverage',
+  ]),
 ]);
 
 export default eslintConfig;
