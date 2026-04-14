@@ -16,7 +16,7 @@ export default defineConfig({
   testMatch: '**/*.e2e.ts',
 
   // Maximum number of parallel workers
-  workers: 2,
+  workers: process.env.CI ? 1 : 3,
 
   // Retry configuration for flaky tests
   retries: process.env.CI ? 2 : 1,
