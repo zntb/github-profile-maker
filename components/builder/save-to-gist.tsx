@@ -48,6 +48,7 @@ export function SaveToGist({ showDesktopButton = true }: SaveToGistProps) {
   useEffect(() => {
     const savedToken = localStorage.getItem('github_gist_token');
     if (savedToken) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setToken(savedToken);
     }
   }, []);
