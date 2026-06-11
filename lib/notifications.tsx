@@ -192,6 +192,7 @@ function useNotificationStorage() {
     try {
       const storedDismissed = sessionStorage.getItem(DISMISSED_NOTIFICATIONS_KEY);
       if (storedDismissed) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setDismissedNotifications(new Set(JSON.parse(storedDismissed)));
       }
     } catch {
