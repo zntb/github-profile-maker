@@ -324,11 +324,7 @@ export function BlockConfigFields({
           bgType={(props.bgType as 'solid' | 'gradient' | 'animated') ?? 'gradient'}
           bgGradientDirection={
             (props.bgGradientDirection as
-              | 'horizontal'
-              | 'vertical'
-              | 'diagonal'
-              | 'radial'
-              | 'conic') ?? 'horizontal'
+              'horizontal' | 'vertical' | 'diagonal' | 'radial' | 'conic') ?? 'horizontal'
           }
           bgAnimation={
             (props.bgAnimation as 'none' | 'gradient' | 'pulse' | 'wave' | 'shimmer') ?? 'none'
@@ -807,11 +803,7 @@ export function BlockConfigFields({
           bgType={(props.bgType as 'solid' | 'gradient' | 'animated') ?? 'gradient'}
           bgGradientDirection={
             (props.bgGradientDirection as
-              | 'horizontal'
-              | 'vertical'
-              | 'diagonal'
-              | 'radial'
-              | 'conic') ?? 'horizontal'
+              'horizontal' | 'vertical' | 'diagonal' | 'radial' | 'conic') ?? 'horizontal'
           }
           bgAnimation={
             (props.bgAnimation as 'none' | 'gradient' | 'pulse' | 'wave' | 'shimmer') ?? 'none'
