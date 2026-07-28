@@ -1,0 +1,3 @@
+Test commit to verify git author config.
+Author should be: zntb <zntbdev@proton.me>
+Created: $(date)
