@@ -47,7 +47,14 @@ const eslintConfig = defineConfig([
       'import/no-default-export': 'off',
     },
   },
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'next-env.d.ts']),
+  globalIgnores([
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    'coverage/**',
+    'eslint.config.mjs',
+  ]),
 ]);
 
 export default eslintConfig;
