@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
+import { SOCIAL_BADGES } from '@/lib/social-badges';
 import type { Block } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -189,20 +190,14 @@ export function BlockPreview({ block, className }: BlockPreviewProps) {
         );
 
       case 'social-badges':
-        const badges = [];
-        if (props.linkedin) badges.push('LinkedIn');
-        if (props.twitter) badges.push('Twitter');
-        if (props.github) badges.push('GitHub');
-        if (props.email) badges.push('Email');
-        if (props.portfolio) badges.push('Portfolio');
-        if (props.youtube) badges.push('YouTube');
-        if (props.instagram) badges.push('Instagram');
-        if (props.discord) badges.push('Discord');
+        const socialBadges = Object.entries(SOCIAL_BADGES)
+          .filter(([key]) => Boolean(props[key]))
+          .map(([, def]) => def.label);
 
         return (
           <div className="flex flex-wrap gap-2 justify-center">
-            {badges.length > 0 ? (
-              badges.map((badge) => (
+            {socialBadges.length > 0 ? (
+              socialBadges.map((badge) => (
                 <span
                   key={badge}
                   className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"

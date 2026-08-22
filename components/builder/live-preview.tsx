@@ -4,6 +4,7 @@
 import { Eye } from 'lucide-react';
 import { JSX, useMemo, type CSSProperties } from 'react';
 
+import { SOCIAL_BADGES } from '@/lib/social-badges';
 import { useBuilderStore } from '@/lib/store';
 import type { Block } from '@/lib/types';
 
@@ -314,124 +315,27 @@ function PreviewBlock({
         );
 
       case 'social-badges': {
-        const badges: JSX.Element[] = [];
         const badgeStyle = props.style as string;
+        const badges: JSX.Element[] = [];
 
-        if (props.linkedin)
+        for (const [key, def] of Object.entries(SOCIAL_BADGES)) {
+          const value = props[key];
+          if (!value) continue;
+          const isExternal = key !== 'email' && key !== 'portfolio';
           badges.push(
             <a
-              key="linkedin"
-              href={`https://linkedin.com/in/${props.linkedin}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              key={key}
+              href={def.url(String(value))}
+              {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             >
               <img
-                src={`https://img.shields.io/badge/LinkedIn-0077B5?style=${badgeStyle}&logo=linkedin&logoColor=white`}
-                alt="LinkedIn"
+                src={`https://img.shields.io/badge/${encodeURIComponent(def.label)}-${def.color}?style=${badgeStyle}&logo=${def.logo}&logoColor=white`}
+                alt={def.label}
                 style={{ height: 'auto' }}
               />
             </a>,
           );
-        if (props.twitter)
-          badges.push(
-            <a
-              key="twitter"
-              href={`https://twitter.com/${props.twitter}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={`https://img.shields.io/badge/Twitter-1DA1F2?style=${badgeStyle}&logo=twitter&logoColor=white`}
-                alt="Twitter"
-                style={{ height: 'auto' }}
-              />
-            </a>,
-          );
-        if (props.github)
-          badges.push(
-            <a
-              key="github"
-              href={`https://github.com/${props.github}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={`https://img.shields.io/badge/GitHub-100000?style=${badgeStyle}&logo=github&logoColor=white`}
-                alt="GitHub"
-                style={{ height: 'auto' }}
-              />
-            </a>,
-          );
-        if (props.youtube)
-          badges.push(
-            <a
-              key="youtube"
-              href={`https://youtube.com/@${props.youtube}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={`https://img.shields.io/badge/YouTube-FF0000?style=${badgeStyle}&logo=youtube&logoColor=white`}
-                alt="YouTube"
-                style={{ height: 'auto' }}
-              />
-            </a>,
-          );
-        if (props.instagram)
-          badges.push(
-            <a
-              key="instagram"
-              href={`https://instagram.com/${props.instagram}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={`https://img.shields.io/badge/Instagram-E4405F?style=${badgeStyle}&logo=instagram&logoColor=white`}
-                alt="Instagram"
-                style={{ height: 'auto' }}
-              />
-            </a>,
-          );
-        if (props.discord)
-          badges.push(
-            <a
-              key="discord"
-              href={`https://discord.gg/${props.discord}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={`https://img.shields.io/badge/Discord-7289DA?style=${badgeStyle}&logo=discord&logoColor=white`}
-                alt="Discord"
-                style={{ height: 'auto' }}
-              />
-            </a>,
-          );
-        if (props.email)
-          badges.push(
-            <a key="email" href={`mailto:${props.email}`}>
-              <img
-                src={`https://img.shields.io/badge/Email-D14836?style=${badgeStyle}&logo=gmail&logoColor=white`}
-                alt="Email"
-                style={{ height: 'auto' }}
-              />
-            </a>,
-          );
-        if (props.portfolio)
-          badges.push(
-            <a
-              key="portfolio"
-              href={props.portfolio as string}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src={`https://img.shields.io/badge/Portfolio-000000?style=${badgeStyle}&logo=About.me&logoColor=white`}
-                alt="Portfolio"
-                style={{ height: 'auto' }}
-              />
-            </a>,
-          );
+        }
 
         return badges.length > 0 ? (
           <div className="flex flex-wrap gap-2 justify-center">{badges}</div>
