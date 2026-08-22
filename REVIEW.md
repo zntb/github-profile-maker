@@ -157,17 +157,11 @@ parameter. Removed the two duplicate functions from markdown.ts.
 
 ---
 
-## 15. GitHub Stats icon paths + `makeStatIcon` only in stats route
+## 15. ~~GitHub Stats icon paths + `makeStatIcon` only in stats route~~ ✅ DONE
 
-**Files:**
-
-- `app/api/stats/route.ts` — lines 28–54 (icon path definitions + helper)
-
-**Problem:** The Octicon SVG path data and `makeStatIcon` helper are defined locally.
-If other routes ever need GitHub icons (e.g., trophies could use stat icons), this
-would need to be duplicated.
-
-**Suggested fix:** Move to `lib/svg-icons.ts` for reuse.
+Moved `STAT_ICON_PATHS` and `makeStatIcon` to `lib/svg-icons.ts`. The stats
+route now imports from the shared module. Typecheck, ESLint, and all 89 tests
+pass.
 
 ---
 
@@ -204,7 +198,6 @@ Then each category just defines its threshold array.
 | 6   | ~~Colour override helper~~                    | ✅ Done                       | —      |
 | 10  | ~~Social badge registry~~                     | ✅ Done                       | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
 | 3   | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                       | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |     | 12    | ~~`ToggleField` component~~ | ✅ Done | —   |
-| 1   | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                       | —      |     | 9   | ~~Move themes to `lib/themes.ts`~~      | ✅ Done          | —   |     | 13+14 | ~~Shared API URL builder~~  | ✅ Done | —   |
-| 15  | Move icon paths to shared module              | Low — future-proofing         | Low    |
+| 1   | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                       | —      |     | 9   | ~~Move themes to `lib/themes.ts`~~      | ✅ Done          | —   |     | 13+14 | ~~Shared API URL builder~~  | ✅ Done | —   |     | 15  | ~~Move icon paths to shared module~~ | ✅ Done | —   |
 | 16  | Data-driven trophy ranks                      | Low — readability improvement | Low    |
 | 7   | ~~Move `formatCompact` to utils~~             | ✅ Done                       | —      |
