@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchLanguageStats, languageColors } from '@/lib/github';
 import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getLangTheme } from '@/lib/themes';
-import { escapeHtml } from '@/lib/utils';
+import { applyColorOverrides, escapeHtml } from '@/lib/utils';
 
 interface LanguageData {
   name: string;
@@ -339,15 +339,11 @@ export async function GET(request: NextRequest) {
 
   let theme = getLangTheme(themeName);
 
-  if (searchParams.get('bg_color')) {
-    theme = { ...theme, bg: searchParams.get('bg_color')!.replace('#', '') };
-  }
-  if (searchParams.get('text_color')) {
-    theme = { ...theme, text: searchParams.get('text_color')!.replace('#', '') };
-  }
-  if (searchParams.get('title_color')) {
-    theme = { ...theme, title: searchParams.get('title_color')!.replace('#', '') };
-  }
+  theme = applyColorOverrides(theme, searchParams, {
+    bg_color: 'bg',
+    text_color: 'text',
+    title_color: 'title',
+  });
 
   const token = process.env.GITHUB_TOKEN;
 
