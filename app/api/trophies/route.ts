@@ -2,68 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { fetchUserStats, type GitHubStats } from '@/lib/github';
 import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
-
-const themes: Record<
-  string,
-  { bg: string; title: string; text: string; trophy: string; frame: string }
-> = {
-  default: {
-    bg: 'ffffff',
-    title: '1a1b27',
-    text: '434d58',
-    trophy: 'ffc000',
-    frame: '000000',
-  },
-  tokyonight: {
-    bg: '1a1b27',
-    title: '70a5fd',
-    text: '38bdae',
-    trophy: 'bf91f3',
-    frame: '70a5fd',
-  },
-  dracula: {
-    bg: '282a36',
-    title: 'ff6e96',
-    text: 'f8f8f2',
-    trophy: 'ffb86c',
-    frame: 'bd93f9',
-  },
-  radical: {
-    bg: '141321',
-    title: 'fe428e',
-    text: 'a9fef7',
-    trophy: 'f8d847',
-    frame: 'fe428e',
-  },
-  onedark: {
-    bg: '282c34',
-    title: 'e4bf7a',
-    text: 'abb2bf',
-    trophy: 'e4bf7a',
-    frame: '8eb573',
-  },
-  nord: {
-    bg: '2e3440',
-    title: '81a1c1',
-    text: 'd8dee9',
-    trophy: 'ebcb8b',
-    frame: '88c0d0',
-  },
-  github_dark: {
-    bg: '0d1117',
-    title: '58a6ff',
-    text: 'c9d1d9',
-    trophy: 'f5700c',
-    frame: '1f6feb',
-  },
-  catppuccin_mocha: {
-    bg: '1e1e2e',
-    title: '89b4fa',
-    text: 'cdd6f4',
-    trophy: 'f9e2af',
-    frame: '94e2d5',
-  },
-};
+import { getTrophyTheme } from '@/lib/themes';
 
 interface Trophy {
   name: string;
@@ -217,10 +156,6 @@ function calculateTrophies(stats: GitHubStats): Trophy[] {
   return trophies;
 }
 
-function getTheme(themeName: string) {
-  return themes[themeName] || themes.default;
-}
-
 function generateTrophySvg(
   trophies: Trophy[],
   theme: { bg: string; title: string; text: string; trophy: string; frame: string },
@@ -302,7 +237,7 @@ export async function GET(request: NextRequest) {
   const noFrame = searchParams.get('no_frame') === 'true';
   const noBg = searchParams.get('no_bg') === 'true';
 
-  const theme = getTheme(themeName);
+  const theme = getTrophyTheme(themeName);
   const token = process.env.GITHUB_TOKEN;
 
   if (token) {

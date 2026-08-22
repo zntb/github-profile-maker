@@ -1173,3 +1173,108 @@ export function getActivityTheme(themeName: string): ActivityTheme {
 
   return deriveActivityTheme(getStatsTheme(themeName));
 }
+
+// ---------------------------------------------------------------------------
+// Trophy themes
+// ---------------------------------------------------------------------------
+
+export interface TrophyTheme {
+  bg: string;
+  title: string;
+  text: string;
+  trophy: string;
+  frame: string;
+}
+
+export const trophyThemes: Record<string, TrophyTheme> = {
+  default: {
+    bg: 'ffffff',
+    title: '1a1b27',
+    text: '434d58',
+    trophy: 'ffc000',
+    frame: '000000',
+  },
+  tokyonight: {
+    bg: '1a1b27',
+    title: '70a5fd',
+    text: '38bdae',
+    trophy: 'bf91f3',
+    frame: '70a5fd',
+  },
+  dracula: {
+    bg: '282a36',
+    title: 'ff6e96',
+    text: 'f8f8f2',
+    trophy: 'ffb86c',
+    frame: 'bd93f9',
+  },
+  radical: {
+    bg: '141321',
+    title: 'fe428e',
+    text: 'a9fef7',
+    trophy: 'f8d847',
+    frame: 'fe428e',
+  },
+  onedark: {
+    bg: '282c34',
+    title: 'e4bf7a',
+    text: 'abb2bf',
+    trophy: 'e4bf7a',
+    frame: '8eb573',
+  },
+  nord: {
+    bg: '2e3440',
+    title: '81a1c1',
+    text: 'd8dee9',
+    trophy: 'ebcb8b',
+    frame: '88c0d0',
+  },
+  github_dark: {
+    bg: '0d1117',
+    title: '58a6ff',
+    text: 'c9d1d9',
+    trophy: 'f5700c',
+    frame: '1f6feb',
+  },
+  catppuccin_mocha: {
+    bg: '1e1e2e',
+    title: '89b4fa',
+    text: 'cdd6f4',
+    trophy: 'f9e2af',
+    frame: '94e2d5',
+  },
+};
+
+export function getTrophyTheme(themeName: string): TrophyTheme {
+  const key = resolveThemeKey(themeName, trophyThemes);
+  return key ? trophyThemes[key] : trophyThemes.default;
+}
+
+// ---------------------------------------------------------------------------
+// Quote themes
+// ---------------------------------------------------------------------------
+
+export interface QuoteTheme {
+  bg: string;
+  text: string;
+  accent: string;
+  border: string;
+}
+
+export const quoteThemes: Record<string, QuoteTheme> = {
+  default: { bg: '0f0f23', text: 'a9b7c6', accent: '6a9955', border: '3e4451' },
+  dark: { bg: '1a1a1a', text: 'ffffff', accent: '79c0ff', border: '30363d' },
+  radical: { bg: '141321', text: 'a9fef7', accent: 'fe428e', border: '302d41' },
+  merko: { bg: '0a0f0b', text: '68b587', accent: 'abd200', border: '1d3521' },
+  gruvbox: { bg: '282828', text: 'ebdbb2', accent: 'fe8019', border: '3c3836' },
+  tokyonight: { bg: '1a1b27', text: '38bdae', accent: '70a5fd', border: '24283b' },
+  onedark: { bg: '282c34', text: 'abb2bf', accent: 'e5c07b', border: '3e4451' },
+  dracula: { bg: '282a36', text: 'f8f8f2', accent: 'bd93f9', border: '44475a' },
+  nord: { bg: '2e3440', text: 'd8dee9', accent: '88c0d0', border: '3b4252' },
+  github_dark: { bg: '0d1117', text: 'c9d1d9', accent: '58a6ff', border: '30363d' },
+};
+
+export function getQuoteTheme(themeName: string): QuoteTheme {
+  const key = resolveThemeKey(themeName, quoteThemes);
+  return key ? quoteThemes[key] : quoteThemes.default;
+}

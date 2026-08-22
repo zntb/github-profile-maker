@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getQuoteTheme } from '@/lib/themes';
+
 // Quote data with different types and themes
 const quotes = [
   // Programming/Dev quotes
@@ -187,22 +189,8 @@ const quotes = [
   },
 ];
 
-// Theme colors for quotes
-const themes: Record<string, { bg: string; text: string; accent: string; border: string }> = {
-  default: { bg: '0f0f23', text: 'a9b7c6', accent: '6a9955', border: '3e4451' },
-  dark: { bg: '1a1a1a', text: 'ffffff', accent: '79c0ff', border: '30363d' },
-  radical: { bg: '141321', text: 'a9fef7', accent: 'fe428e', border: '302d41' },
-  merko: { bg: '0a0f0b', text: '68b587', accent: 'abd200', border: '1d3521' },
-  gruvbox: { bg: '282828', text: 'ebdbb2', accent: 'fe8019', border: '3c3836' },
-  tokyonight: { bg: '1a1b27', text: '38bdae', accent: '70a5fd', border: '24283b' },
-  onedark: { bg: '282c34', text: 'abb2bf', accent: 'e5c07b', border: '3e4451' },
-  dracula: { bg: '282a36', text: 'f8f8f2', accent: 'bd93f9', border: '44475a' },
-  nord: { bg: '2e3440', text: 'd8dee9', accent: '88c0d0', border: '3b4252' },
-  github_dark: { bg: '0d1117', text: 'c9d1d9', accent: '58a6ff', border: '30363d' },
-};
-
 function generateQuoteSvg(quote: { text: string; author: string }, themeName: string): string {
-  const theme = themes[themeName] || themes.default;
+  const theme = getQuoteTheme(themeName);
   const { bg, text, accent, border } = theme;
 
   return `
