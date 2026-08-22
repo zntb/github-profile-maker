@@ -9,11 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 
 import { CardWidthField } from '../card-width-field';
 import { FieldGroup } from '../field-group';
 import { ThemeField } from '../theme-field';
+import { ToggleField } from '../toggle-field';
 
 interface StatsCardConfigProps {
   layoutStyle: 'standard' | 'compact';
@@ -82,42 +82,14 @@ export function StatsCardConfig({
         onWidthChange={onWidthChange}
       />
       <ThemeField value={theme} onChange={onThemeChange} />
-      <FieldGroup>
-        <div className="flex items-center justify-between">
-          <Label>Show Icons</Label>
-          <Switch
-            checked={Boolean(showIcons)}
-            onCheckedChange={(checked) => onShowIconsChange(checked)}
-          />
-        </div>
-      </FieldGroup>
-      <FieldGroup>
-        <div className="flex items-center justify-between">
-          <Label>Hide Border</Label>
-          <Switch
-            checked={Boolean(hideBorder)}
-            onCheckedChange={(checked) => onHideBorderChange(checked)}
-          />
-        </div>
-      </FieldGroup>
-      <FieldGroup>
-        <div className="flex items-center justify-between">
-          <Label>Hide Title</Label>
-          <Switch
-            checked={Boolean(hideTitle)}
-            onCheckedChange={(checked) => onHideTitleChange(checked)}
-          />
-        </div>
-      </FieldGroup>
-      <FieldGroup>
-        <div className="flex items-center justify-between">
-          <Label>Hide Rank</Label>
-          <Switch
-            checked={Boolean(hideRank)}
-            onCheckedChange={(checked) => onHideRankChange(checked)}
-          />
-        </div>
-      </FieldGroup>
+      <ToggleField label="Show Icons" checked={Boolean(showIcons)} onChange={onShowIconsChange} />
+      <ToggleField
+        label="Hide Border"
+        checked={Boolean(hideBorder)}
+        onChange={onHideBorderChange}
+      />
+      <ToggleField label="Hide Title" checked={Boolean(hideTitle)} onChange={onHideTitleChange} />
+      <ToggleField label="Hide Rank" checked={Boolean(hideRank)} onChange={onHideRankChange} />
       <FieldGroup>
         <Label>Border Radius ({borderRadius}px)</Label>
         <Input
