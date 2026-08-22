@@ -12,21 +12,13 @@ quotes, preserving original XML semantics). Removed the local definition from
 `app/api/streak/route.ts` and replaced it with an import from `@/lib/utils`.
 Typecheck, ESLint, and all 89 tests pass.
 
----
+---## 2. ~~`isValidHexColor` duplicated across routes~~ ✅ DONE
 
-## 2. `isValidHexColor` duplicated across routes
-
-**Files:**
-
-- `app/api/stats/route.ts` — line 10
-- `app/api/streak/route.ts` — line 15
-
-**Problem:** Both files define their own `isValidHexColor` function with identical
-regex (`/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/` in stats, `/^[0-9A-Fa-f]{6}$/` in
-streak — the stats version is actually more correct as it also allows 3-char hex).
-
-**Suggested fix:** Move `isValidHexColor` to `lib/utils.ts` (the stats version which
-also supports 3-char hex) and import it in both routes.
+Moved the stats version of `isValidHexColor` (supports both 3-char and 6-char hex)
+to `lib/utils.ts`. Both `app/api/stats/route.ts` and `app/api/streak/route.ts` now
+import from the shared utility. The streak route previously used a stricter regex that
+only accepted 6-char hex — it now correctly also accepts 3-char hex like `fff`.
+Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -342,8 +334,8 @@ Then each category just defines its threshold array.
 | 4+5   | Error/token-required SVG helpers    | High — 10 duplicated blocks           | Low    |
 | 8     | Pie/donut segment generation        | Medium — 3 near-identical functions   | Low    |
 | 6     | Colour override helper              | Medium — inconsistent sanitization    | Low    |
-| 10    | Social badge registry               | High — 3 files to update per platform | Medium |
-| 2+3   | `isValidHexColor` + `sanitizeColor` | Medium — 2 files, inconsistent regex  | Low    |
+| 10    | Social badge registry               | High — 3 files to update per platform | Medium || 2 | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | — |
+| 3 | `sanitizeColor` lives only in stats route | Medium — move to utils | Low |
 | 11    | Use existing `AlignmentField`       | Low — easy swap                       | Low    |
 | 12    | `ToggleField` component             | Low — repeated boilerplate            | Low    |
 | 1     | ~~`escapeXml` → `lib/utils.ts`~~    | ✅ Done                               | —      |
