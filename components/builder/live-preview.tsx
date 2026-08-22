@@ -4,6 +4,14 @@
 import { Eye } from 'lucide-react';
 import { JSX, useMemo, type CSSProperties } from 'react';
 
+import {
+  buildActivityUrl,
+  buildQuotesUrl,
+  buildStatsUrl,
+  buildStreakUrl,
+  buildTopLangsUrl,
+  buildTrophiesUrl,
+} from '@/lib/api-urls';
 import { SOCIAL_BADGES } from '@/lib/social-badges';
 import { useBuilderStore } from '@/lib/store';
 import type { Block } from '@/lib/types';
@@ -382,71 +390,53 @@ function PreviewBlock({
           );
         }
 
-        const statsParams = new URLSearchParams({
+        const statsUrl = buildStatsUrl({
           username,
           theme: props.theme as string,
           layout: layoutStyle,
-          show_icons: props.showIcons ? 'true' : 'false',
-          hide_border: props.hideBorder ? 'true' : 'false',
-          hide_title: props.hideTitle ? 'true' : 'false',
-          hide_rank: props.hideRank ? 'true' : 'false',
-          border_radius: String(props.borderRadius),
+          showIcons: Boolean(props.showIcons),
+          hideBorder: Boolean(props.hideBorder),
+          hideTitle: Boolean(props.hideTitle),
+          hideRank: Boolean(props.hideRank),
+          borderRadius: props.borderRadius,
         });
 
-        return (
-          <img
-            src={`/api/stats?${statsParams.toString()}`}
-            alt="GitHub Stats"
-            style={imageSizeStyle}
-          />
-        );
+        return <img src={statsUrl} alt="GitHub Stats" style={imageSizeStyle} />;
       }
 
       case 'top-languages': {
-        const langsParams = new URLSearchParams({
+        const langsUrl = buildTopLangsUrl({
           username: getUsername(props.username as string),
           theme: props.theme as string,
           layout: props.layout as string,
-          hide_border: props.hideBorder ? 'true' : 'false',
-          hide_progress: props.hideProgress ? 'true' : 'false',
-          langs_count: String(props.langs_count),
-          border_radius: String(props.borderRadius),
+          hideBorder: Boolean(props.hideBorder),
+          hideProgress: Boolean(props.hideProgress),
+          langs_count: props.langs_count,
+          borderRadius: props.borderRadius,
         });
-        return (
-          <img
-            src={`/api/top-langs?${langsParams.toString()}`}
-            alt="Top Languages"
-            style={imageSizeStyle}
-          />
-        );
+        return <img src={langsUrl} alt="Top Languages" style={imageSizeStyle} />;
       }
 
       case 'streak-stats': {
-        const streakParams = new URLSearchParams({
+        const streakUrl = buildStreakUrl({
           username: getUsername(props.username as string),
           theme: props.theme as string,
-          hide_border: props.hideBorder ? 'true' : 'false',
-          border_radius: String(props.borderRadius),
+          hideBorder: Boolean(props.hideBorder),
+          borderRadius: props.borderRadius,
         });
-        return (
-          <img
-            src={`/api/streak?${streakParams.toString()}`}
-            alt="GitHub Streak"
-            style={imageSizeStyle}
-          />
-        );
+        return <img src={streakUrl} alt="GitHub Streak" style={imageSizeStyle} />;
       }
 
       case 'activity-graph': {
-        const activityParams = new URLSearchParams({
+        const activityUrl = buildActivityUrl({
           username: getUsername(props.username as string),
           theme: props.theme as string,
-          hide_border: props.hideBorder ? 'true' : 'false',
+          hideBorder: Boolean(props.hideBorder),
         });
         return (
           // Activity graph SVG is 850 px wide — always fill the full container width
           <img
-            src={`/api/activity?${activityParams.toString()}`}
+            src={activityUrl}
             alt="Activity Graph"
             style={{ width: '100%', height: 'auto', display: 'block' }}
           />
@@ -454,20 +444,20 @@ function PreviewBlock({
       }
 
       case 'trophies': {
-        const trophyParams = new URLSearchParams({
+        const trophiesUrl = buildTrophiesUrl({
           username: getUsername(props.username as string),
           theme: props.theme as string,
-          column: String(props.column),
-          row: String(props.row),
-          margin_w: String(props.margin_w),
-          margin_h: String(props.margin_h),
-          no_frame: props.noFrame ? 'true' : 'false',
-          no_bg: props.noBg ? 'true' : 'false',
+          column: props.column,
+          row: props.row,
+          margin_w: props.margin_w,
+          margin_h: props.margin_h,
+          noFrame: Boolean(props.noFrame),
+          noBg: Boolean(props.noBg),
         });
         return (
           <div className="text-center">
             <img
-              src={`/api/trophies?${trophyParams.toString()}`}
+              src={trophiesUrl}
               alt="GitHub Trophies"
               style={{ maxWidth: '100%', height: 'auto' }}
             />
@@ -493,17 +483,13 @@ function PreviewBlock({
             </blockquote>
           );
         }
-        const quoteParams = new URLSearchParams({
+        const quotesUrl = buildQuotesUrl({
           type: props.type as string,
           theme: props.theme as string,
         });
         return (
           <div className="text-center">
-            <img
-              src={`/api/quotes?${quoteParams.toString()}`}
-              alt="Quote"
-              style={{ maxWidth: '100%', height: 'auto' }}
-            />
+            <img src={quotesUrl} alt="Quote" style={{ maxWidth: '100%', height: 'auto' }} />
           </div>
         );
       }

@@ -1,34 +1,14 @@
+import {
+  buildActivityUrl,
+  buildQuotesUrl,
+  buildStatsUrl,
+  buildStreakUrl,
+  buildTopLangsUrl,
+  buildTrophiesUrl,
+} from './api-urls';
 import { SOCIAL_BADGES } from './social-badges';
 import { useBuilderStore } from './store';
 import type { Block } from './types';
-
-// Build internal API URL
-function buildInternalUrl(endpoint: string, params: Record<string, unknown>): string {
-  const filteredParams: Record<string, string> = {};
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== '') {
-      filteredParams[key] = String(value);
-    }
-  }
-  const query = new URLSearchParams(filteredParams);
-  return `/api/${endpoint}?${query.toString()}`;
-}
-
-// Build external URL for exported markdown
-function buildExternalUrl(
-  endpoint: string,
-  params: Record<string, unknown>,
-  origin: string,
-): string {
-  const filteredParams: Record<string, string> = {};
-  for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== '') {
-      filteredParams[key] = String(value);
-    }
-  }
-  const query = new URLSearchParams(filteredParams);
-  return `${origin}/api/${endpoint}?${query.toString()}`;
-}
 
 // Render a single block to markdown
 export function renderBlock(block: Block, origin: string = ''): string {
@@ -261,19 +241,19 @@ export function renderBlock(block: Block, origin: string = ''): string {
         (!blockUsername || blockUsername === 'github') && globalUsername
           ? globalUsername
           : blockUsername;
-      const params = {
-        username,
-        theme,
-        hide_border: hideBorder ? 'true' : 'false',
-        bg_color: bgColor,
-        color,
-        line: lineColor,
-        point: pointColor,
-        area_color: areaColor,
-      };
-      const url = origin
-        ? buildExternalUrl('activity', params, origin)
-        : buildInternalUrl('activity', params);
+      const url = buildActivityUrl(
+        {
+          username,
+          theme,
+          hideBorder,
+          bgColor,
+          color,
+          lineColor,
+          pointColor,
+          areaColor,
+        },
+        origin || undefined,
+      );
       return `<div align="center">\n  <img src="${url}" alt="Activity Graph" />\n</div>`;
     }
 
@@ -294,19 +274,19 @@ export function renderBlock(block: Block, origin: string = ''): string {
         (!blockUsername || blockUsername === 'github') && globalUsername
           ? globalUsername
           : blockUsername;
-      const params = {
-        username,
-        theme,
-        column,
-        row,
-        margin_w,
-        margin_h,
-        no_frame: noFrame ? 'true' : 'false',
-        no_bg: noBg ? 'true' : 'false',
-      };
-      const url = origin
-        ? buildExternalUrl('trophies', params, origin)
-        : buildInternalUrl('trophies', params);
+      const url = buildTrophiesUrl(
+        {
+          username,
+          theme,
+          column,
+          row,
+          margin_w,
+          margin_h,
+          noFrame,
+          noBg,
+        },
+        origin || undefined,
+      );
       return `<div align="center">\n  <img src="${url}" alt="GitHub Trophies" />\n</div>`;
     }
 
@@ -329,13 +309,7 @@ export function renderBlock(block: Block, origin: string = ''): string {
         return `<div align="center">\n\n> "${quote}"\n> — ${author}\n\n</div>`;
       }
       // Random quote from local API
-      const params = {
-        type,
-        theme,
-      };
-      const url = origin
-        ? buildExternalUrl('quotes', params, origin)
-        : buildInternalUrl('quotes', params);
+      const url = buildQuotesUrl({ type, theme }, origin || undefined);
       return `<div align="center">\n  <img src="${url}" alt="Quote" />\n</div>`;
     }
 
@@ -378,24 +352,23 @@ function renderStatsCardImageTag(block: Block, origin: string): string {
     (!blockUsername || blockUsername === 'github') && globalUsername
       ? globalUsername
       : blockUsername;
-  const params = {
-    username,
-    theme,
-    // 'layoutStyle' maps to the API's 'layout' param ('standard' | 'compact')
-    layout: (layoutStyle as string | undefined) ?? 'standard',
-    show_icons: showIcons ? 'true' : 'false',
-    hide_border: hideBorder ? 'true' : 'false',
-    hide_title: hideTitle ? 'true' : 'false',
-    hide_rank: hideRank ? 'true' : 'false',
-    bg_color: bgColor,
-    text_color: textColor,
-    title_color: titleColor,
-    icon_color: iconColor,
-    border_radius: borderRadius,
-  };
-  const url = origin
-    ? buildExternalUrl('stats', params, origin)
-    : buildInternalUrl('stats', params);
+  const url = buildStatsUrl(
+    {
+      username,
+      theme,
+      layout: (layoutStyle as string | undefined) ?? 'standard',
+      showIcons,
+      hideBorder,
+      hideTitle,
+      hideRank,
+      borderRadius,
+      bgColor,
+      textColor,
+      titleColor,
+      iconColor,
+    },
+    origin || undefined,
+  );
   return `<img src="${url}" alt="GitHub Stats" />`;
 }
 
@@ -417,21 +390,21 @@ function renderTopLanguagesImageTag(block: Block, origin: string): string {
     (!blockUsername || blockUsername === 'github') && globalUsername
       ? globalUsername
       : blockUsername;
-  const params = {
-    username,
-    theme,
-    layout,
-    hide_border: hideBorder ? 'true' : 'false',
-    hide_progress: hideProgress ? 'true' : 'false',
-    langs_count,
-    bg_color: bgColor,
-    text_color: textColor,
-    title_color: titleColor,
-    border_radius: borderRadius,
-  };
-  const url = origin
-    ? buildExternalUrl('top-langs', params, origin)
-    : buildInternalUrl('top-langs', params);
+  const url = buildTopLangsUrl(
+    {
+      username,
+      theme,
+      layout,
+      hideBorder,
+      hideProgress,
+      langs_count,
+      borderRadius,
+      bgColor,
+      textColor,
+      titleColor,
+    },
+    origin || undefined,
+  );
   return `<img src="${url}" alt="Top Languages" />`;
 }
 
@@ -454,22 +427,22 @@ function renderStreakStatsImageTag(block: Block, origin: string): string {
     (!blockUsername || blockUsername === 'github') && globalUsername
       ? globalUsername
       : blockUsername;
-  const params = {
-    username,
-    theme,
-    hide_border: hideBorder ? 'true' : 'false',
-    border_radius: borderRadius,
-    background: bgColor,
-    fire: fireColor,
-    ring: ringColor,
-    currStreakNum: currStreakColor,
-    sideNums: sideNumColor,
-    sideLabels: sideLabelColor,
-    dates: datesColor,
-  };
-  const url = origin
-    ? buildExternalUrl('streak', params, origin)
-    : buildInternalUrl('streak', params);
+  const url = buildStreakUrl(
+    {
+      username,
+      theme,
+      hideBorder,
+      borderRadius,
+      bgColor,
+      fireColor,
+      ringColor,
+      currStreakColor,
+      sideNumColor,
+      sideLabelColor,
+      datesColor,
+    },
+    origin || undefined,
+  );
   return `<img src="${url}" alt="GitHub Streak" />`;
 }
 

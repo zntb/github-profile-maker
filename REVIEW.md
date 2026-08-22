@@ -141,47 +141,19 @@ Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 13. API URL params construction duplicated in live-preview and markdown
+## 13. ~~API URL params construction duplicated in live-preview and markdown~~ ✅ DONE
 
-**Files:**
-
-- `components/builder/live-preview.tsx` — lines 307–395 (URLSearchParams per block type)
-- `lib/markdown.ts` — `renderBlock` function (similar param construction)
-
-**Problem:** Both files build URL query strings for the same API endpoints
-(`/api/stats`, `/api/top-langs`, `/api/streak`, etc.) with overlapping logic.
-
-**Suggested fix:** Create a shared function in `lib/api-urls.ts`:
-
-```ts
-function buildStatsApiUrl(params: { username, theme, layout, ... }): string
-function buildTopLangsApiUrl(params: { ... }): string
-function buildStreakApiUrl(params: { ... }): string
-function buildActivityApiUrl(params: { ... }): string
-function buildTrophiesApiUrl(params: { ... }): string
-```
+Created `lib/api-urls.ts` with a `buildApiUrl` base helper and per-endpoint
+builders (buildStatsUrl, buildTopLangsUrl, buildStreakUrl, buildActivityUrl,
+buildTrophiesUrl, buildQuotesUrl). Both live-preview.tsx and markdown.ts now
+import from the shared module. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 14. `buildInternalUrl` and `buildExternalUrl` are near-identical
+## 14. ~~`buildInternalUrl` and `buildExternalUrl` are near-identical~~ ✅ DONE
 
-**Files:**
-
-- `lib/markdown.ts` — lines 5–28
-
-**Problem:** These two functions are identical except that `buildExternalUrl` prefixes
-the path with `origin`. They could be a single function with an optional `origin`
-parameter.
-
-**Suggested fix:** Merge into one:
-
-```ts
-function buildApiUrl(
-  endpoint: string,
-  params: Record<string, unknown>,
-  origin?: string,
-): string;
-```
+Merged into `buildApiUrl` in `lib/api-urls.ts` with an optional `origin`
+parameter. Removed the two duplicate functions from markdown.ts.
 
 ---
 
@@ -225,15 +197,14 @@ Then each category just defines its threshold array.
 
 ## Summary of Priority
 
-| #     | Item                                          | Impact                             | Effort |
-| ----- | --------------------------------------------- | ---------------------------------- | ------ |
-| 4+5   | Error/token-required SVG helpers              | High — 10 duplicated blocks        | Low    |
-| 8     | ~~Pie/donut segment generation~~              | ✅ Done                            | —      |
-| 6     | ~~Colour override helper~~                    | ✅ Done                            | —      |
-| 10    | ~~Social badge registry~~                     | ✅ Done                            | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
-| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                            | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |     | 12  | ~~`ToggleField` component~~ | ✅ Done | —   |
-| 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                            | —      |     | 9   | ~~Move themes to `lib/themes.ts`~~      | ✅ Done          | —   |
-| 13+14 | Shared API URL builder                        | Medium — DRY up param construction | Medium |
-| 15    | Move icon paths to shared module              | Low — future-proofing              | Low    |
-| 16    | Data-driven trophy ranks                      | Low — readability improvement      | Low    |
-| 7     | ~~Move `formatCompact` to utils~~             | ✅ Done                            | —      |
+| #   | Item                                          | Impact                        | Effort |
+| --- | --------------------------------------------- | ----------------------------- | ------ |
+| 4+5 | Error/token-required SVG helpers              | High — 10 duplicated blocks   | Low    |
+| 8   | ~~Pie/donut segment generation~~              | ✅ Done                       | —      |
+| 6   | ~~Colour override helper~~                    | ✅ Done                       | —      |
+| 10  | ~~Social badge registry~~                     | ✅ Done                       | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
+| 3   | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                       | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |     | 12    | ~~`ToggleField` component~~ | ✅ Done | —   |
+| 1   | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                       | —      |     | 9   | ~~Move themes to `lib/themes.ts`~~      | ✅ Done          | —   |     | 13+14 | ~~Shared API URL builder~~  | ✅ Done | —   |
+| 15  | Move icon paths to shared module              | Low — future-proofing         | Low    |
+| 16  | Data-driven trophy ranks                      | Low — readability improvement | Low    |
+| 7   | ~~Move `formatCompact` to utils~~             | ✅ Done                       | —      |
