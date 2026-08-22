@@ -116,3 +116,53 @@ export function generateErrorSvg(
         </text>
       </svg>`;
 }
+
+// ---------------------------------------------------------------------------
+// Pie / donut segment generation
+// ---------------------------------------------------------------------------
+
+export interface PieSegmentData {
+  /** Fill colour hex (without #) */
+  color: string;
+  /** Percentage 0–100 */
+  percent: number;
+}
+
+/**
+ * Generate SVG `<path>` elements for pie / donut chart segments.
+ * Shared by the compact donut, vertical donut, and full pie layouts.
+ *
+ * @param langs    – Array of language data with color and percent
+ * @param centerX  – X coordinate of the chart centre
+ * @param centerY  – Y coordinate of the chart centre
+ * @param radius   – Outer radius of the pie / donut
+ * @returns        – Concatenated SVG path strings
+ */
+export function generatePieSegments(
+  langs: PieSegmentData[],
+  centerX: number,
+  centerY: number,
+  radius: number,
+): string {
+  let currentAngle = -90;
+
+  return langs
+    .map((lang) => {
+      const angle = (lang.percent / 100) * 360;
+      const startAngle = currentAngle;
+      const endAngle = currentAngle + angle;
+      currentAngle = endAngle;
+
+      const startRad = (startAngle * Math.PI) / 180;
+      const endRad = (endAngle * Math.PI) / 180;
+
+      const x1 = centerX + radius * Math.cos(startRad);
+      const y1 = centerY + radius * Math.sin(startRad);
+      const x2 = centerX + radius * Math.cos(endRad);
+      const y2 = centerY + radius * Math.sin(endRad);
+
+      const largeArc = angle > 180 ? 1 : 0;
+      return `<path d="M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="#${lang.color}"/>`;
+    })
+    .join('');
+}
