@@ -105,22 +105,12 @@ centerX, centerY, and radius. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 9. Inline theme objects in `quotes/route.ts` and `trophies/route.ts`
+## 9. ~~Inline theme objects in `quotes/route.ts` and `trophies/route.ts`~~ ✅ DONE
 
-**Files:**
-
-- `app/api/quotes/route.ts` — lines 191–203 (10 theme entries)
-- `app/api/trophies/route.ts` — lines 5–68 (8 theme entries)
-
-**Problem:** Both routes define their own `themes` object inline rather than
-importing from `lib/themes.ts`. Theme maintenance requires editing route files.
-Also, the stats/lang themes in `lib/themes.ts` use a flat `{ bg, title, text, border }`
-shape, while quotes uses `{ bg, text, accent, border }` and trophies uses
-`{ bg, title, text, trophy, frame }` — inconsistent naming and structure.
-
-**Suggested fix:** Move quote and trophy themes into `lib/themes.ts` with dedicated
-theme types and getter functions (`getQuoteTheme`, `getTrophyTheme`) following the
-pattern already established for stats, lang, and streak themes.
+Moved trophy themes (`TrophyTheme` type, `trophyThemes` map, `getTrophyTheme`) and
+quote themes (`QuoteTheme` type, `quoteThemes` map, `getQuoteTheme`) into
+`lib/themes.ts`. Both routes now import from the shared module. Typecheck,
+ESLint, and all 89 tests pass.
 
 ---
 
@@ -242,8 +232,7 @@ Then each category just defines its threshold array.
 | 6     | ~~Colour override helper~~                    | ✅ Done                            | —      |
 | 10    | ~~Social badge registry~~                     | ✅ Done                            | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
 | 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                            | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |     | 12  | ~~`ToggleField` component~~ | ✅ Done | —   |
-| 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                            | —      |
-| 9     | Move themes to `lib/themes.ts`                | Medium — consistency improvement   | Low    |
+| 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                            | —      |     | 9   | ~~Move themes to `lib/themes.ts`~~      | ✅ Done          | —   |
 | 13+14 | Shared API URL builder                        | Medium — DRY up param construction | Medium |
 | 15    | Move icon paths to shared module              | Low — future-proofing              | Low    |
 | 16    | Data-driven trophy ranks                      | Low — readability improvement      | Low    |
