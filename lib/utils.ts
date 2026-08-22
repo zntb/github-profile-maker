@@ -19,6 +19,19 @@ export function escapeHtml(str: string): string {
 }
 
 /**
+ * Escape XML special characters. Uses the named entity &apos; for the
+ * single-quote character (valid in SVG text content).
+ */
+export function escapeXml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+/**
  * Escape special characters for SVG attribute values to prevent XSS attacks.
  * SVG attributes require stricter escaping than HTML text content.
  */

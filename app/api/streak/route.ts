@@ -2,15 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { calculateStreakStats, fetchContributionCalendar } from '@/lib/github';
 import { getStreakTheme, type StreakTheme } from '@/lib/themes';
-
-function escapeXml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-}
+import { escapeXml } from '@/lib/utils';
 
 function isValidHexColor(color: string): boolean {
   return /^[0-9A-Fa-f]{6}$/.test(color);
