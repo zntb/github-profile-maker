@@ -26,6 +26,15 @@ export function isValidHexColor(color: string): boolean {
 }
 
 /**
+ * Sanitize a color value for use in SVG - strips any non-hex characters.
+ * This provides defense in depth against XSS by ensuring only valid hex
+ * characters can ever appear in color attributes.
+ */
+export function sanitizeColor(color: string): string {
+  return color.replace(/[^0-9a-fA-F]/g, '');
+}
+
+/**
  * Escape XML special characters. Uses the named entity &apos; for the
  * single-quote character (valid in SVG text content).
  */

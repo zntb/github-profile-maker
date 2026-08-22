@@ -2,16 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { calculateRank, fetchUserStats, type GitHubStats } from '@/lib/github';
 import { getStatsTheme } from '@/lib/themes';
-import { escapeSvg, isValidHexColor } from '@/lib/utils';
-
-/**
- * Sanitize a color value for use in SVG - strips any non-hex characters.
- * This provides defense in depth against XSS by ensuring only valid hex
- * characters can ever appear in color attributes.
- */
-function sanitizeColor(color: string): string {
-  return color.replace(/[^0-9a-fA-F]/g, '');
-}
+import { escapeSvg, isValidHexColor, sanitizeColor } from '@/lib/utils';
 
 function formatCompact(num: number): string {
   if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;

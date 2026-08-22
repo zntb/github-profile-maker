@@ -20,18 +20,11 @@ import from the shared utility. The streak route previously used a stricter rege
 only accepted 6-char hex — it now correctly also accepts 3-char hex like `fff`.
 Typecheck, ESLint, and all 89 tests pass.
 
----
+---## 3. ~~`sanitizeColor` lives only in stats route~~ ✅ DONE
 
-## 3. `sanitizeColor` lives only in stats route
-
-**Files:**
-
-- `app/api/stats/route.ts` — line 19
-
-**Problem:** The `sanitizeColor` function (strips non-hex characters) is only defined
-in the stats route but could be useful in other routes that accept colour overrides.
-
-**Suggested fix:** Move to `lib/utils.ts` alongside `isValidHexColor`.
+Moved `sanitizeColor` to `lib/utils.ts` alongside `isValidHexColor`.
+`app/api/stats/route.ts` now imports it from the shared utility.
+Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -335,7 +328,7 @@ Then each category just defines its threshold array.
 | 8     | Pie/donut segment generation        | Medium — 3 near-identical functions   | Low    |
 | 6     | Colour override helper              | Medium — inconsistent sanitization    | Low    |
 | 10    | Social badge registry               | High — 3 files to update per platform | Medium || 2 | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | — |
-| 3 | `sanitizeColor` lives only in stats route | Medium — move to utils | Low |
+| 3 | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done | — |
 | 11    | Use existing `AlignmentField`       | Low — easy swap                       | Low    |
 | 12    | `ToggleField` component             | Low — repeated boilerplate            | Low    |
 | 1     | ~~`escapeXml` → `lib/utils.ts`~~    | ✅ Done                               | —      |
