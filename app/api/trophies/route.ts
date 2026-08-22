@@ -10,150 +10,133 @@ interface Trophy {
   icon: string;
 }
 
-function calculateTrophies(stats: GitHubStats): Trophy[] {
-  const trophies: Trophy[] = [];
+/** Data-driven rank calculator. Thresholds are checked from highest to lowest. */
+function rankFromThresholds(value: number, thresholds: [number, string][]): string {
+  for (const [min, rank] of thresholds) {
+    if (value >= min) return rank;
+  }
+  return 'C';
+}
 
-  // Stars Trophy
-  const starsRank =
-    stats.totalStars >= 10000
-      ? 'SSS'
-      : stats.totalStars >= 5000
-        ? 'SS'
-        : stats.totalStars >= 1000
-          ? 'S'
-          : stats.totalStars >= 500
-            ? 'AA'
-            : stats.totalStars >= 100
-              ? 'A'
-              : stats.totalStars >= 50
-                ? 'B'
-                : 'C';
-  trophies.push({ name: 'Stars', rank: starsRank, icon: 'star' });
-
-  // Commits Trophy
-  const commitsRank =
-    stats.totalCommits >= 10000
-      ? 'SSS'
-      : stats.totalCommits >= 5000
-        ? 'SS'
-        : stats.totalCommits >= 1000
-          ? 'S'
-          : stats.totalCommits >= 500
-            ? 'AA'
-            : stats.totalCommits >= 200
-              ? 'A'
-              : stats.totalCommits >= 100
-                ? 'B'
-                : 'C';
-  trophies.push({ name: 'Commits', rank: commitsRank, icon: 'git-commit' });
-
-  // Followers Trophy
-  const followersRank =
-    stats.followers >= 5000
-      ? 'SSS'
-      : stats.followers >= 1000
-        ? 'SS'
-        : stats.followers >= 500
-          ? 'S'
-          : stats.followers >= 100
-            ? 'AA'
-            : stats.followers >= 50
-              ? 'A'
-              : stats.followers >= 10
-                ? 'B'
-                : 'C';
-  trophies.push({ name: 'Followers', rank: followersRank, icon: 'users' });
-
-  // PRs Trophy
-  const prsRank =
-    stats.totalPRs >= 1000
-      ? 'SSS'
-      : stats.totalPRs >= 500
-        ? 'SS'
-        : stats.totalPRs >= 200
-          ? 'S'
-          : stats.totalPRs >= 100
-            ? 'AA'
-            : stats.totalPRs >= 50
-              ? 'A'
-              : stats.totalPRs >= 20
-                ? 'B'
-                : 'C';
-  trophies.push({ name: 'PRs', rank: prsRank, icon: 'git-pull-request' });
-
-  // Issues Trophy
-  const issuesRank =
-    stats.totalIssues >= 500
-      ? 'SSS'
-      : stats.totalIssues >= 200
-        ? 'SS'
-        : stats.totalIssues >= 100
-          ? 'S'
-          : stats.totalIssues >= 50
-            ? 'AA'
-            : stats.totalIssues >= 20
-              ? 'A'
-              : stats.totalIssues >= 10
-                ? 'B'
-                : 'C';
-  trophies.push({ name: 'Issues', rank: issuesRank, icon: 'alert-circle' });
-
-  // Repos Trophy
-  const reposRank =
-    stats.publicRepos >= 200
-      ? 'SSS'
-      : stats.publicRepos >= 100
-        ? 'SS'
-        : stats.publicRepos >= 50
-          ? 'S'
-          : stats.publicRepos >= 30
-            ? 'AA'
-            : stats.publicRepos >= 20
-              ? 'A'
-              : stats.publicRepos >= 10
-                ? 'B'
-                : 'C';
-  trophies.push({ name: 'Repos', rank: reposRank, icon: 'repo' });
-
-  // Reviews Trophy
-  const reviewsRank =
-    stats.totalReviews >= 500
-      ? 'SSS'
-      : stats.totalReviews >= 200
-        ? 'SS'
-        : stats.totalReviews >= 100
-          ? 'S'
-          : stats.totalReviews >= 50
-            ? 'AA'
-            : stats.totalReviews >= 20
-              ? 'A'
-              : stats.totalReviews >= 10
-                ? 'B'
-                : 'C';
-  trophies.push({ name: 'Reviews', rank: reviewsRank, icon: 'code-review' });
-
-  // Contributed To Trophy
-  const contributedRank =
-    stats.contributedTo >= 100
-      ? 'SSS'
-      : stats.contributedTo >= 50
-        ? 'SS'
-        : stats.contributedTo >= 30
-          ? 'S'
-          : stats.contributedTo >= 20
-            ? 'AA'
-            : stats.contributedTo >= 10
-              ? 'A'
-              : stats.contributedTo >= 5
-                ? 'B'
-                : 'C';
-  trophies.push({
+/** Trophy category definitions: stat key → thresholds (descending). */
+const TROPHY_CATEGORIES: {
+  name: string;
+  stat: keyof GitHubStats;
+  icon: string;
+  thresholds: [number, string][];
+}[] = [
+  {
+    name: 'Stars',
+    stat: 'totalStars',
+    icon: 'star',
+    thresholds: [
+      [10000, 'SSS'],
+      [5000, 'SS'],
+      [1000, 'S'],
+      [500, 'AA'],
+      [100, 'A'],
+      [50, 'B'],
+    ],
+  },
+  {
+    name: 'Commits',
+    stat: 'totalCommits',
+    icon: 'git-commit',
+    thresholds: [
+      [10000, 'SSS'],
+      [5000, 'SS'],
+      [1000, 'S'],
+      [500, 'AA'],
+      [200, 'A'],
+      [100, 'B'],
+    ],
+  },
+  {
+    name: 'Followers',
+    stat: 'followers',
+    icon: 'users',
+    thresholds: [
+      [5000, 'SSS'],
+      [1000, 'SS'],
+      [500, 'S'],
+      [100, 'AA'],
+      [50, 'A'],
+      [10, 'B'],
+    ],
+  },
+  {
+    name: 'PRs',
+    stat: 'totalPRs',
+    icon: 'git-pull-request',
+    thresholds: [
+      [1000, 'SSS'],
+      [500, 'SS'],
+      [200, 'S'],
+      [100, 'AA'],
+      [50, 'A'],
+      [20, 'B'],
+    ],
+  },
+  {
+    name: 'Issues',
+    stat: 'totalIssues',
+    icon: 'alert-circle',
+    thresholds: [
+      [500, 'SSS'],
+      [200, 'SS'],
+      [100, 'S'],
+      [50, 'AA'],
+      [20, 'A'],
+      [10, 'B'],
+    ],
+  },
+  {
+    name: 'Repos',
+    stat: 'publicRepos',
+    icon: 'repo',
+    thresholds: [
+      [200, 'SSS'],
+      [100, 'SS'],
+      [50, 'S'],
+      [30, 'AA'],
+      [20, 'A'],
+      [10, 'B'],
+    ],
+  },
+  {
+    name: 'Reviews',
+    stat: 'totalReviews',
+    icon: 'code-review',
+    thresholds: [
+      [500, 'SSS'],
+      [200, 'SS'],
+      [100, 'S'],
+      [50, 'AA'],
+      [20, 'A'],
+      [10, 'B'],
+    ],
+  },
+  {
     name: 'Contributed',
-    rank: contributedRank,
+    stat: 'contributedTo',
     icon: 'comment-discussion',
-  });
+    thresholds: [
+      [100, 'SSS'],
+      [50, 'SS'],
+      [30, 'S'],
+      [20, 'AA'],
+      [10, 'A'],
+      [5, 'B'],
+    ],
+  },
+];
 
-  return trophies;
+function calculateTrophies(stats: GitHubStats): Trophy[] {
+  return TROPHY_CATEGORIES.map((cat) => ({
+    name: cat.name,
+    rank: rankFromThresholds(Number(stats[cat.stat]), cat.thresholds),
+    icon: cat.icon,
+  }));
 }
 
 function generateTrophySvg(
