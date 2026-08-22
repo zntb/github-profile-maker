@@ -165,39 +165,23 @@ pass.
 
 ---
 
-## 16. Trophy rank calculation uses deeply nested ternaries
+## 16. ~~Trophy rank calculation uses deeply nested ternaries~~ ✅ DONE
 
-**Files:**
-
-- `app/api/trophies/route.ts` — `calculateTrophies` function (lines 72–176)
-
-**Problem:** Each stat category (stars, commits, followers, etc.) uses a 6-level
-nested ternary chain. This pattern is repeated 7 times with different thresholds.
-
-**Suggested fix:** Extract a data-driven rank calculator:
-
-```ts
-function calculateRank(value: number, thresholds: [number, string][]): string {
-  for (const [min, rank] of thresholds) {
-    if (value >= min) return rank;
-  }
-  return 'C';
-}
-```
-
-Then each category just defines its threshold array.
+Replaced 7 nested ternary chains with a data-driven `rankFromThresholds`
+helper and a `TROPHY_CATEGORIES` array. Each category defines its stat key,
+icon, and threshold array. `calculateTrophies` now maps over the categories.
+Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
 ## Summary of Priority
 
-| #   | Item                                          | Impact                        | Effort |
-| --- | --------------------------------------------- | ----------------------------- | ------ |
-| 4+5 | Error/token-required SVG helpers              | High — 10 duplicated blocks   | Low    |
-| 8   | ~~Pie/donut segment generation~~              | ✅ Done                       | —      |
-| 6   | ~~Colour override helper~~                    | ✅ Done                       | —      |
-| 10  | ~~Social badge registry~~                     | ✅ Done                       | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
-| 3   | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                       | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |     | 12    | ~~`ToggleField` component~~ | ✅ Done | —   |
-| 1   | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                       | —      |     | 9   | ~~Move themes to `lib/themes.ts`~~      | ✅ Done          | —   |     | 13+14 | ~~Shared API URL builder~~  | ✅ Done | —   |     | 15  | ~~Move icon paths to shared module~~ | ✅ Done | —   |
-| 16  | Data-driven trophy ranks                      | Low — readability improvement | Low    |
-| 7   | ~~Move `formatCompact` to utils~~             | ✅ Done                       | —      |
+| #   | Item                                          | Impact                      | Effort |
+| --- | --------------------------------------------- | --------------------------- | ------ |
+| 4+5 | Error/token-required SVG helpers              | High — 10 duplicated blocks | Low    |
+| 8   | ~~Pie/donut segment generation~~              | ✅ Done                     | —      |
+| 6   | ~~Colour override helper~~                    | ✅ Done                     | —      |
+| 10  | ~~Social badge registry~~                     | ✅ Done                     | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
+| 3   | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                     | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |     | 12    | ~~`ToggleField` component~~ | ✅ Done | —   |
+| 1   | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                     | —      |     | 9   | ~~Move themes to `lib/themes.ts`~~      | ✅ Done          | —   |     | 13+14 | ~~Shared API URL builder~~  | ✅ Done | —   |     | 15  | ~~Move icon paths to shared module~~ | ✅ Done | —   |     | 16  | ~~Data-driven trophy ranks~~ | ✅ Done | —   |
+| 7   | ~~Move `formatCompact` to utils~~             | ✅ Done                     | —      |
