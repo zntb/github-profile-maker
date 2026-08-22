@@ -133,20 +133,11 @@ Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 11. Alignment select field duplicated — `AlignmentField` component exists but isn't used
+## 11. ~~Alignment select field duplicated — `AlignmentField` component exists but isn't used~~ ✅ DONE
 
-**Files:**
-
-- `components/builder/config/alignment-field.tsx` — reusable component
-- `components/builder/config/blocks/greeting-config.tsx` — lines 24–38 (inline)
-- `components/builder/config/blocks/paragraph-config.tsx` — lines 14–24 (inline)
-- `components/builder/config/blocks/heading-config.tsx` — likely similar
-
-**Problem:** An `AlignmentField` component already exists in
-`components/builder/config/alignment-field.tsx`, but several config components
-re-implement the left/center/right alignment select inline.
-
-**Suggested fix:** Replace inline alignment selects with `<AlignmentField>`.
+Replaced inline alignment selects in greeting-config, paragraph-config, and
+heading-config with the existing `<AlignmentField>` component. Removed unused
+imports. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -269,8 +260,7 @@ Then each category just defines its threshold array.
 | 8     | ~~Pie/donut segment generation~~              | ✅ Done                            | —      |
 | 6     | ~~Colour override helper~~                    | ✅ Done                            | —      |
 | 10    | ~~Social badge registry~~                     | ✅ Done                            | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
-| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                            | —      |
-| 11    | Use existing `AlignmentField`                 | Low — easy swap                    | Low    |
+| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                            | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |
 | 12    | `ToggleField` component                       | Low — repeated boilerplate         | Low    |
 | 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                            | —      |
 | 9     | Move themes to `lib/themes.ts`                | Medium — consistency improvement   | Low    |
