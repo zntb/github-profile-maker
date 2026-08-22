@@ -322,18 +322,18 @@ Then each category just defines its threshold array.
 
 ## Summary of Priority
 
-| #     | Item                                | Impact                                | Effort |
-| ----- | ----------------------------------- | ------------------------------------- | ------ |
-| 4+5   | Error/token-required SVG helpers    | High — 10 duplicated blocks           | Low    |
-| 8     | Pie/donut segment generation        | Medium — 3 near-identical functions   | Low    |
-| 6     | Colour override helper              | Medium — inconsistent sanitization    | Low    |
-| 10    | Social badge registry               | High — 3 files to update per platform | Medium || 2 | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | — |
-| 3 | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done | — |
-| 11    | Use existing `AlignmentField`       | Low — easy swap                       | Low    |
-| 12    | `ToggleField` component             | Low — repeated boilerplate            | Low    |
-| 1     | ~~`escapeXml` → `lib/utils.ts`~~    | ✅ Done                               | —      |
-| 9     | Move themes to `lib/themes.ts`      | Medium — consistency improvement      | Low    |
-| 13+14 | Shared API URL builder              | Medium — DRY up param construction    | Medium |
-| 15    | Move icon paths to shared module    | Low — future-proofing                 | Low    |
-| 16    | Data-driven trophy ranks            | Low — readability improvement         | Low    |
-| 7     | Move `formatCompact` to utils       | Low — single function move            | Low    |
+| #     | Item                                          | Impact                                | Effort |
+| ----- | --------------------------------------------- | ------------------------------------- | ------ |
+| 4+5   | Error/token-required SVG helpers              | High — 10 duplicated blocks           | Low    |
+| 8     | Pie/donut segment generation                  | Medium — 3 near-identical functions   | Low    |
+| 6     | Colour override helper                        | Medium — inconsistent sanitization    | Low    |
+| 10    | Social badge registry                         | High — 3 files to update per platform | Medium |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
+| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                               | —      |
+| 11    | Use existing `AlignmentField`                 | Low — easy swap                       | Low    |
+| 12    | `ToggleField` component                       | Low — repeated boilerplate            | Low    |
+| 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                               | —      |
+| 9     | Move themes to `lib/themes.ts`                | Medium — consistency improvement      | Low    |
+| 13+14 | Shared API URL builder                        | Medium — DRY up param construction    | Medium |
+| 15    | Move icon paths to shared module              | Low — future-proofing                 | Low    |
+| 16    | Data-driven trophy ranks                      | Low — readability improvement         | Low    |
+| 7     | Move `formatCompact` to utils                 | Low — single function move            | Low    |

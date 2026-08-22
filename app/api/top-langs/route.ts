@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { fetchLanguageStats, languageColors } from '@/lib/github';
+import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getLangTheme } from '@/lib/themes';
 import { escapeHtml } from '@/lib/utils';
 
@@ -368,15 +369,9 @@ export async function GET(request: NextRequest) {
         .sort((a, b) => b.size - a.size);
     } catch {
       return new NextResponse(
-        `<svg width="495" height="120" xmlns="http://www.w3.org/2000/svg">
-          <rect width="495" height="120" fill="#${theme.bg}" rx="10"/>
-          <text x="247.5" y="50" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="14">
-            Error fetching languages for @${escapeHtml(username)}
-          </text>
-          <text x="247.5" y="75" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12" opacity="0.7">
-            User may not exist or API rate limit exceeded
-          </text>
-        </svg>`,
+        generateErrorSvg(theme.bg, escapeHtml(username), 'Error fetching languages for', {
+          textColor: theme.text,
+        }),
         {
           headers: {
             'Content-Type': 'image/svg+xml',
@@ -387,18 +382,11 @@ export async function GET(request: NextRequest) {
     }
   } else {
     return new NextResponse(
-      `<svg width="495" height="120" xmlns="http://www.w3.org/2000/svg">
-        <rect width="495" height="120" fill="#${theme.bg}" rx="10" stroke="#${theme.border}"/>
-        <text x="247.5" y="45" text-anchor="middle" fill="#${theme.title}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="14" font-weight="600">
-          GitHub Token Required
-        </text>
-        <text x="247.5" y="70" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12">
-          Set GITHUB_TOKEN environment variable
-        </text>
-        <text x="247.5" y="90" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="11" opacity="0.7">
-          to fetch real languages for @${escapeHtml(username)}
-        </text>
-      </svg>`,
+      generateTokenRequiredSvg(theme.bg, escapeHtml(username), 'to fetch real languages for', {
+        border: theme.border,
+        titleColor: theme.title,
+        bodyColor: theme.text,
+      }),
       {
         headers: {
           'Content-Type': 'image/svg+xml',
