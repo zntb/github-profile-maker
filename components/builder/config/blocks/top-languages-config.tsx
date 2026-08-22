@@ -9,11 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 
 import { CardWidthField } from '../card-width-field';
 import { FieldGroup } from '../field-group';
 import { ThemeField } from '../theme-field';
+import { ToggleField } from '../toggle-field';
 
 interface TopLanguagesConfigProps {
   layoutWidth: string;
@@ -82,24 +82,16 @@ export function TopLanguagesConfig({
           max={20}
         />
       </FieldGroup>
-      <FieldGroup>
-        <div className="flex items-center justify-between">
-          <Label>Hide Border</Label>
-          <Switch
-            checked={Boolean(hideBorder)}
-            onCheckedChange={(checked) => onHideBorderChange(checked)}
-          />
-        </div>
-      </FieldGroup>
-      <FieldGroup>
-        <div className="flex items-center justify-between">
-          <Label>Hide Progress</Label>
-          <Switch
-            checked={Boolean(hideProgress)}
-            onCheckedChange={(checked) => onHideProgressChange(checked)}
-          />
-        </div>
-      </FieldGroup>
+      <ToggleField
+        label="Hide Border"
+        checked={Boolean(hideBorder)}
+        onChange={onHideBorderChange}
+      />
+      <ToggleField
+        label="Hide Progress"
+        checked={Boolean(hideProgress)}
+        onChange={onHideProgressChange}
+      />
     </>
   );
 }

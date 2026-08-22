@@ -141,32 +141,13 @@ imports. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 12. "Hide Border" toggle duplicated across config components
+## 12. ~~"Hide Border" toggle duplicated across config components~~ ✅ DONE
 
-**Files:**
-
-- `components/builder/config/blocks/stats-card-config.tsx` — lines 73–80
-- `components/builder/config/blocks/top-languages-config.tsx` — lines 67–74
-- `components/builder/config/blocks/streak-stats-config.tsx` — lines 46–53
-- `components/builder/config/blocks/activity-graph-config.tsx` — lines 26–33
-
-**Problem:** The "Hide Border" label + Switch pattern is repeated identically across
-4+ config components.
-
-**Suggested fix:** Extract a `HideBorderField` (or a more generic `ToggleField`):
-
-```tsx
-function ToggleField({ label, checked, onChange }: { ... }) {
-  return (
-    <FieldGroup>
-      <div className="flex items-center justify-between">
-        <Label>{label}</Label>
-        <Switch checked={checked} onCheckedChange={onChange} />
-      </div>
-    </FieldGroup>
-  );
-}
-```
+Created `ToggleField` component in `components/builder/config/toggle-field.tsx`.
+Replaced inline toggle patterns in stats-card-config (4 toggles),
+top-languages-config (2 toggles), streak-stats-config (1 toggle), and
+activity-graph-config (1 toggle). Removed unused `Switch`/`Label` imports.
+Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -260,8 +241,7 @@ Then each category just defines its threshold array.
 | 8     | ~~Pie/donut segment generation~~              | ✅ Done                            | —      |
 | 6     | ~~Colour override helper~~                    | ✅ Done                            | —      |
 | 10    | ~~Social badge registry~~                     | ✅ Done                            | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
-| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                            | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |
-| 12    | `ToggleField` component                       | Low — repeated boilerplate         | Low    |
+| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                            | —      |     | 11  | ~~Use existing `AlignmentField`~~       | ✅ Done          | —   |     | 12  | ~~`ToggleField` component~~ | ✅ Done | —   |
 | 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                            | —      |
 | 9     | Move themes to `lib/themes.ts`                | Medium — consistency improvement   | Low    |
 | 13+14 | Shared API URL builder                        | Medium — DRY up param construction | Medium |
