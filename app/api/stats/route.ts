@@ -3,13 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calculateRank, fetchUserStats, type GitHubStats } from '@/lib/github';
 import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getStatsTheme } from '@/lib/themes';
-import { applyColorOverrides, escapeSvg } from '@/lib/utils';
-
-function formatCompact(num: number): string {
-  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
-  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}k`;
-  return num.toString();
-}
+import { applyColorOverrides, escapeSvg, formatCompact } from '@/lib/utils';
 
 // ---------------------------------------------------------------------------
 // Icon helpers (16×16 GitHub Octicons) — used by the standard layout

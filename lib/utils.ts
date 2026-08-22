@@ -63,6 +63,15 @@ export function escapeSvg(str: string): string {
 }
 
 /**
+ * Format a number compactly (e.g. 1200 → "1.2k", 3000000 → "3.0M").
+ */
+export function formatCompact(num: number): string {
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}k`;
+  return num.toString();
+}
+
+/**
  * Apply colour overrides from URL query parameters to a theme object.
  * Each override is sanitised (non-hex characters stripped) and validated
  * (must be 3 or 6 hex characters) before being applied.
