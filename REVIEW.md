@@ -90,17 +90,10 @@ validation is applied everywhere. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 7. `formatCompact` utility only in stats route
+## 7. ~~`formatCompact` utility only in stats route~~ ✅ DONE
 
-**Files:**
-
-- `app/api/stats/route.ts` — line 23
-
-**Problem:** The `formatCompact` function (formats numbers like `1.2k`, `3.4M`) is
-defined locally in the stats route. It's a general-purpose utility that could be
-useful in other contexts.
-
-**Suggested fix:** Move to `lib/utils.ts`.
+Moved `formatCompact` to `lib/utils.ts`. The stats route now imports it from the
+shared utility. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -320,4 +313,4 @@ Then each category just defines its threshold array.
 | 13+14 | Shared API URL builder                        | Medium — DRY up param construction    | Medium |
 | 15    | Move icon paths to shared module              | Low — future-proofing                 | Low    |
 | 16    | Data-driven trophy ranks                      | Low — readability improvement         | Low    |
-| 7     | Move `formatCompact` to utils                 | Low — single function move            | Low    |
+| 7     | ~~Move `formatCompact` to utils~~             | ✅ Done                               | —      |
