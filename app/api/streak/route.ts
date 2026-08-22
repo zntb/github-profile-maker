@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calculateStreakStats, fetchContributionCalendar } from '@/lib/github';
 import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getStreakTheme, type StreakTheme } from '@/lib/themes';
-import { escapeXml, isValidHexColor } from '@/lib/utils';
+import { applyColorOverrides, escapeXml } from '@/lib/utils';
 
 function formatDate(date: Date | null): string {
   if (!date) return 'N/A';
@@ -155,23 +155,15 @@ export async function GET(request: NextRequest) {
   let theme = getStreakTheme(themeName);
 
   // Allow individual colour overrides via query params
-  const colourOverrides: Partial<StreakTheme> = {};
-  const tryColour = (param: string, key: keyof StreakTheme) => {
-    const raw = searchParams.get(param)?.replace('#', '') ?? '';
-    if (isValidHexColor(raw)) colourOverrides[key] = raw;
-  };
-
-  tryColour('background', 'bg');
-  tryColour('fire', 'fire');
-  tryColour('ring', 'ring');
-  tryColour('currStreakNum', 'currStreak');
-  tryColour('sideNums', 'sideNums');
-  tryColour('sideLabels', 'sideLabels');
-  tryColour('dates', 'dates');
-
-  if (Object.keys(colourOverrides).length > 0) {
-    theme = { ...theme, ...colourOverrides };
-  }
+  theme = applyColorOverrides(theme, searchParams, {
+    background: 'bg',
+    fire: 'fire',
+    ring: 'ring',
+    currStreakNum: 'currStreak',
+    sideNums: 'sideNums',
+    sideLabels: 'sideLabels',
+    dates: 'dates',
+  });
 
   const token = process.env.GITHUB_TOKEN;
 

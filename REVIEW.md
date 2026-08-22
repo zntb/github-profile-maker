@@ -81,28 +81,12 @@ function generateErrorSvg(
 
 ---
 
-## 6. Theme colour override pattern duplicated across routes
+## 6. ~~Theme colour override pattern duplicated across routes~~ ✅ DONE
 
-**Files:**
-
-- `app/api/activity/route.ts` — lines 83–103 (manual if/replace chain)
-- `app/api/stats/route.ts` — lines 328–354 (sanitize + validate pattern)
-- `app/api/streak/route.ts` — lines 170–181 (tryColour helper)
-- `app/api/top-langs/route.ts` — lines 341–351 (manual if/replace chain)
-
-**Problem:** Each route implements its own colour-override-from-query-params logic
-with varying levels of sanitization. Some validate hex, some don't; some sanitize,
-some just strip `#`.
-
-**Suggested fix:** Create a shared helper:
-
-```ts
-function applyColorOverrides<T extends Record<string, string>>(
-  baseTheme: T,
-  searchParams: URLSearchParams,
-  overrides: Record<string, keyof T>,
-): T;
-```
+Added `applyColorOverrides` to `lib/utils.ts` with a generic signature that
+works with all theme types. All 4 API routes now call the shared helper with a
+mapping from query-param name to theme key. Consistent sanitization and hex
+validation is applied everywhere. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -326,7 +310,7 @@ Then each category just defines its threshold array.
 | ----- | --------------------------------------------- | ------------------------------------- | ------ |
 | 4+5   | Error/token-required SVG helpers              | High — 10 duplicated blocks           | Low    |
 | 8     | Pie/donut segment generation                  | Medium — 3 near-identical functions   | Low    |
-| 6     | Colour override helper                        | Medium — inconsistent sanitization    | Low    |
+| 6     | ~~Colour override helper~~                    | ✅ Done                               | —      |
 | 10    | Social badge registry                         | High — 3 files to update per platform | Medium |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
 | 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                               | —      |
 | 11    | Use existing `AlignmentField`                 | Low — easy swap                       | Low    |

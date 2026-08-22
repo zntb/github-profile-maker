@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calculateRank, fetchUserStats, type GitHubStats } from '@/lib/github';
 import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getStatsTheme } from '@/lib/themes';
-import { escapeSvg, isValidHexColor, sanitizeColor } from '@/lib/utils';
+import { applyColorOverrides, escapeSvg } from '@/lib/utils';
 
 function formatCompact(num: number): string {
   if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
@@ -309,34 +309,12 @@ export async function GET(request: NextRequest) {
   const theme = getStatsTheme(themeName);
 
   // Per-request colour overrides (with validation and sanitization)
-  const bgColor = searchParams.get('bg_color');
-  if (bgColor) {
-    const sanitized = sanitizeColor(bgColor.replace('#', ''));
-    if (isValidHexColor(sanitized)) {
-      theme.bg = sanitized;
-    }
-  }
-  const textColor = searchParams.get('text_color');
-  if (textColor) {
-    const sanitized = sanitizeColor(textColor.replace('#', ''));
-    if (isValidHexColor(sanitized)) {
-      theme.text = sanitized;
-    }
-  }
-  const titleColor = searchParams.get('title_color');
-  if (titleColor) {
-    const sanitized = sanitizeColor(titleColor.replace('#', ''));
-    if (isValidHexColor(sanitized)) {
-      theme.title = sanitized;
-    }
-  }
-  const iconColor = searchParams.get('icon_color');
-  if (iconColor) {
-    const sanitized = sanitizeColor(iconColor.replace('#', ''));
-    if (isValidHexColor(sanitized)) {
-      theme.icon = sanitized;
-    }
-  }
+  applyColorOverrides(theme, searchParams, {
+    bg_color: 'bg',
+    text_color: 'text',
+    title_color: 'title',
+    icon_color: 'icon',
+  });
 
   const token = process.env.GITHUB_TOKEN;
 

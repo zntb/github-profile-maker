@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchContributionCalendar } from '@/lib/github';
 import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getActivityTheme } from '@/lib/themes';
+import { applyColorOverrides } from '@/lib/utils';
 
 function toGraphTheme(themeName: string) {
   const theme = getActivityTheme(themeName);
@@ -124,23 +125,16 @@ export async function GET(request: NextRequest) {
 
   let theme = toGraphTheme(themeName);
 
-  if (searchParams.get('bg_color')) {
-    theme = { ...theme, bg: searchParams.get('bg_color')!.replace('#', '') };
-  }
-  if (searchParams.get('color')) {
-    theme = { ...theme, color: searchParams.get('color')!.replace('#', '') };
-  }
-  if (searchParams.get('line')) {
-    theme = { ...theme, line: searchParams.get('line')!.replace('#', '') };
-  }
-  if (searchParams.get('point')) {
-    theme = { ...theme, point: searchParams.get('point')!.replace('#', '') };
-  }
-  if (searchParams.get('area_color')) {
-    theme = {
-      ...theme,
-      area: searchParams.get('area_color')!.replace('#', '') + '30',
-    };
+  theme = applyColorOverrides(theme, searchParams, {
+    bg_color: 'bg',
+    color: 'color',
+    line: 'line',
+    point: 'point',
+  });
+  // area_color needs the '30' opacity suffix appended
+  const areaColor = searchParams.get('area_color');
+  if (areaColor) {
+    theme = { ...theme, area: areaColor.replace('#', '') + '30' };
   }
 
   const token = process.env.GITHUB_TOKEN;

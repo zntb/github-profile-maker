@@ -61,3 +61,33 @@ export function escapeSvg(str: string): string {
     .replace(/\//g, '&#47;')
     .replace(/\n/g, '&#10;');
 }
+
+/**
+ * Apply colour overrides from URL query parameters to a theme object.
+ * Each override is sanitised (non-hex characters stripped) and validated
+ * (must be 3 or 6 hex characters) before being applied.
+ *
+ * @param baseTheme  – The base theme object to clone and modify
+ * @param searchParams – URL search parameters to read overrides from
+ * @param overrides  – Mapping from query-param name to theme key
+ * @returns A new theme object with the overrides applied
+ */
+export function applyColorOverrides<T extends object>(
+  baseTheme: T,
+  searchParams: URLSearchParams,
+  overrides: Record<string, keyof T & string>,
+): T {
+  const result = { ...baseTheme } as Record<string, string>;
+
+  for (const [param, key] of Object.entries(overrides)) {
+    const raw = searchParams.get(param);
+    if (raw) {
+      const sanitized = sanitizeColor(raw.replace('#', ''));
+      if (isValidHexColor(sanitized)) {
+        result[key] = sanitized;
+      }
+    }
+  }
+
+  return result as T;
+}
