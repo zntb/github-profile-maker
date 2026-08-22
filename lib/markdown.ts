@@ -1,3 +1,4 @@
+import { SOCIAL_BADGES } from './social-badges';
 import { useBuilderStore } from './store';
 import type { Block } from './types';
 
@@ -190,49 +191,15 @@ export function renderBlock(block: Block, origin: string = ''): string {
     }
 
     case 'social-badges': {
-      const { linkedin, twitter, email, portfolio, github, youtube, instagram, discord, style } =
-        props as Record<string, string>;
+      const { style } = props as Record<string, string>;
       const badges: string[] = [];
 
-      if (linkedin) {
-        badges.push(
-          `[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=${style}&logo=linkedin&logoColor=white)](https://linkedin.com/in/${linkedin})`,
-        );
-      }
-      if (twitter) {
-        badges.push(
-          `[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=${style}&logo=twitter&logoColor=white)](https://twitter.com/${twitter})`,
-        );
-      }
-      if (github) {
-        badges.push(
-          `[![GitHub](https://img.shields.io/badge/GitHub-100000?style=${style}&logo=github&logoColor=white)](https://github.com/${github})`,
-        );
-      }
-      if (youtube) {
-        badges.push(
-          `[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=${style}&logo=youtube&logoColor=white)](https://youtube.com/@${youtube})`,
-        );
-      }
-      if (instagram) {
-        badges.push(
-          `[![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=${style}&logo=instagram&logoColor=white)](https://instagram.com/${instagram})`,
-        );
-      }
-      if (discord) {
-        badges.push(
-          `[![Discord](https://img.shields.io/badge/Discord-7289DA?style=${style}&logo=discord&logoColor=white)](https://discord.gg/${discord})`,
-        );
-      }
-      if (email) {
-        badges.push(
-          `[![Email](https://img.shields.io/badge/Email-D14836?style=${style}&logo=gmail&logoColor=white)](mailto:${email})`,
-        );
-      }
-      if (portfolio) {
-        badges.push(
-          `[![Portfolio](https://img.shields.io/badge/Portfolio-000000?style=${style}&logo=About.me&logoColor=white)](${portfolio})`,
-        );
+      for (const [key, def] of Object.entries(SOCIAL_BADGES)) {
+        const value = props[key];
+        if (!value) continue;
+        const url = def.url(String(value));
+        const badgeUrl = `https://img.shields.io/badge/${encodeURIComponent(def.label)}-${def.color}?style=${style}&logo=${def.logo}&logoColor=white`;
+        badges.push(`[![${def.label}](${badgeUrl})](${url})`);
       }
 
       if (badges.length === 0) return '';

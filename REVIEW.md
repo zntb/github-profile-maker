@@ -124,30 +124,12 @@ pattern already established for stats, lang, and streak themes.
 
 ---
 
-## 10. Social badge rendering duplicated across 3 files
+## 10. ~~Social badge rendering duplicated across 3 files~~ ✅ DONE
 
-**Files:**
-
-- `components/builder/block-preview.tsx` — lines 151–180 (list of badge names)
-- `components/builder/live-preview.tsx` — lines 193–275 (JSX badge elements)
-- `lib/markdown.ts` — lines 175–220 (markdown badge syntax)
-
-**Problem:** The social badge definition (platform → name, URL pattern, color) is
-repeated in all three files. Adding a new platform (e.g., Mastodon) requires editing
-all three locations.
-
-**Suggested fix:** Define a shared badge registry:
-
-```ts
-const SOCIAL_BADGES: Record<string, {
-  label: string;
-  color: string;
-  logo: string;
-  urlPattern: (username: string) => string;
-}> = { ... }
-```
-
-Then each renderer consumes the registry instead of hardcoding the mapping.
+Created `lib/social-badges.ts` with a shared `SOCIAL_BADGES` registry and
+`buildBadgeUrl` helper. All 3 renderers (block-preview, live-preview, markdown)
+now consume the registry. Adding a new platform requires a single edit.
+Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -281,18 +263,18 @@ Then each category just defines its threshold array.
 
 ## Summary of Priority
 
-| #     | Item                                          | Impact                                | Effort |
-| ----- | --------------------------------------------- | ------------------------------------- | ------ |
-| 4+5   | Error/token-required SVG helpers              | High — 10 duplicated blocks           | Low    |
-| 8     | ~~Pie/donut segment generation~~              | ✅ Done                               | —      |
-| 6     | ~~Colour override helper~~                    | ✅ Done                               | —      |
-| 10    | Social badge registry                         | High — 3 files to update per platform | Medium |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
-| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                               | —      |
-| 11    | Use existing `AlignmentField`                 | Low — easy swap                       | Low    |
-| 12    | `ToggleField` component                       | Low — repeated boilerplate            | Low    |
-| 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                               | —      |
-| 9     | Move themes to `lib/themes.ts`                | Medium — consistency improvement      | Low    |
-| 13+14 | Shared API URL builder                        | Medium — DRY up param construction    | Medium |
-| 15    | Move icon paths to shared module              | Low — future-proofing                 | Low    |
-| 16    | Data-driven trophy ranks                      | Low — readability improvement         | Low    |
-| 7     | ~~Move `formatCompact` to utils~~             | ✅ Done                               | —      |
+| #     | Item                                          | Impact                             | Effort |
+| ----- | --------------------------------------------- | ---------------------------------- | ------ |
+| 4+5   | Error/token-required SVG helpers              | High — 10 duplicated blocks        | Low    |
+| 8     | ~~Pie/donut segment generation~~              | ✅ Done                            | —      |
+| 6     | ~~Colour override helper~~                    | ✅ Done                            | —      |
+| 10    | ~~Social badge registry~~                     | ✅ Done                            | —      |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
+| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                            | —      |
+| 11    | Use existing `AlignmentField`                 | Low — easy swap                    | Low    |
+| 12    | `ToggleField` component                       | Low — repeated boilerplate         | Low    |
+| 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                            | —      |
+| 9     | Move themes to `lib/themes.ts`                | Medium — consistency improvement   | Low    |
+| 13+14 | Shared API URL builder                        | Medium — DRY up param construction | Medium |
+| 15    | Move icon paths to shared module              | Low — future-proofing              | Low    |
+| 16    | Data-driven trophy ranks                      | Low — readability improvement      | Low    |
+| 7     | ~~Move `formatCompact` to utils~~             | ✅ Done                            | —      |
