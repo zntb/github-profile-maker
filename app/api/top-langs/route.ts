@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { fetchLanguageStats, languageColors } from '@/lib/github';
-import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
+import { generateErrorSvg, generatePieSegments, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getLangTheme } from '@/lib/themes';
 import { applyColorOverrides, escapeHtml } from '@/lib/utils';
 
@@ -137,32 +137,14 @@ function generateDonutSvg(
     borderRadius: number;
   },
 ) {
-  const langs = languages.slice(0, options.langsCount); // Removed hardcoded limit
+  const langs = languages.slice(0, options.langsCount);
   const width = 495;
-  // Calculate height: base 100px + (number of langs * line height) + padding
   const height = Math.max(200, 45 + langs.length * 25 + 20);
   const centerX = 120;
-  const centerY = height / 2 + 10; // Keep chart centered vertically relative to dynamic height
+  const centerY = height / 2 + 10;
   const radius = 70;
 
-  let currentAngle = -90;
-  const segments = langs.map((lang) => {
-    const angle = (lang.percent / 100) * 360;
-    const startAngle = currentAngle;
-    const endAngle = currentAngle + angle;
-    currentAngle = endAngle;
-
-    const startRad = (startAngle * Math.PI) / 180;
-    const endRad = (endAngle * Math.PI) / 180;
-
-    const x1 = centerX + radius * Math.cos(startRad);
-    const y1 = centerY + radius * Math.sin(startRad);
-    const x2 = centerX + radius * Math.cos(endRad);
-    const y2 = centerY + radius * Math.sin(endRad);
-
-    const largeArc = angle > 180 ? 1 : 0;
-    return `<path d="M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="#${lang.color}"/>`;
-  });
+  const segments = generatePieSegments(langs, centerX, centerY, radius);
 
   const legend = langs
     .map(
@@ -187,7 +169,7 @@ function generateDonutSvg(
   <rect x="0.5" y="0.5" rx="${options.borderRadius}" ry="${options.borderRadius}" width="${width - 1}" height="${height - 1}" fill="#${theme.bg}" stroke="${options.hideBorder ? 'none' : '#' + theme.border}" stroke-width="${options.hideBorder ? 0 : 1}"/>
 
   <text x="25" y="35" class="header">Most Used Languages</text>
-  <g>${segments.join('')}</g>
+  <g>${segments}</g>
   <circle cx="${centerX}" cy="${centerY}" r="40" fill="#${theme.bg}"/>
   ${legend}
 </svg>
@@ -204,32 +186,14 @@ function generateDonutVerticalSvg(
     borderRadius: number;
   },
 ) {
-  const langs = languages.slice(0, options.langsCount); // Removed hardcoded limit
+  const langs = languages.slice(0, options.langsCount);
   const width = 400;
-  // Chart area is ~200px, legend is 20px per item
   const height = 210 + langs.length * 20 + 30;
   const centerX = 200;
   const centerY = 110;
   const radius = 70;
 
-  let currentAngle = -90;
-  const segments = langs.map((lang) => {
-    const angle = (lang.percent / 100) * 360;
-    const startAngle = currentAngle;
-    const endAngle = currentAngle + angle;
-    currentAngle = endAngle;
-
-    const startRad = (startAngle * Math.PI) / 180;
-    const endRad = (endAngle * Math.PI) / 180;
-
-    const x1 = centerX + radius * Math.cos(startRad);
-    const y1 = centerY + radius * Math.sin(startRad);
-    const x2 = centerX + radius * Math.cos(endRad);
-    const y2 = centerY + radius * Math.sin(endRad);
-
-    const largeArc = angle > 180 ? 1 : 0;
-    return `<path d="M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="#${lang.color}"/>`;
-  });
+  const segments = generatePieSegments(langs, centerX, centerY, radius);
 
   const legend = langs
     .map(
@@ -254,7 +218,7 @@ function generateDonutVerticalSvg(
   <rect x="0.5" y="0.5" rx="${options.borderRadius}" ry="${options.borderRadius}" width="${width - 1}" height="${height - 1}" fill="#${theme.bg}" stroke="${options.hideBorder ? 'none' : '#' + theme.border}" stroke-width="${options.hideBorder ? 0 : 1}"/>
 
   <text x="200" y="35" text-anchor="middle" class="header">Most Used Languages</text>
-  <g>${segments.join('')}</g>
+  <g>${segments}</g>
   <circle cx="${centerX}" cy="${centerY}" r="40" fill="#${theme.bg}"/>
   ${legend}
 </svg>
@@ -271,31 +235,14 @@ function generatePieSvg(
     borderRadius: number;
   },
 ) {
-  const langs = languages.slice(0, options.langsCount); // Removed hardcoded limit
+  const langs = languages.slice(0, options.langsCount);
   const width = 495;
   const height = Math.max(220, 45 + langs.length * 25 + 20);
   const centerX = 120;
   const centerY = height / 2 + 10;
   const radius = 75;
 
-  let currentAngle = -90;
-  const segments = langs.map((lang) => {
-    const angle = (lang.percent / 100) * 360;
-    const startAngle = currentAngle;
-    const endAngle = currentAngle + angle;
-    currentAngle = endAngle;
-
-    const startRad = (startAngle * Math.PI) / 180;
-    const endRad = (endAngle * Math.PI) / 180;
-
-    const x1 = centerX + radius * Math.cos(startRad);
-    const y1 = centerY + radius * Math.sin(startRad);
-    const x2 = centerX + radius * Math.cos(endRad);
-    const y2 = centerY + radius * Math.sin(endRad);
-
-    const largeArc = angle > 180 ? 1 : 0;
-    return `<path d="M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2} Z" fill="#${lang.color}"/>`;
-  });
+  const segments = generatePieSegments(langs, centerX, centerY, radius);
 
   const legend = langs
     .map(
@@ -320,7 +267,7 @@ function generatePieSvg(
   <rect x="0.5" y="0.5" rx="${options.borderRadius}" ry="${options.borderRadius}" width="${width - 1}" height="${height - 1}" fill="#${theme.bg}" stroke="${options.hideBorder ? 'none' : '#' + theme.border}" stroke-width="${options.hideBorder ? 0 : 1}"/>
 
   <text x="25" y="35" class="header">Most Used Languages</text>
-  <g>${segments.join('')}</g>
+  <g>${segments}</g>
   ${legend}
 </svg>
   `.trim();

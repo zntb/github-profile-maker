@@ -97,29 +97,11 @@ shared utility. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 8. Pie/donut chart segment generation — 3 near-identical implementations
+## 8. ~~Pie/donut chart segment generation — 3 near-identical implementations~~ ✅ DONE
 
-**Files:**
-
-- `app/api/top-langs/route.ts`:
-  - `generateDonutSvg` — lines 141–198
-  - `generateDonutVerticalSvg` — lines 201–257
-  - `generatePieSvg` — lines 260–325
-
-**Problem:** All three functions contain identical angle-to-SVG-path math for
-converting language percentages into pie/donut segments. The only differences are
-the center coordinates, radius, and legend positioning.
-
-**Suggested fix:** Extract a shared segment calculator:
-
-```ts
-function generatePieSegments(
-  langs: LanguageData[],
-  centerX: number,
-  centerY: number,
-  radius: number,
-): string;
-```
+Extracted `generatePieSegments` into `lib/svg-helpers.ts`. All three functions
+(compact donut, vertical donut, and full pie) now call the shared helper with
+centerX, centerY, and radius. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -302,7 +284,7 @@ Then each category just defines its threshold array.
 | #     | Item                                          | Impact                                | Effort |
 | ----- | --------------------------------------------- | ------------------------------------- | ------ |
 | 4+5   | Error/token-required SVG helpers              | High — 10 duplicated blocks           | Low    |
-| 8     | Pie/donut segment generation                  | Medium — 3 near-identical functions   | Low    |
+| 8     | ~~Pie/donut segment generation~~              | ✅ Done                               | —      |
 | 6     | ~~Colour override helper~~                    | ✅ Done                               | —      |
 | 10    | Social badge registry                         | High — 3 files to update per platform | Medium |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
 | 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                               | —      |
