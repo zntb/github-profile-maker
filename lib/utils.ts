@@ -19,6 +19,13 @@ export function escapeHtml(str: string): string {
 }
 
 /**
+ * Validate that a string is a valid hex color (3 or 6 characters).
+ */
+export function isValidHexColor(color: string): boolean {
+  return /^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(color);
+}
+
+/**
  * Escape XML special characters. Uses the named entity &apos; for the
  * single-quote character (valid in SVG text content).
  */

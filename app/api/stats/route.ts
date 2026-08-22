@@ -2,14 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { calculateRank, fetchUserStats, type GitHubStats } from '@/lib/github';
 import { getStatsTheme } from '@/lib/themes';
-import { escapeSvg } from '@/lib/utils';
-
-/**
- * Validate that a string is a valid hex color (3 or 6 characters).
- */
-function isValidHexColor(color: string): boolean {
-  return /^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(color);
-}
+import { escapeSvg, isValidHexColor } from '@/lib/utils';
 
 /**
  * Sanitize a color value for use in SVG - strips any non-hex characters.
