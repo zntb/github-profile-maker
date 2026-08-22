@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { fetchContributionCalendar } from '@/lib/github';
+import { generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getActivityTheme } from '@/lib/themes';
 
 function toGraphTheme(themeName: string) {
@@ -185,18 +186,12 @@ export async function GET(request: NextRequest) {
     }
   } else {
     return new NextResponse(
-      `<svg width="850" height="120" xmlns="http://www.w3.org/2000/svg">
-        <rect width="850" height="120" fill="#${theme.bg}" rx="10" stroke="#${theme.border}"/>
-        <text x="425" y="45" text-anchor="middle" fill="#${theme.color}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="14" font-weight="600">
-          GitHub Token Required
-        </text>
-        <text x="425" y="70" text-anchor="middle" fill="#${theme.color}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12">
-          Set GITHUB_TOKEN environment variable
-        </text>
-        <text x="425" y="90" text-anchor="middle" fill="#${theme.color}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="11" opacity="0.7">
-          to fetch real activity for @${username}
-        </text>
-      </svg>`,
+      generateTokenRequiredSvg(theme.bg, username, 'to fetch real activity for', {
+        width: 850,
+        border: theme.border,
+        titleColor: theme.color,
+        bodyColor: theme.color,
+      }),
       {
         headers: {
           'Content-Type': 'image/svg+xml',

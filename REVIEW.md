@@ -28,29 +28,12 @@ Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
-## 4. "GitHub Token Required" error SVG — copy-pasted across all 5 API routes
+## 4. ~~"GitHub Token Required" error SVG — copy-pasted across all 5 API routes~~ ✅ DONE
 
-**Files:**
-
-- `app/api/activity/route.ts` — lines 184–200
-- `app/api/stats/route.ts` — lines 383–398
-- `app/api/streak/route.ts` — lines 224–242
-- `app/api/top-langs/route.ts` — lines 387–404
-- `app/api/trophies/route.ts` — lines 345–362
-
-**Problem:** Every API route renders a nearly identical "GitHub Token Required" SVG
-placeholder when `GITHUB_TOKEN` is missing. The only differences are the endpoint name
-(e.g., "stats", "streak", "trophies") and minor styling variations.
-
-**Suggested fix:** Create a shared helper in `lib/svg-helpers.ts`:
-
-```ts
-function generateTokenRequiredSvg(
-  theme: { bg: string; text: string; border: string; title?: string },
-  endpointName: string,
-  username: string,
-): string;
-```
+Created `generateTokenRequiredSvg` in `lib/svg-helpers.ts` with an options interface
+for width, height, border, titleColor, bodyColor, and font sizes. All 5 API routes
+now call the shared helper instead of inlining the SVG. Typecheck, ESLint, and all
+89 tests pass.
 
 ---
 
@@ -322,18 +305,19 @@ Then each category just defines its threshold array.
 
 ## Summary of Priority
 
-| #     | Item                                | Impact                                | Effort |
-| ----- | ----------------------------------- | ------------------------------------- | ------ |
-| 4+5   | Error/token-required SVG helpers    | High — 10 duplicated blocks           | Low    |
-| 8     | Pie/donut segment generation        | Medium — 3 near-identical functions   | Low    |
-| 6     | Colour override helper              | Medium — inconsistent sanitization    | Low    |
-| 10    | Social badge registry               | High — 3 files to update per platform | Medium || 2 | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | — |
-| 3 | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done | — |
-| 11    | Use existing `AlignmentField`       | Low — easy swap                       | Low    |
-| 12    | `ToggleField` component             | Low — repeated boilerplate            | Low    |
-| 1     | ~~`escapeXml` → `lib/utils.ts`~~    | ✅ Done                               | —      |
-| 9     | Move themes to `lib/themes.ts`      | Medium — consistency improvement      | Low    |
-| 13+14 | Shared API URL builder              | Medium — DRY up param construction    | Medium |
-| 15    | Move icon paths to shared module    | Low — future-proofing                 | Low    |
-| 16    | Data-driven trophy ranks            | Low — readability improvement         | Low    |
-| 7     | Move `formatCompact` to utils       | Low — single function move            | Low    |
+| #     | Item                                          | Impact                                | Effort |
+| ----- | --------------------------------------------- | ------------------------------------- | ------ |
+| 4     | ~~Token-required SVG helper~~                 | ✅ Done                               | —      |
+| 5     | Error SVG helper                              | High — 5 duplicated blocks            | Low    |
+| 8     | Pie/donut segment generation                  | Medium — 3 near-identical functions   | Low    |
+| 6     | Colour override helper                        | Medium — inconsistent sanitization    | Low    |
+| 10    | Social badge registry                         | High — 3 files to update per platform | Medium |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |
+| 3     | ~~`sanitizeColor` lives only in stats route~~ | ✅ Done                               | —      |
+| 11    | Use existing `AlignmentField`                 | Low — easy swap                       | Low    |
+| 12    | `ToggleField` component                       | Low — repeated boilerplate            | Low    |
+| 1     | ~~`escapeXml` → `lib/utils.ts`~~              | ✅ Done                               | —      |
+| 9     | Move themes to `lib/themes.ts`                | Medium — consistency improvement      | Low    |
+| 13+14 | Shared API URL builder                        | Medium — DRY up param construction    | Medium |
+| 15    | Move icon paths to shared module              | Low — future-proofing                 | Low    |
+| 16    | Data-driven trophy ranks                      | Low — readability improvement         | Low    |
+| 7     | Move `formatCompact` to utils                 | Low — single function move            | Low    |

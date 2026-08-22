@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { calculateRank, fetchUserStats, type GitHubStats } from '@/lib/github';
+import { generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getStatsTheme } from '@/lib/themes';
 import { escapeSvg, isValidHexColor, sanitizeColor } from '@/lib/utils';
 
@@ -367,18 +368,16 @@ export async function GET(request: NextRequest) {
     const noTokW = layout === 'standard' ? 495 : 330;
     const noTokH = layout === 'standard' ? 195 : 80;
     return new NextResponse(
-      `<svg width="${noTokW}" height="${noTokH}" xmlns="http://www.w3.org/2000/svg">
-        <rect width="${noTokW}" height="${noTokH}" fill="#${theme.bg}" rx="10" stroke="#${theme.border}"/>
-        <text x="${noTokW / 2}" y="${noTokH / 2 - 18}" text-anchor="middle" fill="#${theme.title}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12" font-weight="600">
-          GitHub Token Required
-        </text>
-        <text x="${noTokW / 2}" y="${noTokH / 2 + 2}" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="10">
-          Set GITHUB_TOKEN environment variable
-        </text>
-        <text x="${noTokW / 2}" y="${noTokH / 2 + 18}" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="9" opacity="0.7">
-          to fetch real stats for @${escapeSvg(username)}
-        </text>
-      </svg>`,
+      generateTokenRequiredSvg(theme.bg, escapeSvg(username), 'to fetch real stats for', {
+        width: noTokW,
+        height: noTokH,
+        border: theme.border,
+        titleColor: theme.title,
+        bodyColor: theme.text,
+        titleFontSize: 12,
+        bodyFontSize: 10,
+        descFontSize: 9,
+      }),
       { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=60' } },
     );
   }
