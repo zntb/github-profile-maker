@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { fetchLanguageStats, languageColors } from '@/lib/github';
-import { generateTokenRequiredSvg } from '@/lib/svg-helpers';
+import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getLangTheme } from '@/lib/themes';
 import { escapeHtml } from '@/lib/utils';
 
@@ -369,15 +369,9 @@ export async function GET(request: NextRequest) {
         .sort((a, b) => b.size - a.size);
     } catch {
       return new NextResponse(
-        `<svg width="495" height="120" xmlns="http://www.w3.org/2000/svg">
-          <rect width="495" height="120" fill="#${theme.bg}" rx="10"/>
-          <text x="247.5" y="50" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="14">
-            Error fetching languages for @${escapeHtml(username)}
-          </text>
-          <text x="247.5" y="75" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12" opacity="0.7">
-            User may not exist or API rate limit exceeded
-          </text>
-        </svg>`,
+        generateErrorSvg(theme.bg, escapeHtml(username), 'Error fetching languages for', {
+          textColor: theme.text,
+        }),
         {
           headers: {
             'Content-Type': 'image/svg+xml',

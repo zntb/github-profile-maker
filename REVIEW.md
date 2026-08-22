@@ -37,30 +37,11 @@ now call the shared helper instead of inlining the SVG. Typecheck, ESLint, and a
 
 ---
 
-## 5. "Error fetching" error SVG — copy-pasted across all 5 API routes
+## 5. ~~"Error fetching" error SVG — copy-pasted across all 5 API routes~~ ✅ DONE
 
-**Files:**
-
-- `app/api/activity/route.ts` — lines 167–182
-- `app/api/stats/route.ts` — lines 368–381
-- `app/api/streak/route.ts` — lines 203–222
-- `app/api/top-langs/route.ts` — lines 371–385
-- `app/api/trophies/route.ts` — lines 330–343
-
-**Problem:** Every API route renders a nearly identical error SVG when the GitHub API
-call fails. The only differences are the endpoint name, dimensions, and username escaping.
-
-**Suggested fix:** Extend the shared helper from item #4:
-
-```ts
-function generateErrorSvg(
-  theme: { bg: string; text: string },
-  endpointName: string,
-  username: string,
-  width?: number,
-  height?: number,
-): string;
-```
+Added `generateErrorSvg` to `lib/svg-helpers.ts` with an options interface for
+width, height, textColor, and font sizes. All 5 API routes now call the shared
+helper instead of inlining the SVG. Typecheck, ESLint, and all 89 tests pass.
 
 ---
 
@@ -308,7 +289,7 @@ Then each category just defines its threshold array.
 | #     | Item                                          | Impact                                | Effort |
 | ----- | --------------------------------------------- | ------------------------------------- | ------ |
 | 4     | ~~Token-required SVG helper~~                 | ✅ Done                               | —      |
-| 5     | Error SVG helper                              | High — 5 duplicated blocks            | Low    |
+| 5     | ~~Error SVG helper~~                          | ✅ Done                               | —      |
 | 8     | Pie/donut segment generation                  | Medium — 3 near-identical functions   | Low    |
 | 6     | Colour override helper                        | Medium — inconsistent sanitization    | Low    |
 | 10    | Social badge registry                         | High — 3 files to update per platform | Medium |     | 2   | ~~`isValidHexColor` + `sanitizeColor`~~ | ✅ Done (part 1) | —   |

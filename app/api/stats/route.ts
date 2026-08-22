@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { calculateRank, fetchUserStats, type GitHubStats } from '@/lib/github';
-import { generateTokenRequiredSvg } from '@/lib/svg-helpers';
+import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getStatsTheme } from '@/lib/themes';
 import { escapeSvg, isValidHexColor, sanitizeColor } from '@/lib/utils';
 
@@ -350,17 +350,14 @@ export async function GET(request: NextRequest) {
     } catch {
       const errW = layout === 'standard' ? 495 : 350;
       const errH = layout === 'standard' ? 195 : 80;
-      const escapedUsername = escapeSvg(username);
       return new NextResponse(
-        `<svg width="${errW}" height="${errH}" xmlns="http://www.w3.org/2000/svg">
-          <rect width="${errW}" height="${errH}" fill="#${theme.bg}" rx="10"/>
-          <text x="${errW / 2}" y="${errH / 2 - 8}" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12">
-            Error fetching stats for @${escapedUsername}
-          </text>
-          <text x="${errW / 2}" y="${errH / 2 + 12}" text-anchor="middle" fill="#${theme.text}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="10" opacity="0.7">
-            User may not exist or API rate limit exceeded
-          </text>
-        </svg>`,
+        generateErrorSvg(theme.bg, escapeSvg(username), 'Error fetching stats for', {
+          width: errW,
+          height: errH,
+          textColor: theme.text,
+          titleFontSize: 12,
+          bodyFontSize: 10,
+        }),
         { headers: { 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=300' } },
       );
     }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { fetchContributionCalendar } from '@/lib/github';
-import { generateTokenRequiredSvg } from '@/lib/svg-helpers';
+import { generateErrorSvg, generateTokenRequiredSvg } from '@/lib/svg-helpers';
 import { getActivityTheme } from '@/lib/themes';
 
 function toGraphTheme(themeName: string) {
@@ -167,15 +167,10 @@ export async function GET(request: NextRequest) {
       });
     } catch {
       return new NextResponse(
-        `<svg width="850" height="120" xmlns="http://www.w3.org/2000/svg">
-          <rect width="850" height="120" fill="#${theme.bg}" rx="10"/>
-          <text x="425" y="50" text-anchor="middle" fill="#${theme.color}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="14">
-            Error fetching activity for @${username}
-          </text>
-          <text x="425" y="75" text-anchor="middle" fill="#${theme.color}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="12" opacity="0.7">
-            User may not exist or API rate limit exceeded
-          </text>
-        </svg>`,
+        generateErrorSvg(theme.bg, username, 'Error fetching activity for', {
+          width: 850,
+          textColor: theme.color,
+        }),
         {
           headers: {
             'Content-Type': 'image/svg+xml',

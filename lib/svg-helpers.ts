@@ -1,5 +1,5 @@
 /**
- * Shared helper for generating "GitHub Token Required" placeholder SVGs.
+ * Shared helpers for generating error and token-required placeholder SVGs.
  * Used by the activity, stats, streak, top-langs, and trophies API routes.
  */
 
@@ -60,6 +60,59 @@ export function generateTokenRequiredSvg(
         </text>
         <text x="${centerX}" y="${centerY + 18}" text-anchor="middle" fill="#${bodyColor}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="${descFontSize}" opacity="0.7">
           ${endpointDescription} @${escapedUsername}
+        </text>
+      </svg>`;
+}
+
+// ---------------------------------------------------------------------------
+// Error SVG
+// ---------------------------------------------------------------------------
+
+export interface ErrorSvgOptions {
+  /** SVG width (default 495) */
+  width?: number;
+  /** SVG height (default 120) */
+  height?: number;
+  /** Text hex color (default '434d58') */
+  textColor?: string;
+  /** Title font size (default 14) */
+  titleFontSize?: number;
+  /** Body font size (default 12) */
+  bodyFontSize?: number;
+}
+
+/**
+ * Generate an SVG error placeholder shown when the GitHub API call fails.
+ *
+ * @param bg          – Background hex color (from the route's theme)
+ * @param escapedUsername – Already-escaped username for safe insertion into SVG
+ * @param endpointDescription – Short text like "Error fetching activity for"
+ * @param options     – Optional overrides for dimensions, colors, and font sizes
+ */
+export function generateErrorSvg(
+  bg: string,
+  escapedUsername: string,
+  endpointDescription: string,
+  options: ErrorSvgOptions = {},
+): string {
+  const {
+    width = 495,
+    height = 120,
+    textColor = '434d58',
+    titleFontSize = 14,
+    bodyFontSize = 12,
+  } = options;
+
+  const centerX = width / 2;
+  const centerY = height / 2;
+
+  return `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="${width}" height="${height}" fill="#${bg}" rx="10"/>
+        <text x="${centerX}" y="${centerY - 10}" text-anchor="middle" fill="#${textColor}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="${titleFontSize}">
+          ${endpointDescription} @${escapedUsername}
+        </text>
+        <text x="${centerX}" y="${centerY + 10}" text-anchor="middle" fill="#${textColor}" font-family="Segoe UI, Ubuntu, Sans-Serif" font-size="${bodyFontSize}" opacity="0.7">
+          User may not exist or API rate limit exceeded
         </text>
       </svg>`;
 }
