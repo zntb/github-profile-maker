@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { AlignmentField } from '../alignment-field';
 import { FieldGroup } from '../field-group';
 
 interface HeadingConfigProps {
@@ -56,19 +57,7 @@ export function HeadingConfig({
         <Label>Emoji (optional)</Label>
         <Input value={emoji} onChange={(e) => onEmojiChange(e.target.value)} />
       </FieldGroup>
-      <FieldGroup>
-        <Label>Alignment</Label>
-        <Select value={alignment} onValueChange={onAlignmentChange}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="left">Left</SelectItem>
-            <SelectItem value="center">Center</SelectItem>
-            <SelectItem value="right">Right</SelectItem>
-          </SelectContent>
-        </Select>
-      </FieldGroup>
+      <AlignmentField value={alignment} onChange={onAlignmentChange} />
     </>
   );
 }
