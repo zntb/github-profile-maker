@@ -23,7 +23,7 @@ export function Builder() {
   const [configOpen, setConfigOpen] = useState(false);
 
   return (
-    <div className="h-screen flex flex-col bg-background gradient-bg">
+    <div className="flex min-h-0 flex-1 flex-col bg-background gradient-bg">
       <BuilderHeader />
 
       {/* Desktop Layout */}

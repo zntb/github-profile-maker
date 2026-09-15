@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Outfit, JetBrains_Mono } from 'next/font/google';
 
+import { SiteFooter } from '@/components/site-footer';
 import { ThemeProvider } from '@/components/theme-provider';
 import './globals.css';
 
@@ -57,7 +58,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <main className="flex min-h-0 flex-1 flex-col">{children}</main>
+          <SiteFooter />
         </ThemeProvider>
       </body>
     </html>
